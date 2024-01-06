@@ -1,0 +1,14 @@
+{
+  "sources": [
+    {
+      "id": "Foo",
+      "name": "Foo",
+      "endpoint": "xxx",
+      "storages": [
+        "mongo"
+      ],
+      "model": "sebix",
+      "table": "sebix.collection"
+    }
+  ]
+}

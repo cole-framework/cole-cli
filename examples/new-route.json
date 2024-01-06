@@ -1,0 +1,36 @@
+{
+  "controllers": [
+    {
+      "name": "xxx",
+      "endpoint": "xxx",
+      "handlers": [
+        {
+          "name": "getFoo",
+          "input": "Array<Entity<Fooo>>",
+          "output": "Array<Entity<Bar>>"
+        }
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "name": "Foo",
+      "endpoint": "xxx",
+      "controller": "xxx",
+      "handler": "getFoo",
+      "request": {
+        "method": "GET",
+        "path": "foo/:id",
+        "validate": false,
+        "auth": "jwt",
+        "body": { "foo":"string", "bar":"number" },
+        "headers": {}
+      },
+      "response": {
+        "200": "OK",
+        "500": "Error",
+        "404": { "foo":"string", "bar":"number" }
+      }
+    }
+  ]
+}

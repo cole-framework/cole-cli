@@ -1,0 +1,59 @@
+{
+  "models": [
+    {
+      "name": "Foo",
+      "endpoint": "xxx",
+      "types": [
+        "json"
+      ],
+      "props": [
+        {
+          "name": "prop1",
+          "type": "Array<Entity<Bar>>"
+        },
+        {
+          "name": "prop2",
+          "type": "Model<Baz, mongo>"
+        },
+        {
+          "name": "prop3",
+          "type": "Qwerty"
+        }
+      ]
+    },
+    {
+      "name": "Bar",
+      "endpoint": "xxx",
+      "types": [
+        "json"
+      ],
+      "props": [
+        {
+          "name": "x",
+          "type": "number"
+        },
+        {
+          "name": "y",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "name": "Baz",
+      "endpoint": "xxx",
+      "types": [
+        "json"
+      ],
+      "props": [
+        {
+          "name": "h",
+          "type": "number"
+        },
+        {
+          "name": "z",
+          "type": "number"
+        }
+      ]
+    }
+  ]
+}

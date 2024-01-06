@@ -1,0 +1,40 @@
+{
+  "controllers": [
+    {
+      "name": "Foo",
+      "endpoint": "xxx",
+      "handlers": [
+        {
+          "name": "getFoooo",
+          "input": "Array<Entity<Fooo>>",
+          "output": { "a": "string", "b": "wtf" }
+        }
+      ]
+    },
+    {
+      "name": "Bar",
+      "endpoint": "xxx",
+      "handlers": [
+        {
+          "name": "getBar",
+          "input": "Array<Entity<Bar>>",
+          "output": "BarO"
+        }
+      ]
+    },
+    {
+      "name": "Baz",
+      "endpoint": "xxx",
+      "handlers": [
+        {
+          "name": "getBaz"
+        }
+      ]
+    },
+    {
+      "name": "Qwerty",
+      "endpoint": "xxx",
+      "handlers": ["getQwerty"]
+    }
+  ]
+}

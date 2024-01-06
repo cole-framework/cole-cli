@@ -1,0 +1,37 @@
+import {
+  ClassJson,
+  ParamJson,
+  ElementWithProps,
+  ElementWithMethods,
+  ElementWithGenerics,
+  ComponentElement,
+  Component,
+} from "../../../../core";
+import { DefaultCliOptions } from "../api.types";
+
+export type NewUseCaseOptions = DefaultCliOptions & {
+  name: string;
+  input?: string[];
+  output?: string;
+  endpoint?: string;
+};
+
+export type UseCaseJson = ClassJson & {
+  name: string;
+  input: (string | ParamJson)[];
+  output?: string;
+  endpoint?: string;
+};
+
+export type UseCaseData = UseCaseJson;
+
+export type UseCaseElement = ElementWithProps &
+  ElementWithMethods &
+  ElementWithGenerics &
+  ComponentElement<any>;
+
+export type UseCase = Component<UseCaseElement>;
+
+export type NewUseCaseJson = {
+  use_cases: UseCaseJson[];
+};

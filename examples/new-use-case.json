@@ -1,0 +1,23 @@
+{
+  "use_cases": [
+    {
+      "name": "Foo",
+      "endpoint": "xxx",
+      "input": [
+        {
+          "name": "prop1",
+          "type": "Array<Entity<Bar>>"
+        },
+        {
+          "name": "prop2",
+          "type": "Baz"
+        },
+        {
+          "name": "prop3",
+          "type": "number"
+        }
+      ],
+      "output": "Baz"
+    }
+  ]
+}

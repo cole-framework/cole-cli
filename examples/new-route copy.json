@@ -1,0 +1,70 @@
+{
+  "routes": [
+    {
+      "name": "Foo",
+      "endpoint": "xxx",
+      "handler": {
+        "controller": "xxx",
+        "name": "getFoo",
+        "input": "Entity<GetFooInput>",
+        "output": "Array<Entity<Bar>>"
+      },
+      "request": {
+        "method": "GET",
+        "path": "foo/:id",
+        "validate": false,
+        "auth": "jwt",
+        "body": { "foo":"string", "bar":"number" },
+        "headers": {}
+      },
+      "response": {
+        "200": "OK",
+        "500": "Error",
+        "404": { "foo":"string", "bar":"number" }
+      }
+    },
+    {
+      "name": "Bar",
+      "endpoint": "xxx",
+      "handler": {
+        "controller": "xxx",
+        "name": "getBar",
+        "input": { "key": "string", "val": "unknown" },
+        "output": "Array<Entity<Bar>>"
+      },
+      "request": {
+        "method": "GET",
+        "path": "bar/:id?age",
+        "validate": false,
+        "body": {},
+        "headers": {}
+      },
+      "response": {
+        "200": "OK",
+        "500": "Error",
+        "404": { "foo":"string", "bar":"number" }
+      }
+    }
+  ],
+  "entities":[],
+  "models": [
+    {
+      "id": "sebix",
+      "name": "Foo",
+      "endpoint": "xxx",
+      "types": [
+        "json"
+      ],
+      "props": [
+        {
+          "name": "prop1",
+          "type": "Array<Entity<Bar>>"
+        },
+        {
+          "name": "prop2",
+          "type": "BazModel"
+        }
+      ]
+    }
+  ]
+}

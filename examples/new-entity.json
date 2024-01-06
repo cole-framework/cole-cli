@@ -1,0 +1,26 @@
+{
+  "entities": [
+    {
+      "name": "Foo",
+      "endpoint": "xxx",
+      "has_model": false,
+      "types": [
+        "json"
+      ],
+      "props": [
+        {
+          "name": "prop1",
+          "type": "Array<Entity<Bar>>"
+        },
+        {
+          "name": "prop2",
+          "type": "Baz"
+        },
+        {
+          "name": "prop3",
+          "type": "number"
+        }
+      ]
+    }
+  ]
+}

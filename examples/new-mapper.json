@@ -1,0 +1,51 @@
+{
+  "mappers": [
+    {
+      "name": "Foo",
+      "endpoint": "xxx",
+      "storages": [
+        "mongo"
+      ],
+      "model": "sebix",
+      "entity": "Bar"
+    },
+    {
+      "name": "Bar",
+      "endpoint": "xxx",
+      "storages": [
+        "mongo"
+      ],
+      "model": "Bar",
+      "entity": "Bar",
+      "props": [
+        {
+          "name": "prop1",
+          "type": "Array<Entity<Bar>>"
+        },
+        {
+          "name": "prop2",
+          "type": "Model<Baz,mongo>"
+        }
+      ]
+    }
+  ],
+  "models": [
+    {
+      "name": "Bar",
+      "endpoint": "xxx",
+      "types": [
+        "json"
+      ],
+      "props": [
+        {
+          "name": "prop1",
+          "type": "Array<Entity<Bar>>"
+        },
+        {
+          "name": "prop2",
+          "type": "Model<Baz,mongo>"
+        }
+      ]
+    }
+  ]
+}

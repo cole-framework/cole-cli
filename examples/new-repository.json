@@ -1,0 +1,31 @@
+{
+  "repositories": [
+    {
+      "name": "Qwerty",
+      "endpoint": "xxx",
+      "methods": [],
+      "entity": "Baz",
+      "contexts": [
+        {
+          "type": "mongo",
+          "source": "Foo",
+          "mapper": "Foo",
+          "model": "sebix"
+        }
+      ]
+    },
+    {
+      "name": "Bar",
+      "endpoint": "xxx",
+      "contexts": [
+        "mongo",
+        "sql"
+      ],
+      "methods": [
+        {
+          "name": "addBar"
+        }
+      ]
+    }
+  ]
+}
