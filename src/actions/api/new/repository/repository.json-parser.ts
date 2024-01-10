@@ -47,8 +47,14 @@ export class RepositoryJsonParser {
       {
         name,
         endpoint,
-        props: PropTools.arrayToData(props, config.reservedTypes, []),
-        methods: MethodTools.arrayToData(methods, config.reservedTypes, []),
+        props: PropTools.arrayToData(props, config.reservedTypes, {
+          dependencies: [],
+          addons: {},
+        }),
+        methods: MethodTools.arrayToData(methods, config.reservedTypes, {
+          dependencies: [],
+          addons: {},
+        }),
       },
       entity,
       writeMethod.component,
@@ -58,28 +64,30 @@ export class RepositoryJsonParser {
     repository.unresolvedDependencies.forEach((type) => {
       if (type.isModel) {
         let model;
-        model = modelsRef.find(
-          (m) => m.element.name === type.name && m.type.type === type.type
-        );
+        model = modelsRef.find((m) => {
+          return m.type.name === type.name && m.type.type === type.type;
+        });
 
         if (!model) {
           model = ModelFactory.create(
             { name: type.name, endpoint: repository.endpoint, type: type.type },
             writeMethod.dependency,
-            config
+            config,
+            []
           );
           models.push(model);
         }
         repository.addDependency(model);
-      } else if (type.isEntity && type.name !== entity.element.name) {
+      } else if (type.isEntity && type.name !== entity.type.name) {
         let e;
-        e = entitiesRef.find((m) => m.element.name === type.name);
+        e = entitiesRef.find((m) => m.type.name === type.name);
         if (!e) {
           e = EntityFactory.create(
             { name: type.name, endpoint: repository.endpoint },
             null,
             writeMethod.dependency,
-            config
+            config,
+            []
           );
           entities.push(e);
         }
@@ -116,8 +124,14 @@ export class RepositoryJsonParser {
       {
         name,
         endpoint,
-        props: PropTools.arrayToData(props, config.reservedTypes, []),
-        methods: MethodTools.arrayToData(methods, config.reservedTypes, []),
+        props: PropTools.arrayToData(props, config.reservedTypes, {
+          dependencies: [],
+          addons: {},
+        }),
+        methods: MethodTools.arrayToData(methods, config.reservedTypes, {
+          dependencies: [],
+          addons: {},
+        }),
       },
       entity,
       contexts,
@@ -129,27 +143,29 @@ export class RepositoryJsonParser {
       if (type.isModel) {
         let model;
         model = modelsRef.find(
-          (m) => m.element.name === type.name && m.type.type === type.type
+          (m) => m.type.name === type.name && m.type.type === type.type
         );
 
         if (!model) {
           model = ModelFactory.create(
             { name: type.name, endpoint: impl.endpoint, type: type.type },
             writeMethod.dependency,
-            config
+            config,
+            []
           );
           models.push(model);
         }
         impl.addDependency(model);
-      } else if (type.isEntity && type.name !== entity.element.name) {
+      } else if (type.isEntity && type.name !== entity.type.name) {
         let e;
-        e = entitiesRef.find((m) => m.element.name === type.name);
+        e = entitiesRef.find((m) => m.type.name === type.name);
         if (!e) {
           e = EntityFactory.create(
             { name: type.name, endpoint: impl.endpoint },
             null,
             writeMethod.dependency,
-            config
+            config,
+            []
           );
           entities.push(e);
         }
@@ -198,22 +214,27 @@ export class RepositoryJsonParser {
       let repository;
       let impl;
 
-      const {
-        build_factory,
-        use_default_impl,
-        build_interface,
-        endpoint,
-        contexts,
-      } = data;
+      const { endpoint, contexts } = data;
+
+      const build_interface =
+        typeof data.build_factory === "boolean" ? data.build_interface : true;
+      const use_default_impl =
+        typeof data.use_default_impl === "boolean"
+          ? data.use_default_impl
+          : (Array.isArray(data.methods) && data.methods.length > 0) ||
+            (Array.isArray(data.contexts) && data.contexts.length > 1);
+      const build_factory = false;
+
       const entityName = data.entity || data.name;
-      let entity = entitiesRef.find((e) => e.element.name === entityName);
+      let entity = entitiesRef.find((e) => e.type.name === entityName);
 
       if (!entity) {
         entity = EntityFactory.create(
           { name: entityName, endpoint },
           null,
           writeMethod.dependency,
-          config
+          config,
+          []
         );
         entities.push(entity);
       }
@@ -258,17 +279,20 @@ export class RepositoryJsonParser {
             modelName = context.model || data.name;
           }
 
-          model = modelsRef.find((s) => s.element.name === modelName);
+          model = modelsRef.find((s) => {
+            return s.type.name === modelName;
+          });
           if (!model) {
             model = ModelFactory.create(
               { name: modelName, endpoint, type },
               writeMethod.dependency,
-              config
+              config,
+              []
             );
             models.push(model);
           }
 
-          source = sourcesRef.find((s) => s.element.name === sourceName);
+          source = sourcesRef.find((s) => s.type.name === sourceName);
           if (!source) {
             source = SourceFactory.create(
               {
@@ -284,7 +308,7 @@ export class RepositoryJsonParser {
             sources.push(source);
           }
 
-          mapper = mappersRef.find((s) => s.element.name === mapperName);
+          mapper = mappersRef.find((s) => s.type.name === mapperName);
           if (!mapper) {
             mapper = MapperFactory.create(
               { name: mapperName, endpoint, storage: type },

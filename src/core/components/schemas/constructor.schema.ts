@@ -26,8 +26,7 @@ export class ConstructorTools {
   static stringToData(
     str: string,
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ): ConstructorData {
     let access: string = AccessType.Public;
     const params: ParamData[] = [];
@@ -39,9 +38,7 @@ export class ConstructorTools {
         access = match[1].trim();
       }
       SchemaTools.splitIgnoringBrackets(match[3], ",").forEach((str) => {
-        params.push(
-          ParamTools.stringToData(str, reserved, dependencies, addons)
-        );
+        params.push(ParamTools.stringToData(str, reserved, references));
       });
     } else {
       throw new Error(`Constructor regex match failure`);
@@ -58,8 +55,7 @@ export class ConstructorSchema {
   public static create(
     data: ConstructorJson | ConstructorData | string,
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ) {
     let access: string = AccessType.Public;
     let body: string;
@@ -67,32 +63,24 @@ export class ConstructorSchema {
     const params: ParamSchema[] = [];
 
     if (typeof data === "string") {
-      const ctor = ConstructorTools.stringToData(
-        data,
-        reserved,
-        dependencies,
-        addons
-      );
+      const ctor = ConstructorTools.stringToData(data, reserved, references);
       access = ctor.access;
       ctor.params.forEach((p) =>
-        params.push(ParamSchema.create(p, reserved, dependencies, addons))
+        params.push(ParamSchema.create(p, reserved, references))
       );
     } else {
       body = data.body;
       access = data.access;
 
       if (data.supr) {
-        supr = ConstructorSchema.create(
-          data.supr,
-          reserved,
-          dependencies,
-          addons
-        );
+        supr = ConstructorSchema.create(data.supr, reserved, references);
       }
 
       if (Array.isArray(data.params)) {
         data.params.forEach((p) => {
-          params.push(ParamSchema.create(p, reserved, dependencies, addons));
+          if (SchemaTools.executeMeta(p, references, reserved)) {
+            params.push(ParamSchema.create(p, reserved, references));
+          }
         });
       }
     }

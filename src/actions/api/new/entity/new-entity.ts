@@ -2,11 +2,7 @@ import chalk from "chalk";
 import { ConfigLoader, WriteMethod } from "../../../../core";
 import { FileTransport } from "../../../../transport/file.transport";
 import { ApiGenerator } from "../api-generator";
-import {
-  // NewEntityInteractiveStrategy,
-  NewEntityJsonStrategy,
-  NewEntityOptionsStrategy,
-} from "./strategies";
+import { NewEntityOptionsStrategy } from "./strategies";
 import { NewEntityOptions } from "./types";
 import { ApiData } from "../api.types";
 
@@ -35,9 +31,7 @@ export const newEntity = async (options: NewEntityOptions) => {
     components: [],
   };
 
-  if (options.json) {
-    new NewEntityJsonStrategy(config).apply(schema, options.json);
-  } else if (Object.keys(options).includes("name")) {
+  if (Object.keys(options).includes("name")) {
     new NewEntityOptionsStrategy(config).apply(schema, options);
   } else {
     // new NewEntityInteractiveStrategy(config).apply(schema);

@@ -12,8 +12,7 @@ const logger = Logger.getLogger({
 });
 
 const program = new commander.Command();
-
-program.description("Cole");
+program.description("Cole").enablePositionalOptions();
 
 const config = program.command("config");
 
@@ -23,16 +22,14 @@ const config = program.command("config");
 const newComponent = program.command("new");
 
 newComponent
-  // .option("-f, --force", "", false)
-  // .option("-h, --here", "", false)
-  // .option("-j, --json <value>", "path to the json")
-  .action((options) => {
-    console.log("AHA!");
-  });
+  .option("-f, --force", "", false)
+  .option("-j, --json <value>", "path to the json")
+  .option("--skip-tests", "Determines if tests should be included")
+  .option("-w, --with-deps", "Include component dependencies")
+  .action((options) => Actions.Api.fromJson(options));
 
 newComponent
   .command("model")
-  .option("-j, --json <value>", "Path to the model configuration file.")
   .option("-f, --force", "Determines whether to overwrite existing files")
   .option("-n, --name <value>", "Name of the model")
   .option("-e, --endpoint <value>", "Name of the endpoint")
@@ -45,7 +42,6 @@ newComponent
 
 newComponent
   .command("entity")
-  .option("-j, --json <value>", "Path to the entity configuration file.")
   .option("-f, --force", "Determines whether to overwrite existing files")
   .option("-n, --name <value>", "Name of the entity")
   .option("-e, --endpoint <value>", "Name of the endpoint")
@@ -57,7 +53,6 @@ newComponent
 
 newComponent
   .command("mapper")
-  .option("-j, --json <value>", "Path to the mapper configuration file.")
   .option("-f, --force", "Determines whether to overwrite existing files")
   .option("-n, --name <value>", "Name of the data source")
   .option("-e, --endpoint <value>", "Name of the endpoint")
@@ -71,7 +66,6 @@ newComponent
 
 newComponent
   .command("use-case")
-  .option("-j, --json <value>", "Path to the use case configuration file.")
   .option("-f, --force", "Determines whether to overwrite existing files")
   .option("-n, --name <value>", "Name of the use case")
   .option("-e, --endpoint <value>", "Name of the endpoint")
@@ -84,7 +78,6 @@ newComponent
 
 newComponent
   .command("source")
-  .option("-j, --json <value>", "Path to the data source configuration file.")
   .option("-f, --force", "Determines whether to overwrite existing files")
   .option("-n, --name <value>", "Name of the data source")
   .option("-e, --endpoint <value>", "Name of the endpoint")
@@ -98,7 +91,6 @@ newComponent
 
 newComponent
   .command("repository")
-  .option("-j, --json <value>", "Path to the model configuration file.")
   .option("-f, --force", "Determines whether to overwrite existing files")
   .option("-n, --name <value>", "Name of the repository")
   .option("-e, --endpoint <value>", "Name of the endpoint")
@@ -116,7 +108,6 @@ newComponent
 
 newComponent
   .command("route")
-  .option("-j, --json <value>", "Path to the model configuration file.")
   .option("-f, --force", "Determines whether to overwrite existing files")
   .option("-n, --name <value>", "Name of the repository")
   .option("-m, --method <value>", "Request method")
@@ -134,7 +125,6 @@ newComponent
 
 newComponent
   .command("controller")
-  .option("-j, --json <value>", "Path to the model configuration file.")
   .option("-f, --force", "Determines whether to overwrite existing files")
   .option("-e, --endpoint <value>", "Name of the endpoint")
   .option(

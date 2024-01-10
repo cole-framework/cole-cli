@@ -4,7 +4,6 @@ import { ApiGenerator } from "../api-generator";
 import { ApiData } from "../api.types";
 import {
   NewUseCaseInteractiveStrategy,
-  NewUseCaseJsonStrategy,
   NewUseCaseOptionsStrategy,
 } from "./strategies";
 import { NewUseCaseOptions } from "./types";
@@ -36,8 +35,6 @@ export const newUseCase = async (options: NewUseCaseOptions) => {
 
   if (!options || Object.keys(options).length === 0) {
     new NewUseCaseInteractiveStrategy(config).apply(schema);
-  } else if (options.json) {
-    new NewUseCaseJsonStrategy(config).apply(schema, options.json);
   } else {
     new NewUseCaseOptionsStrategy(config).apply(schema, options);
   }
@@ -45,7 +42,7 @@ export const newUseCase = async (options: NewUseCaseOptions) => {
   const result = new ApiGenerator(config, new FileTransport()).generate(schema);
 
   if (result.isFailure) {
-    console.log(result.failure.error.message);
+    console.log(result.failure.error);
     process.exit(1);
   }
 };

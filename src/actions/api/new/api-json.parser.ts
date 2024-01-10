@@ -5,7 +5,7 @@ import {
   RepositoryImpl,
   RepositoryJson,
 } from "./repository";
-import { Route, RouteJsonParser, RouteJson } from "./route";
+import { Route, RouteJsonParser, RouteJson, RouteIO } from "./route";
 import { Model, ModelJson } from "./model";
 import { Source, SourceJsonParser, SourceJson } from "./source";
 import { UseCase, UseCaseJsonParse, UseCaseJson } from "./use-case";
@@ -26,6 +26,7 @@ export class ApiJsonParser {
   private mappers = new ApiComponentCollection<Mapper>();
   private sources = new ApiComponentCollection<Source>();
   private routes = new ApiComponentCollection<Route>();
+  private route_ios = new ApiComponentCollection<RouteIO>();
   private controllers = new ApiComponentCollection<Controller>();
   private use_cases = new ApiComponentCollection<UseCase>();
   private repositories = new ApiComponentCollection<Repository>();
@@ -210,6 +211,7 @@ export class ApiJsonParser {
       models,
       controllers,
       routes,
+      route_ios,
       entities,
       config,
       texts,
@@ -224,6 +226,10 @@ export class ApiJsonParser {
 
     result.routes.forEach((r) => {
       routes.add(r);
+    });
+
+    result.route_ios.forEach((r) => {
+      route_ios.add(r);
     });
 
     result.entities.forEach((e) => {
@@ -243,6 +249,7 @@ export class ApiJsonParser {
       sources,
       controllers,
       routes,
+      route_ios,
       use_cases,
       repositories,
       repository_impls,
@@ -259,16 +266,19 @@ export class ApiJsonParser {
     this.parseRoutes(json.routes || []);
 
     return {
-      controllers: controllers.toArray(),
-      models: models.toArray(),
-      entities: entities.toArray(),
-      mappers: mappers.toArray(),
-      sources: sources.toArray(),
-      routes: routes.toArray(),
-      use_cases: use_cases.toArray(),
-      repositories: repositories.toArray(),
-      repository_impls: repository_impls.toArray(),
-      repository_factories: repository_factories.toArray(),
+      controllers: controllers.toArray().map((i) => i.toObject()),
+      models: models.toArray().map((i) => i.toObject()),
+      entities: entities.toArray().map((i) => i.toObject()),
+      mappers: mappers.toArray().map((i) => i.toObject()),
+      sources: sources.toArray().map((i) => i.toObject()),
+      routes: routes.toArray().map((i) => i.toObject()),
+      route_ios: route_ios.toArray().map((i) => i.toObject()),
+      use_cases: use_cases.toArray().map((i) => i.toObject()),
+      repositories: repositories.toArray().map((i) => i.toObject()),
+      repository_impls: repository_impls.toArray().map((i) => i.toObject()),
+      repository_factories: repository_factories
+        .toArray()
+        .map((i) => i.toObject()),
     };
   }
 }

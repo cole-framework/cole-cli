@@ -2,11 +2,7 @@ import { ConfigLoader, WriteMethod } from "../../../../core";
 import { FileTransport } from "../../../../transport/file.transport";
 import { ApiGenerator } from "../api-generator";
 import { ApiData } from "../api.types";
-import {
-  // NewRepositoryInteractiveStrategy,
-  NewRepositoryJsonStrategy,
-  NewRepositoryOptionsStrategy,
-} from "./strategies";
+import { NewRepositoryOptionsStrategy } from "./strategies";
 import { NewRepositoryOptions } from "./types";
 
 export const newRepository = async (options: NewRepositoryOptions) => {
@@ -36,8 +32,6 @@ export const newRepository = async (options: NewRepositoryOptions) => {
 
   if (!options || Object.keys(options).length === 0) {
     // new NewRepositoryInteractiveStrategy(config).apply(schema);
-  } else if (options.json) {
-    new NewRepositoryJsonStrategy(config).apply(schema, options.json);
   } else {
     new NewRepositoryOptionsStrategy(config).apply(schema, options);
   }

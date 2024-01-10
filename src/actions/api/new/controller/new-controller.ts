@@ -4,7 +4,6 @@ import { FileTransport } from "../../../../transport/file.transport";
 import { ApiGenerator } from "../api-generator";
 import {
   NewControllerInteractiveStrategy,
-  NewControllerJsonStrategy,
   NewControllerOptionsStrategy,
 } from "./strategies";
 import { NewControllerOptions } from "./types";
@@ -35,9 +34,7 @@ export const newController = async (options: NewControllerOptions) => {
     components: [],
   };
 
-  if (options.json) {
-    new NewControllerJsonStrategy(config).apply(schema, options.json);
-  } else if (Object.keys(options).includes("name")) {
+  if (Object.keys(options).includes("name")) {
     new NewControllerOptionsStrategy(config).apply(schema, options);
   } else {
     new NewControllerInteractiveStrategy(config).apply(schema);

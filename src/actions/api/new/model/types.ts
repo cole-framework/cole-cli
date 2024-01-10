@@ -22,6 +22,7 @@ export type ModelJson = {
   types: string[];
   props?: (PropJson | string)[];
   generics?: GenericJson[];
+  alias?: any;
 };
 
 export type ModelData = {
@@ -31,6 +32,7 @@ export type ModelData = {
   type: string;
   props?: (PropJson | string)[];
   generics?: GenericJson[];
+  alias?: any;
 };
 
 export type ModelAddons = {

@@ -4,7 +4,6 @@ import { FileTransport } from "../../../../transport/file.transport";
 import { ApiGenerator } from "../api-generator";
 import {
   NewRouteInteractiveStrategy,
-  NewRouteJsonStrategy,
   NewRouteOptionsStrategy,
 } from "./strategies";
 import { NewRouteOptions } from "./types";
@@ -35,9 +34,7 @@ export const newRoute = async (options: NewRouteOptions) => {
     components: [],
   };
 
-  if (options.json) {
-    new NewRouteJsonStrategy(config).apply(schema, options.json);
-  } else if (Object.keys(options).includes("name")) {
+  if (Object.keys(options).includes("name")) {
     new NewRouteOptionsStrategy(config).apply(schema, options);
   } else {
     new NewRouteInteractiveStrategy(config).apply(schema);

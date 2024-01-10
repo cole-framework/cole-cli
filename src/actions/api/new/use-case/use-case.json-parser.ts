@@ -51,27 +51,29 @@ export class UseCaseJsonParse {
         if (type.isModel) {
           let model;
           model = modelsRef.find(
-            (m) => m.element.name === type.name && m.type.type === type.type
+            (m) => m.type.name === type.name && m.type.type === type.type
           );
 
           if (!model) {
             model = ModelFactory.create(
               { name: type.name, endpoint: useCase.endpoint, type: type.type },
               writeMethod.dependency,
-              config
+              config,
+              []
             );
             models.push(model);
           }
           useCase.addDependency(model);
         } else if (type.isEntity) {
           let entity;
-          entity = entitiesRef.find((m) => m.element.name === type.name);
+          entity = entitiesRef.find((m) => m.type.name === type.name);
           if (!entity) {
             entity = EntityFactory.create(
               { name: type.name, endpoint: useCase.endpoint },
               null,
               writeMethod.dependency,
-              config
+              config,
+              []
             );
             entities.push(entity);
           }

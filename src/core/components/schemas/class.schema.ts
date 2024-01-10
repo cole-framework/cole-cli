@@ -17,9 +17,8 @@ import {
   InheritanceJson,
   InheritanceSchema,
 } from "./inheritance.schema";
-import { Component } from "../component";
 import { ImportData, ImportJson, ImportSchema } from "./import.schema";
-import { ReservedType } from "../../config";
+import { ConfigTools, ReservedType } from "../../config";
 import { SchemaTools } from "../schema.tools";
 import { TypeInfo } from "../../type.info";
 
@@ -53,8 +52,7 @@ export class ClassSchema {
   public static create(
     data: ClassData | ClassJson,
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ) {
     if (!data) {
       return null;
@@ -69,29 +67,21 @@ export class ClassSchema {
     }
 
     if (data.ctor) {
-      ctor = ConstructorSchema.create(
-        data.ctor,
-        reserved,
-        dependencies,
-        addons
-      );
+      if (SchemaTools.executeMeta(data.ctor, references, reserved)) {
+        ctor = ConstructorSchema.create(data.ctor, reserved, references);
+      }
     }
 
     if (Array.isArray(data.inheritance)) {
       data.inheritance.forEach((i) => {
         if (typeof i === "string") {
           inheritance.push(
-            InheritanceSchema.create(
-              { name: i },
-              reserved,
-              dependencies,
-              addons
-            )
+            InheritanceSchema.create({ name: i }, reserved, references)
           );
         } else {
-          inheritance.push(
-            InheritanceSchema.create(i, reserved, dependencies, addons)
-          );
+          if (SchemaTools.executeMeta(i, references, reserved)) {
+            inheritance.push(InheritanceSchema.create(i, reserved, references));
+          }
         }
       });
     }
@@ -100,27 +90,35 @@ export class ClassSchema {
 
     if (Array.isArray(data.interfaces)) {
       data.interfaces.forEach((i) => {
-        cls.addInterface(
-          InterfaceSchema.create(i, reserved, dependencies, addons)
-        );
+        if (SchemaTools.executeMeta(i, references, reserved)) {
+          inheritance.push(InheritanceSchema.create(i, reserved, references));
+        }
+
+        cls.addInterface(InterfaceSchema.create(i, reserved, references));
       });
     }
 
     if (Array.isArray(data.props)) {
       data.props.forEach((p) => {
-        cls.addProp(PropSchema.create(p, reserved, dependencies, addons));
+        if (SchemaTools.executeMeta(p, references, reserved)) {
+          cls.addProp(PropSchema.create(p, reserved, references));
+        }
       });
     }
 
     if (Array.isArray(data.methods)) {
       data.methods.forEach((m) => {
-        cls.addMethod(MethodSchema.create(m, reserved, dependencies, addons));
+        if (SchemaTools.executeMeta(m, references, reserved)) {
+          cls.addMethod(MethodSchema.create(m, reserved, references));
+        }
       });
     }
 
     if (Array.isArray(data.generics)) {
       data.generics.forEach((g) => {
-        cls.addGeneric(GenericSchema.create(g, reserved, dependencies, addons));
+        if (SchemaTools.executeMeta(g, references, reserved)) {
+          cls.addGeneric(GenericSchema.create(g, reserved, references));
+        }
       });
     }
 

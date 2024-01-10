@@ -1,11 +1,7 @@
 import chalk from "chalk";
 import { FileTransport } from "../../../../transport/file.transport";
 import { ApiGenerator } from "../api-generator";
-import {
-  // NewModelInteractiveStrategy,
-  NewModelJsonStrategy,
-  NewModelOptionsStrategy,
-} from "./strategies";
+import { NewModelOptionsStrategy } from "./strategies";
 import { NewModelOptions } from "./types";
 import { ConfigLoader, WriteMethod } from "../../../../core";
 import { ApiData } from "../api.types";
@@ -35,9 +31,7 @@ export const newModel = async (options: NewModelOptions) => {
     components: [],
   };
 
-  if (options.json) {
-    new NewModelJsonStrategy(config).apply(schema, options.json);
-  } else if (Object.keys(options).includes("name")) {
+  if (Object.keys(options).includes("name")) {
     new NewModelOptionsStrategy(config).apply(schema, options);
   } else {
     // new NewModelInteractiveStrategy(config).apply(schema);
