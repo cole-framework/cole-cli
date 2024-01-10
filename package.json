@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Alien-Worlds/cole-cli.git"
+    "url": "git+https://github.com/cole-framework/cole-cli.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Alien-Worlds/cole-cli/issues"
+    "url": "https://github.com/cole-framework/cole-cli/issues"
   },
-  "homepage": "https://github.com/Alien-Worlds/cole-cli#readme",
+  "homepage": "https://github.com/cole-framework/cole-cli#readme",
   "scripts": {
     "clean": "rm -rf ./build",
     "build": "yarn clean && tsc",
