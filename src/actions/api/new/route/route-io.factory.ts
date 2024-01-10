@@ -6,22 +6,32 @@ import {
   WriteMethod,
 } from "../../../../core";
 
-import { ComponentType, TypeInfo } from "../../../../core/type.info";
+import { RouteIOType, TypeInfo } from "../../../../core/type.info";
+import { Model } from "../model";
 import { RouteData, RouteModel, RouteElement } from "./types";
 
 export class RouteIOFactory {
   public static create(
     data: RouteData,
-    input: TypeInfo,
-    output: TypeInfo,
+    input: Model,
+    output: Model,
     pathParams: RouteModel,
     queryParams: RouteModel,
-    requestBody: string | RouteModel,
-    responseBody: string | RouteModel,
+    requestBody: RouteModel,
+    responseBody: RouteModel,
     writeMethod: WriteMethod,
     config: Config
   ): Component<RouteElement> {
     const dependencies = [];
+
+    [input, output, pathParams, queryParams, requestBody, responseBody].forEach(
+      (dep) => {
+        if (dep) {
+          dependencies.push(dep);
+        }
+      }
+    );
+
     const {
       id,
       name,
@@ -29,16 +39,7 @@ export class RouteIOFactory {
       endpoint,
     } = data;
     const { defaults } = config.components.routeIO;
-    const addons = {
-      input: input?.name,
-      output: output?.name,
-      path_params: pathParams?.name,
-      query_params: queryParams?.name,
-      request_body:
-        typeof requestBody === "string" ? requestBody : requestBody?.name,
-      response_body:
-        typeof responseBody === "string" ? responseBody : responseBody?.name,
-    };
+    const addons = {};
     const interfaces = [];
     const methods = [];
     const props = [];
@@ -46,6 +47,17 @@ export class RouteIOFactory {
     const imports = [];
     let inheritance = [];
     let ctor;
+
+    const componentName = config.components.routeIO.generateName(name, {
+      type: method,
+      method,
+    });
+    const componentPath = config.components.routeIO.generatePath({
+      name,
+      type: method,
+      method,
+      endpoint,
+    }).path;
 
     if (defaults?.common?.ctor) {
       ctor = defaults.common.ctor;
@@ -109,37 +121,24 @@ export class RouteIOFactory {
 
     const classData: ClassData = {
       id,
-      name,
+      name: componentName,
       props,
       methods,
       interfaces,
       generics,
       inheritance,
       ctor,
+      imports,
     };
 
-    const element = ClassSchema.create(
-      classData,
-      config.reservedTypes,
+    const element = ClassSchema.create(classData, config.reservedTypes, {
+      addons,
       dependencies,
-      addons
-    );
-
-    const componentName = config.components.routeIO.generateName(name, {
-      type: method,
-      method,
     });
-    const componentPath = config.components.routeIO.generatePath({
-      name,
-      type: method,
-      method,
-      endpoint,
-    }).path;
 
     const component = Component.create<RouteElement>(
       id,
-      componentName,
-      new ComponentType("route_io"),
+      new RouteIOType(name),
       endpoint,
       componentPath,
       writeMethod,

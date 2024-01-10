@@ -1,4 +1,4 @@
-import { Component } from "../../../core";
+import { Component, TypeInfo } from "../../../core";
 
 export class ApiComponentCollection<T extends Component> {
   private _list: T[] = [];
@@ -6,7 +6,9 @@ export class ApiComponentCollection<T extends Component> {
   add(component: T) {
     if (
       this._list.findIndex(
-        (i) => i.name === component.name && i.type === component.type
+        (i) =>
+          i.element.name === component.element.name &&
+          TypeInfo.areIdentical(i.type, component.type)
       ) === -1
     ) {
       this._list.push(component);

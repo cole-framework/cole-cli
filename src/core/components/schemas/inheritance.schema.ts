@@ -1,11 +1,4 @@
-import {
-  ConfigAddons,
-  ReservedType,
-  ConfigInstruction,
-  ConfigUseInstruction,
-  ConfigDependencyInstruction,
-} from "../../config";
-import { Component } from "../component";
+import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { SchemaTools } from "../schema.tools";
 import { GenericData, GenericJson, GenericSchema } from "./generic.schema";
 
@@ -25,8 +18,7 @@ export class InheritanceSchema {
   public static create(
     data: string | InheritanceData | InheritanceJson,
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ) {
     if (!data) {
       return null;
@@ -39,28 +31,16 @@ export class InheritanceSchema {
     if (typeof data === "string") {
       const temp = data.trim();
 
-      if (ConfigInstruction.isUseInstruction(temp)) {
-        name = ConfigUseInstruction.getValue(temp, addons);
-      } else if (ConfigInstruction.isDependencyInstruction(temp)) {
-        const component = ConfigDependencyInstruction.getDependency(
-          temp,
-          dependencies
-        );
-        name = component.name;
+      if (ConfigTools.hasInstructions(temp)) {
+        name = ConfigTools.executeInstructions(temp, references, reserved);
       } else {
         name = temp;
       }
     } else {
       const temp = data.name.trim();
 
-      if (ConfigInstruction.isUseInstruction(temp)) {
-        name = ConfigUseInstruction.getValue(temp, addons);
-      } else if (ConfigInstruction.isDependencyInstruction(temp)) {
-        const component = ConfigDependencyInstruction.getDependency(
-          temp,
-          dependencies
-        );
-        name = component.name;
+      if (ConfigTools.hasInstructions(temp)) {
+        name = ConfigTools.executeInstructions(temp, references, reserved);
       } else {
         name = temp;
       }
@@ -73,7 +53,9 @@ export class InheritanceSchema {
     inth = new InheritanceSchema(name);
 
     generics.forEach((g) => {
-      inth.addGeneric(GenericSchema.create(g, reserved, dependencies, addons));
+      if (SchemaTools.executeMeta(g, references, reserved)) {
+        inth.addGeneric(GenericSchema.create(g, reserved, references));
+      }
     });
 
     return inth;

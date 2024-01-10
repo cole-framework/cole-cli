@@ -1,4 +1,4 @@
-import { ComponentType, OutputBuilder, Config } from "../../../core";
+import { OutputBuilder, Config } from "../../../core";
 
 export class OutputBuilderFactory {
   public create(type: string, config: Config): OutputBuilder {

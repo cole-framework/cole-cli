@@ -1,6 +1,6 @@
 import { SourceAddons, SourceData, SourceElement } from "./types";
 import { Model } from "../model";
-import { ComponentType } from "../../../../core/type.info";
+import { SourceType } from "../../../../core/type.info";
 import {
   ClassData,
   ClassSchema,
@@ -27,6 +27,15 @@ export class SourceFactory {
     const imports = [];
     let inheritance = [];
     let ctor;
+
+    const componentName = config.components.source.generateName(name, {
+      type: storage,
+    });
+    const componentPath = config.components.source.generatePath({
+      name,
+      type: storage,
+      endpoint,
+    }).path;
 
     if (defaults?.common?.ctor) {
       ctor = defaults.common.ctor;
@@ -84,41 +93,34 @@ export class SourceFactory {
       props.push(...data.props);
     }
 
+    if (Array.isArray(data.methods)) {
+      methods.push(...data.methods);
+    }
+
     if (Array.isArray(defaults?.[storage]?.generics)) {
       generics.push(...defaults[storage].generics);
     }
 
     const classData: ClassData = {
       id,
-      name,
+      name: componentName,
       props,
       methods,
       interfaces,
       generics,
       inheritance,
       ctor,
+      imports,
     };
 
-    const element = ClassSchema.create(
-      classData,
-      config.reservedTypes,
-      dependencies,
-      addons
-    );
-
-    const componentName = config.components.source.generateName(name, {
-      type: storage,
+    const element = ClassSchema.create(classData, config.reservedTypes, {
+      addons,
+      dependencies
     });
-    const componentPath = config.components.source.generatePath({
-      name,
-      type: storage,
-      endpoint,
-    }).path;
 
     const component = Component.create<SourceElement, SourceAddons>(
       id,
-      componentName,
-      new ComponentType("source", storage),
+      new SourceType(name, storage),
       endpoint,
       componentPath,
       writeMethod,

@@ -1,11 +1,11 @@
 import { RepositoryData, RepositoryElement } from "./types";
 import { Entity } from "../entity";
-import { ComponentType } from "../../../../core/type.info";
 import {
   ClassData,
   ClassSchema,
   Component,
   Config,
+  RepositoryType,
   WriteMethod,
 } from "../../../../core";
 
@@ -26,9 +26,20 @@ export class RepositoryComponentFactory {
     const generics = [];
     const imports = [];
     let inheritance = [];
+    let ctor;
+
+    const componentName = config.components.repository.generateName(name);
+    const componentPath = config.components.repository.generatePath({
+      name,
+      endpoint,
+    }).path;
+
+    if (defaults?.common?.ctor) {
+      ctor = defaults.common.ctor;
+    }
 
     if (defaults?.common?.inheritance) {
-      inheritance.push(defaults.common?.inheritance);
+      inheritance.push(defaults.common.inheritance);
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
@@ -61,31 +72,24 @@ export class RepositoryComponentFactory {
 
     const classData: ClassData = {
       id,
-      name,
+      name: componentName,
       props,
       methods,
       interfaces,
       generics,
       inheritance,
+      imports,
+      ctor,
     };
 
-    const element = ClassSchema.create(
-      classData,
-      config.reservedTypes,
-      dependencies,
-      addons
-    );
-
-    const componentName = config.components.repository.generateName(name);
-    const componentPath = config.components.repository.generatePath({
-      name,
-      endpoint,
-    }).path;
+    const element = ClassSchema.create(classData, config.reservedTypes, {
+      addons,
+      dependencies
+    });
 
     const component = Component.create<RepositoryElement>(
       id,
-      componentName,
-      new ComponentType("repository"),
+      new RepositoryType(name),
       endpoint,
       componentPath,
       writeMethod,

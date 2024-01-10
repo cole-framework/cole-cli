@@ -7,12 +7,7 @@ import {
   GenericSchema,
   GenericTools,
 } from "./generic.schema";
-import {
-  ReservedType,
-  ConfigInstruction,
-  ConfigUseInstruction,
-  ConfigDependencyInstruction,
-} from "../../config";
+import { ConfigTools, ReservedType } from "../../config";
 import { Component } from "../component";
 import { SchemaTools } from "../schema.tools";
 
@@ -45,8 +40,7 @@ export class FunctionTools {
   static stringToData(
     str: string,
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ): FunctionData {
     let name: string;
     let params: ParamData[] = [];
@@ -62,9 +56,10 @@ export class FunctionTools {
 
       if (match[2]) {
         let temp = match[2].trim();
-        name = temp;
-        if (ConfigInstruction.isUseInstruction(temp)) {
-          name = ConfigUseInstruction.getValue(temp, addons);
+        if (ConfigTools.hasInstructions(temp)) {
+          name = ConfigTools.executeInstructions(temp, references, reserved);
+        } else {
+          name = temp;
         }
       }
 
@@ -72,17 +67,12 @@ export class FunctionTools {
 
       if (match[8]) {
         let temp = match[8].trim();
-        if (ConfigInstruction.isUseInstruction(temp)) {
-          returnType = TypeInfo.create(
-            ConfigUseInstruction.getValue(temp, addons),
+        if (ConfigTools.hasInstructions(temp)) {
+          returnType = ConfigTools.executeInstructions(
+            temp,
+            references,
             reserved
           );
-        } else if (ConfigInstruction.isDependencyInstruction(temp)) {
-          const component = ConfigDependencyInstruction.getDependency(
-            temp,
-            dependencies
-          );
-          returnType = TypeInfo.fromComponent(component);
         } else {
           returnType = TypeInfo.create(temp, reserved);
         }
@@ -91,14 +81,10 @@ export class FunctionTools {
       }
 
       SchemaTools.splitIgnoringBrackets(match[4], ",").forEach((str) => {
-        generics.push(
-          GenericTools.stringToData(str, reserved, dependencies, addons)
-        );
+        generics.push(GenericTools.stringToData(str, reserved, references));
       });
       SchemaTools.splitIgnoringBrackets(match[6], ",").forEach((str) => {
-        params.push(
-          ParamTools.stringToData(str, reserved, dependencies, addons)
-        );
+        params.push(ParamTools.stringToData(str, reserved, references));
       });
     } else {
       throw new Error(`Function regex match failure`);
@@ -119,8 +105,7 @@ export class FunctionSchema {
   public static create(
     data: FunctionData | FunctionJson | string,
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ): FunctionSchema {
     if (!data) {
       return null;
@@ -134,76 +119,81 @@ export class FunctionSchema {
     let generics: GenericSchema[] = [];
 
     if (typeof data === "string") {
-      const fn = FunctionTools.stringToData(
-        data,
-        reserved,
-        dependencies,
-        addons
-      );
+      const fn = FunctionTools.stringToData(data, reserved, references);
 
       name = fn.name;
       params = fn.params.map((p) =>
-        ParamSchema.create(p, reserved, dependencies, addons)
+        ParamSchema.create(p, reserved, references)
       );
       returnType = fn.return_type;
       isAsync = fn.is_async;
       body = fn.body;
       generics = fn.generics.map((g) =>
-        GenericSchema.create(g, reserved, dependencies, addons)
+        GenericSchema.create(g, reserved, references)
       );
     } else {
       name = data.name;
       isAsync = data.is_async;
       body = data.body;
 
-      if (ConfigInstruction.isUseInstruction(data.name)) {
-        name = ConfigUseInstruction.getValue(data.name, addons);
+      const tempName = data.name.trim();
+      if (ConfigTools.hasInstructions(tempName)) {
+        name = ConfigTools.executeInstructions(tempName, references, reserved);
+      } else {
+        name = tempName;
       }
 
       if (TypeInfo.isType(data.return_type)) {
         returnType = data.return_type;
       } else if (typeof data.return_type === "string") {
-        if (ConfigInstruction.isUseInstruction(data.return_type)) {
-          returnType = TypeInfo.create(
-            ConfigUseInstruction.getValue(data.return_type, addons),
+        const temp = data.return_type.trim();
+        if (ConfigTools.hasInstructions(temp)) {
+          returnType = ConfigTools.executeInstructions(
+            temp,
+            references,
             reserved
           );
-        } else if (
-          ConfigInstruction.isDependencyInstruction(data.return_type)
-        ) {
-          const component = ConfigDependencyInstruction.getDependency(
-            data.return_type,
-            dependencies
-          );
-          returnType = TypeInfo.fromComponent(component);
         } else {
-          returnType = TypeInfo.create(data.return_type, reserved);
+          returnType = TypeInfo.create(temp, reserved);
         }
       }
 
       if (Array.isArray(data.params)) {
         data.params.forEach((param) => {
-          params.push(
-            ParamSchema.create(param, reserved, dependencies, addons)
-          );
+          if (SchemaTools.executeMeta(param, references, reserved)) {
+            if (ConfigTools.hasInstructions(param)) {
+              const p = ConfigTools.executeInstructions(
+                param,
+                references,
+                reserved
+              );
+              if (p) {
+                params.push(p);
+              }
+            } else {
+              params.push(ParamSchema.create(param, reserved, references));
+            }
+          }
         });
-      } else if (
-        typeof data.params === "string" &&
-        ConfigInstruction.isUseInstruction(data.params)
-      ) {
-        const ref = ConfigUseInstruction.getValue(data.params, addons);
-        if (Array.isArray(ref)) {
-          ref.forEach((param) => {
-            params.push(ParamSchema.create(param, reserved, dependencies));
-          });
+      } else if (typeof data.params === "string") {
+        if (ConfigTools.hasInstructions(data.params)) {
+          params = ConfigTools.executeInstructions(
+            data.params,
+            references,
+            reserved
+          );
+        } else {
+          if (SchemaTools.executeMeta(data.params, references, reserved)) {
+            params.push(ParamSchema.create(data.params, reserved, references));
+          }
         }
       }
 
       if (Array.isArray(data.generics)) {
         data.generics.forEach((g) => {
-          generics.push(
-            GenericSchema.create(g, reserved, dependencies, addons)
-          );
+          if (SchemaTools.executeMeta(g, references, reserved)) {
+            generics.push(GenericSchema.create(g, reserved, references));
+          }
         });
       }
     }

@@ -1,13 +1,8 @@
 import { camelCase } from "change-case";
-import {
-  ReservedType,
-  ConfigInstruction,
-  ConfigUseInstruction,
-  ConfigDependencyInstruction,
-} from "../../config";
+import { ConfigTools, ReservedType } from "../../config";
 import { AccessType } from "../../enums";
 import { TypeInfo, UnknownType } from "../../type.info";
-import { Component } from "../component";
+import { SchemaTools } from "../schema.tools";
 
 export const PARAM_REGEX =
   /^(inject)?\s*(private|protected|public)?\s*(readonly)?\s*([a-zA-Z0-9_]+)(\?)?(\s*:\s*([a-zA-Z0-9\[\]\<\>\{\}\|\& ]+))?(\s*=\s*(.+))?$/;
@@ -33,8 +28,7 @@ export class ParamTools {
   static stringToData(
     str: string,
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ): ParamData {
     let name: string;
     let type: TypeInfo;
@@ -44,12 +38,12 @@ export class ParamTools {
     let access: string;
 
     const match = str.match(PARAM_REGEX);
-    console.log();
+
     if (Array.isArray(match)) {
       if (match[4]) {
         const temp = match[4].trim();
-        if (ConfigInstruction.isUseInstruction(temp)) {
-          name = ConfigUseInstruction.getValue(temp, addons);
+        if (ConfigTools.hasInstructions(temp)) {
+          name = ConfigTools.executeInstructions(temp, references, reserved);
         } else {
           name = temp;
         }
@@ -57,17 +51,8 @@ export class ParamTools {
 
       if (match[7]) {
         const temp = match[7].trim();
-        if (ConfigInstruction.isUseInstruction(temp)) {
-          type = TypeInfo.create(
-            ConfigUseInstruction.getValue(temp, addons),
-            reserved
-          );
-        } else if (ConfigInstruction.isDependencyInstruction(temp)) {
-          const component = ConfigDependencyInstruction.getDependency(
-            temp,
-            dependencies
-          );
-          type = TypeInfo.fromComponent(component);
+        if (ConfigTools.hasInstructions(temp)) {
+          type = ConfigTools.executeInstructions(temp, references, reserved);
         } else {
           type = TypeInfo.create(temp, reserved);
         }
@@ -77,8 +62,8 @@ export class ParamTools {
 
       if (match[9]) {
         const temp = match[9].trim();
-        if (ConfigInstruction.isUseInstruction(temp)) {
-          value = ConfigUseInstruction.getValue(temp, addons);
+        if (ConfigTools.hasInstructions(temp)) {
+          value = ConfigTools.executeInstructions(temp, references, reserved);
         } else {
           value = temp;
         }
@@ -104,46 +89,52 @@ export class ParamTools {
   static arrayToData(
     data: (string | ParamJson)[],
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ) {
     if (Array.isArray(data)) {
       return data.map((item) => {
         if (typeof item === "string") {
-          return ParamTools.stringToData(item, reserved, dependencies, addons);
+          return ParamTools.stringToData(item, reserved, references);
         }
-        let value = item.value;
+        let value;
         let type;
-        let name = item.name;
+        let name;
 
         if (typeof item.value === "string") {
-          if (ConfigInstruction.isUseInstruction(item.value)) {
-            value = ConfigUseInstruction.getValue(item.value, addons);
+          const temp = item.value.trim();
+          if (ConfigTools.hasInstructions(temp)) {
+            value = ConfigTools.executeInstructions(temp, references, reserved);
+          } else {
+            value = temp;
           }
+        } else {
+          value = SchemaTools.parseValue(item.value, (value) => {
+            return ConfigTools.hasInstructions(value)
+              ? ConfigTools.executeInstructions(value, references, reserved)
+              : value;
+          });
         }
 
         if (typeof item.type === "string") {
-          if (ConfigInstruction.isUseInstruction(item.type)) {
-            type = TypeInfo.create(
-              ConfigUseInstruction.getValue(item.type, addons),
-              reserved
-            );
-          } else if (ConfigInstruction.isDependencyInstruction(item.type)) {
-            const component = ConfigDependencyInstruction.getDependency(
-              item.type,
-              dependencies
-            );
-            type = TypeInfo.fromComponent(component);
+          const temp = item.type.trim();
+          if (ConfigTools.hasInstructions(temp)) {
+            type = ConfigTools.executeInstructions(temp, references, reserved);
           } else {
-            type = TypeInfo.create(item.type, reserved);
+            type = TypeInfo.create(temp, reserved);
           }
         }
 
         if (typeof item.name === "string") {
-          if (ConfigInstruction.isUseInstruction(item.name)) {
-            name = ConfigUseInstruction.getValue(item.name, addons);
+          const temp = item.name.trim();
+          if (ConfigTools.hasInstructions(temp)) {
+            name = ConfigTools.executeInstructions(temp, references, reserved);
+          } else {
+            name = temp;
           }
+        } else {
+          name = item.name;
         }
+
         return {
           name,
           type,
@@ -162,8 +153,7 @@ export class ParamSchema {
   public static create(
     data: string | ParamJson | ParamData,
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ): ParamSchema {
     if (!data) {
       return null;
@@ -177,12 +167,7 @@ export class ParamSchema {
     let access: string;
 
     if (typeof data === "string") {
-      const param = ParamTools.stringToData(
-        data,
-        reserved,
-        dependencies,
-        addons
-      );
+      const param = ParamTools.stringToData(data, reserved, references);
       name = param.name;
       type = param.type;
       value = param.value;
@@ -197,17 +182,8 @@ export class ParamSchema {
 
       if (typeof data.type === "string") {
         let temp = data.type.trim();
-        if (ConfigInstruction.isUseInstruction(temp)) {
-          type = TypeInfo.create(
-            ConfigUseInstruction.getValue(temp, addons),
-            reserved
-          );
-        } else if (ConfigInstruction.isDependencyInstruction(temp)) {
-          const component = ConfigDependencyInstruction.getDependency(
-            temp,
-            dependencies
-          );
-          type = TypeInfo.fromComponent(component);
+        if (ConfigTools.hasInstructions(temp)) {
+          type = ConfigTools.executeInstructions(temp, references, reserved);
         } else {
           type = TypeInfo.create(temp, reserved);
         }
@@ -219,24 +195,24 @@ export class ParamSchema {
 
       if (typeof data.value === "string") {
         const temp = data.value.trim();
-        if (ConfigInstruction.isUseInstruction(temp)) {
-          value = ConfigUseInstruction.getValue(temp, addons);
+        if (ConfigTools.hasInstructions(temp)) {
+          value = ConfigTools.executeInstructions(temp, references, reserved);
         } else {
           value = temp;
         }
       } else {
-        value = data.value;
+        value = SchemaTools.parseValue(data.value, (value) => {
+          return ConfigTools.hasInstructions(value)
+            ? ConfigTools.executeInstructions(value, references, reserved)
+            : value;
+        });
       }
 
-      if (typeof data.name === "string") {
-        const temp = data.name.trim();
-        if (ConfigInstruction.isUseInstruction(temp)) {
-          name = ConfigUseInstruction.getValue(temp, addons);
-        } else {
-          name = temp;
-        }
+      const tempName = data.name.trim();
+      if (ConfigTools.hasInstructions(tempName)) {
+        name = ConfigTools.executeInstructions(tempName, references, reserved);
       } else {
-        name = data.name;
+        name = tempName;
       }
     }
 

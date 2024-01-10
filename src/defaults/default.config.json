@@ -18,15 +18,6 @@
           "path": "storage import from \"...\""
         }
       },
-      "storage": {
-        "name": "MongoStorage",
-        "source": {
-          "name": "MongoSource"
-        },
-        "config": {
-          "name": "MongoConfig"
-        }
-      },
       "mappings": [
         {
           "db_type": "ObjectID",
@@ -115,20 +106,20 @@
               "params": [
                 {
                   "name": "model",
-                  "type": "dependency#model.name"
+                  "type": "{{USE DEPENDENCY(WHERE type.isModel IS true).type}}"
                 }
               ],
-              "return_type": "dependency#entity.name"
+              "return_type": "{{USE DEPENDENCY(WHERE type.isEntity IS true).type}}"
             },
             {
               "name": "toModel",
               "params": [
                 {
                   "name": "entity",
-                  "type": "dependency#entity.name"
+                  "type": "{{USE DEPENDENCY(WHERE type.isEntity IS true).type}}"
                 }
               ],
-              "return_type": "dependency#model.name"
+              "return_type": "{{USE DEPENDENCY(WHERE type.isModel IS true).type}}"
             }
           ]
         },
@@ -137,10 +128,10 @@
             "name": "MongoMapper",
             "generics": [
               {
-                "dflt": "dependency#entity.name"
+                "dflt": "{{USE DEPENDENCY(WHERE type.isEntity IS true).element.name}}"
               },
               {
-                "dflt": "dependency#model.name"
+                "dflt": "{{USE DEPENDENCY(WHERE type.isModel IS true).element.name}}"
               }
             ]
           },
@@ -179,7 +170,7 @@
                 {
                   "name": "table",
                   "type": "string",
-                  "value": "use#table"
+                  "value": "{{USE addons.table}}"
                 }
               ]
             }
@@ -188,7 +179,7 @@
             "name": "MongoCollectionSource",
             "generics": [
               {
-                "dflt": "dependency#model.name"
+                "dflt": "{{USE DEPENDENCY(WHERE type.isModel IS true).type}}"
               }
             ]
           },
@@ -213,15 +204,16 @@
         "common": {
           "generics": [
             {
-              "dflt": "dependency#model.name"
+              "meta": "{{IF addons.hasModel IS true}}",
+              "dflt": "{{USE DEPENDENCY(WHERE type.isModel IS true).type}}"
             }
           ],
           "methods": [
             {
-              "meta": "is#to_model_method",
+              "meta": "{{IF addons.hasModel IS true}}",
               "name": "toModel",
               "params": [],
-              "return_type": "dependency#model.name"
+              "return_type": "{{USE DEPENDENCY(WHERE type.isModel IS true).type}}"
             }
           ],
           "imports": [
@@ -307,8 +299,8 @@
           "methods": [
             {
               "name": "execute",
-              "params": "use#input",
-              "return_type": "use#output",
+              "params": "{{USE addons.input TO BUILD Array<Param>}}",
+              "return_type": "{{USE addons.output.type}}",
               "async": true
             }
           ]
@@ -334,10 +326,7 @@
             "name": "Respository",
             "generics": [
               {
-                "dflt": "dependency#entity.name"
-              },
-              {
-                "dflt": "dependency#model.name"
+                "dflt": "{{USE DEPENDENCY(WHERE type.isEntity IS true).type}}"
               }
             ]
           }
@@ -364,10 +353,10 @@
             "name": "RepositoryImpl",
             "generics": [
               {
-                "dflt": "dependency#entity.name"
+                "dflt": "{{USE DEPENDENCY(WHERE type.isEntity IS true).type}}"
               },
               {
-                "dflt": "dependency#model.name"
+                "dflt": "{{USE DEPENDENCY(WHERE type.isModel IS true).type}}"
               }
             ]
           }
@@ -413,7 +402,6 @@
           "props": [],
           "methods": [
             {
-              "meta": "global#repository_factory_method",
               "name": "create",
               "params": [],
               "return": null,
@@ -461,7 +449,8 @@
               "params": [
                 {
                   "name": "path",
-                  "value": "use#path"
+                  "type": "string",
+                  "value": "{{USE addons.path}}"
                 },
                 {
                   "name": "handler",
@@ -470,7 +459,10 @@
                 },
                 {
                   "name": "addons",
-                  "value": "use#addons"
+                  "type": "RouteAddons",
+                  "value": {
+                    "io": "{{USE DEPENDENCY(WHERE type.component IS route_io).element.name}}"
+                  }
                 }
               ]
             }
@@ -554,18 +546,18 @@
           "interfaces": [{
             "name": "RouteIO",
             "generics": [
-              { "dflt": "use#input" },
-              { "dflt": "use#output" }
+              { "dflt": "{{USE DEPENDENCY(WHERE type.type IS input).element.name}}" },
+              { "dflt": "{{USE DEPENDENCY(WHERE type.type IS output).element.name}}" }
             ]
           }],
           "methods": [
             {
               "name": "toResponse",
-              "return_type": "use#input",
+              "return_type": "{{USE DEPENDENCY(WHERE type.type IS input).type}}",
               "params": [
                 {
                   "name": "output",
-                  "type": "use#output"
+                  "type": "{{USE DEPENDENCY(WHERE type.type IS output).type}}"
                 }
               ]
             },
@@ -575,7 +567,7 @@
               "params": [
                 {
                   "name": "request",
-                  "type": "Request<use#query_params, use#path_params, use#request_body>"
+                  "type": "Request<{{USE DEPENDENCY(WHERE type.type IS query_params).element.name}}, {{USE DEPENDENCY(WHERE type.type IS path_params).element.name}}, {{USE DEPENDENCY(WHERE type.type IS request_body).element.name}}>"
                 }
               ]
             }

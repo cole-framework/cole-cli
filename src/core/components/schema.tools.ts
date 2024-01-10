@@ -1,3 +1,4 @@
+import { ConfigTools, InstructionData, ReservedType } from "../config";
 import { AccessType } from "../enums";
 
 export class SchemaTools {
@@ -106,5 +107,40 @@ export class SchemaTools {
       }
     });
     return obj;
+  }
+
+  static parseValue(data: any, parser) {
+    if (Array.isArray(data)) {
+      return data.map((value) => parser(value));
+    }
+
+    if (typeof data === "object") {
+      const parsed = {};
+
+      Object.keys(data).forEach((key) => {
+        const value = data[key];
+
+        if (Array.isArray(value)) {
+          parsed[key] = value.map((v) => parser(v));
+        } else {
+          parsed[key] = parser(value);
+        }
+      });
+      return parsed;
+    }
+
+    return data;
+  }
+
+  static executeMeta(
+    item: any,
+    data: InstructionData,
+    reserved: ReservedType[]
+  ) {
+    if (item["meta"]) {
+      return ConfigTools.executeInstructions(item["meta"], data, reserved);
+    }
+
+    return true;
   }
 }

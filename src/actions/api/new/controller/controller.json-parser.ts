@@ -37,7 +37,7 @@ export class ControllerJsonParser {
         continue;
       }
 
-      if (controllers.find((e) => e.name === name)) {
+      if (controllers.find((e) => e.type.name === name)) {
         continue;
       }
 
@@ -55,7 +55,8 @@ export class ControllerJsonParser {
                 },
                 null,
                 writeMethod.dependency,
-                config
+                config,
+                []
               );
               handler.input = entity.element.name;
               entities.push(entity);
@@ -71,7 +72,8 @@ export class ControllerJsonParser {
                 },
                 null,
                 writeMethod.dependency,
-                config
+                config,
+                []
               );
               handler.output = entity.element.name;
               entities.push(entity);
@@ -83,7 +85,8 @@ export class ControllerJsonParser {
       const controller = ControllerFactory.create(
         data,
         writeMethod.component,
-        config
+        config,
+        []
       );
 
       controller.unresolvedDependencies.forEach((type) => {
@@ -91,12 +94,12 @@ export class ControllerJsonParser {
         if (type.isModel) {
           let model;
           model = modelsRef.find(
-            (m) => m.element.name === type.name && m.type.type === type.type
+            (m) => m.type.name === type.name && m.type.type === type.type
           );
 
           if (!model) {
             model = models.find(
-              (m) => m.element.name === type.name && m.type.type === type.type
+              (m) => m.type.name === type.name && m.type.type === type.type
             );
           }
 
@@ -108,17 +111,18 @@ export class ControllerJsonParser {
                 type: type.type,
               },
               writeMethod.dependency,
-              config
+              config,
+              []
             );
             models.push(model);
           }
           controller.addDependency(model);
         } else if (type.isEntity) {
           let entity;
-          entity = entitiesRef.find((m) => m.element.name === type.name);
+          entity = entitiesRef.find((m) => m.type.name === type.name);
 
           if (!entity) {
-            entity = entities.find((m) => m.element.name === type.name);
+            entity = entities.find((m) => m.type.name === type.name);
           }
 
           if (!entity) {
@@ -126,7 +130,8 @@ export class ControllerJsonParser {
               { name: type.name, endpoint: controller.endpoint },
               null,
               writeMethod.dependency,
-              config
+              config,
+              []
             );
             entities.push(entity);
           }

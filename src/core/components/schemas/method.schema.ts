@@ -1,10 +1,4 @@
-import {
-  ConfigAddons,
-  ReservedType,
-  ConfigInstruction,
-  ConfigUseInstruction,
-  ConfigDependencyInstruction,
-} from "../../config";
+import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { AccessType } from "../../enums";
 import { TypeInfo, UnknownType } from "../../type.info";
 import { Component } from "../component";
@@ -50,8 +44,7 @@ export class MethodTools {
   static stringToData(
     str: string,
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ): MethodData {
     let name: string;
     let access: string;
@@ -85,25 +78,21 @@ export class MethodTools {
 
       if (match[4]) {
         let temp = match[4].trim();
-        name = temp;
-        if (ConfigInstruction.isUseInstruction(temp)) {
-          name = ConfigUseInstruction.getValue(temp, addons);
+        if (ConfigTools.hasInstructions(temp)) {
+          name = ConfigTools.executeInstructions(temp, references, reserved);
+        } else {
+          name = temp;
         }
       }
 
       if (match[10]) {
         let temp = match[10].trim();
-        if (ConfigInstruction.isUseInstruction(temp)) {
-          returnType = TypeInfo.create(
-            ConfigUseInstruction.getValue(temp, addons),
+        if (ConfigTools.hasInstructions(temp)) {
+          returnType = ConfigTools.executeInstructions(
+            temp,
+            references,
             reserved
           );
-        } else if (ConfigInstruction.isDependencyInstruction(temp)) {
-          const component = ConfigDependencyInstruction.getDependency(
-            temp,
-            dependencies
-          );
-          returnType = TypeInfo.fromComponent(component);
         } else {
           returnType = TypeInfo.create(temp, reserved);
         }
@@ -114,14 +103,10 @@ export class MethodTools {
       body = match[12]?.trim();
 
       SchemaTools.splitIgnoringBrackets(match[6], ",").forEach((str) => {
-        generics.push(
-          GenericTools.stringToData(str, reserved, dependencies, addons)
-        );
+        generics.push(GenericTools.stringToData(str, reserved, references));
       });
       SchemaTools.splitIgnoringBrackets(match[8], ",").forEach((str) => {
-        params.push(
-          ParamTools.stringToData(str, reserved, dependencies, addons)
-        );
+        params.push(ParamTools.stringToData(str, reserved, references));
       });
     } else {
       throw new Error(`Method regex match failure`);
@@ -143,46 +128,44 @@ export class MethodTools {
   static arrayToData(
     data: (string | MethodJson)[],
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ) {
     if (Array.isArray(data)) {
       return data.map((item) => {
         if (typeof item === "string") {
-          return MethodTools.stringToData(item, reserved, dependencies, addons);
+          return MethodTools.stringToData(item, reserved, references);
         }
         let name = item.name;
         let return_type;
 
         if (typeof item.return_type === "string") {
-          if (ConfigInstruction.isUseInstruction(item.return_type)) {
-            return_type = TypeInfo.create(
-              ConfigUseInstruction.getValue(item.return_type, addons),
+          const temp = item.return_type.trim();
+          if (ConfigTools.hasInstructions(temp)) {
+            return_type = ConfigTools.executeInstructions(
+              temp,
+              references,
               reserved
             );
-          } else if (
-            ConfigInstruction.isDependencyInstruction(item.return_type)
-          ) {
-            const component = ConfigDependencyInstruction.getDependency(
-              item.return_type,
-              dependencies
-            );
-            return_type = TypeInfo.fromComponent(component);
           } else {
-            return_type = TypeInfo.create(item.return_type, reserved);
+            return_type = TypeInfo.create(temp, reserved);
           }
         }
 
-        if (typeof item.name === "string") {
-          if (ConfigInstruction.isUseInstruction(item.name)) {
-            name = ConfigUseInstruction.getValue(item.name, addons);
-          }
+        const tempName = item.name.trim();
+        if (ConfigTools.hasInstructions(tempName)) {
+          name = ConfigTools.executeInstructions(
+            tempName,
+            references,
+            reserved
+          );
+        } else {
+          name = tempName;
         }
 
         return {
           name,
           params: Array.isArray(item.params)
-            ? ParamTools.arrayToData(item.params, reserved, [], addons)
+            ? ParamTools.arrayToData(item.params, reserved, references)
             : [],
           access: item.access,
           is_async: item.is_async,
@@ -199,8 +182,7 @@ export class MethodSchema {
   public static create(
     data: MethodData | MethodJson | string,
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ): MethodSchema {
     if (!data) {
       return null;
@@ -217,84 +199,90 @@ export class MethodSchema {
     let generics: GenericSchema[] = [];
 
     if (typeof data === "string") {
-      const mth = MethodTools.stringToData(
-        data,
-        reserved,
-        dependencies,
-        addons
-      );
+      const mth = MethodTools.stringToData(data, reserved, references);
       name = mth.name;
       access = mth.access;
       params = mth.params.map((p) =>
-        ParamSchema.create(p, reserved, dependencies, addons)
+        ParamSchema.create(p, reserved, references)
       );
       returnType = mth.return_type;
       isAsync = mth.is_async;
       isStatic = mth.is_static;
       body = mth.body;
       generics = mth.generics.map((g) =>
-        GenericSchema.create(g, reserved, dependencies, addons)
+        GenericSchema.create(g, reserved, references)
       );
     } else {
       access = data.access || AccessType.Public;
-      name = data.name;
       isAsync = data.is_async;
       isStatic = data.is_static;
       body = data.body;
 
-      if (ConfigInstruction.isUseInstruction(data.name)) {
-        name = ConfigUseInstruction.getValue(data.name, addons);
+      const tempName = data.name.trim();
+      if (ConfigTools.hasInstructions(tempName)) {
+        name = ConfigTools.executeInstructions(tempName, references, reserved);
+      } else {
+        name = tempName;
       }
 
       if (TypeInfo.isType(data.return_type)) {
         returnType = data.return_type;
       } else if (typeof data.return_type === "string") {
-        if (ConfigInstruction.isUseInstruction(data.return_type)) {
-          returnType = TypeInfo.create(
-            ConfigUseInstruction.getValue(data.return_type, addons),
+        const temp = data.return_type.trim();
+        if (ConfigTools.hasInstructions(temp)) {
+          returnType = ConfigTools.executeInstructions(
+            temp,
+            references,
             reserved
           );
-        } else if (
-          ConfigInstruction.isDependencyInstruction(data.return_type)
-        ) {
-          const component = ConfigDependencyInstruction.getDependency(
-            data.return_type,
-            dependencies
-          );
-          returnType = TypeInfo.fromComponent(component);
         } else {
-          returnType = TypeInfo.create(data.return_type, reserved);
+          returnType = TypeInfo.create(temp, reserved);
         }
       }
 
       if (Array.isArray(data.params)) {
         data.params.forEach((param) => {
-          params.push(
-            ParamSchema.create(param, reserved, dependencies, addons)
-          );
+          if (SchemaTools.executeMeta(param, references, reserved)) {
+            if (ConfigTools.hasInstructions(param)) {
+              const p = ConfigTools.executeInstructions(
+                param,
+                references,
+                reserved
+              );
+              if (p) {
+                params.push(p);
+              }
+            } else {
+              params.push(ParamSchema.create(param, reserved, references));
+            }
+          }
         });
-      } else if (
-        typeof data.params === "string" &&
-        ConfigInstruction.isUseInstruction(data.params)
-      ) {
-        const ref = ConfigUseInstruction.getValue(data.params, addons);
-        if (Array.isArray(ref)) {
-          ref.forEach((param) => {
-            params.push(ParamSchema.create(param, reserved, dependencies));
-          });
+      } else if (typeof data.params === "string") {
+        if (ConfigTools.hasInstructions(data.params)) {
+          params = ConfigTools.executeInstructions(
+            data.params,
+            references,
+            reserved
+          );
+        } else {
+          if (SchemaTools.executeMeta(data.params, references, reserved)) {
+            params.push(ParamSchema.create(data.params, reserved, references));
+          }
         }
       }
 
       if (Array.isArray(data.generics)) {
         data.generics.forEach((g) => {
-          generics.push(
-            GenericSchema.create(g, reserved, dependencies, addons)
-          );
+          if (SchemaTools.executeMeta(g, references, reserved)) {
+            generics.push(GenericSchema.create(g, reserved, references));
+          }
         });
       }
 
       if (data.supr) {
-        supr = MethodSchema.create(data.supr, reserved, dependencies, addons);
+        if (SchemaTools.executeMeta(data.supr, references, reserved)) {
+          supr = MethodSchema.create(data.supr, reserved, references);
+        }
       }
     }
 

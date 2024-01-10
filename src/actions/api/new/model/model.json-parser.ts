@@ -29,14 +29,19 @@ export class ModelJsonParser {
       const { types, ...rest } = data;
 
       for (const type of types) {
-        if (models.find((m) => m.name === data.name && m.type.type === type)) {
+        if (
+          models.find(
+            (m) => m.type.name === data.name && m.type.type === type
+          )
+        ) {
           continue;
         }
 
         const model = ModelFactory.create(
           { ...rest, type },
           writeMethod.component,
-          config
+          config,
+          []
         );
 
         models.push(model);
@@ -48,13 +53,14 @@ export class ModelJsonParser {
         if (type.isModel) {
           let m;
           m = models.find(
-            (m) => m.element.name === type.name && m.type.type === type.type
+            (m) => m.type.name === type.name && m.type.type === type.type
           );
           if (!m) {
             m = ModelFactory.create(
               { name: type.name, endpoint: model.endpoint, type: type.type },
               writeMethod.dependency,
-              config
+              config,
+              []
             );
             models.push(m);
           }

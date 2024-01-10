@@ -4,8 +4,8 @@ import {
   Component,
   TypeSchema,
   TypeJson,
-  ComponentType,
   Config,
+  ModelType,
 } from "../../../../core";
 import { ModelData, ModelElement, ModelAddons } from "./types";
 
@@ -14,10 +14,9 @@ export class ModelFactory {
     data: ModelData,
     writeMethod: WriteMethod,
     config: Config,
-    dependencies?: Component[]
+    dependencies: Component[]
   ): Component<ModelElement, ModelAddons> {
-    const deps = Array.isArray(dependencies) ? [...dependencies] : [];
-    const { id, name, type, endpoint } = data;
+    const { id, name, type, endpoint, alias } = data;
     const addons = { modelType: type };
     const { defaults } = config.components.model;
     const componentName = config.components.model.generateName(name, {
@@ -67,26 +66,29 @@ export class ModelFactory {
 
     const element = TypeSchema.create(
       {
-        name,
+        name: componentName,
         type,
         props,
         generics,
+        imports,
+        alias,
       } as TypeJson,
       config.reservedTypes,
-      deps,
-      addons
+      {
+        addons,
+        dependencies,
+      }
     );
 
     const component = Component.create<ModelElement, ModelAddons>(
       id || nanoid(),
-      componentName,
-      new ComponentType("model", type),
+      new ModelType(name, type),
       endpoint,
       componentPath,
       writeMethod,
       addons,
       element,
-      deps
+      dependencies
     );
 
     return component;

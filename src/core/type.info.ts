@@ -1,7 +1,6 @@
 import { pascalCase } from "change-case";
 
 import { BasicType } from "./enums";
-import { Component } from "./components";
 import { ReservedType } from "./config";
 
 export type ComponentLabel =
@@ -19,6 +18,12 @@ export type ComponentLabel =
   | "route_io";
 
 export abstract class TypeInfo {
+  public static areIdentical(a: TypeInfo, b: TypeInfo) {
+    return (
+      a.name === a.name && a.type === b.type && a.component === b.component
+    );
+  }
+
   public static createFrameworkType(
     name: string,
     generics: string[] = []
@@ -35,44 +40,42 @@ export abstract class TypeInfo {
         : pascalCase(name)
     );
   }
-  public static fromComponent(component: Component): TypeInfo {
-    if (!component) {
+
+  public static create(data: any, reserved?: ReservedType[]): TypeInfo {
+    if (!data) {
       return new UnknownType();
     }
 
-    switch (component.type.name) {
-      case "model": {
-        return new ModelType(component.name, component.type.type);
+    if (data.type?.name) {
+      switch (data.type.name) {
+        case "model": {
+          return new ModelType(data.name, data.type.type);
+        }
+        case "route_model": {
+          return new ModelType(data.name, data.type.type);
+        }
+        case "entity": {
+          return new EntityType(data.name);
+        }
+        default: {
+          return new UnknownType();
+        }
       }
-      case "route_model": {
-        return new ModelType(component.name, component.type.type);
-      }
-      case "entity": {
-        return new EntityType(component.name);
-      }
-      default: {
-        return new UnknownType();
-      }
-    }
-  }
-  public static create(name: string, reserved?: ReservedType[]): TypeInfo {
-    if (!name) {
-      return new UnknownType();
     }
 
-    const entityMatch = name.match(/^entity\s*<\s*(\w+)\s*>/i);
+    const entityMatch = data.match(/^entity\s*<\s*(\w+)\s*>/i);
     if (entityMatch) {
       return new EntityType(entityMatch[1]);
     }
 
-    const modelMatch = name.match(/^model\s*<\s*(\w+)\s*,?\s*(\w+)?\s*>/i);
+    const modelMatch = data.match(/^model\s*<\s*(\w+)\s*,?\s*(\w+)?\s*>/i);
     if (modelMatch) {
       return new ModelType(modelMatch[1], modelMatch[2]?.toLowerCase());
     }
 
-    if (name.includes("|") || name.includes("&")) {
+    if (data.includes("|") || data.includes("&")) {
       const chain = new Set<TypeInfo | "|" | "&">();
-      const match = name.match(/[a-zA-Z0-9<>, ]+|[|&]/g);
+      const match = data.match(/[a-zA-Z0-9<>, ]+|[|&]/g);
       match.forEach((str) => {
         if (str !== "|" && str !== "&") {
           chain.add(TypeInfo.create(str.trim()));
@@ -94,12 +97,12 @@ export abstract class TypeInfo {
       );
     }
 
-    const typeLC = name.toLowerCase();
+    const typeLC = data.toLowerCase();
 
     if (typeLC.includes(BasicType.Array) || typeLC.includes("[]")) {
       const t = /^array\s*<\s*([a-zA-Z0-9<>_ ]+)\s*>/.test(typeLC)
-        ? name.match(/<([a-zA-Z0-9<>_ ]+)>/)[1]
-        : name.replace("[]", "");
+        ? data.match(/<([a-zA-Z0-9<>_ ]+)>/)[1]
+        : data.replace("[]", "");
 
       const itemType = TypeInfo.create(t, reserved);
 
@@ -107,14 +110,14 @@ export abstract class TypeInfo {
     }
 
     if (typeLC.includes(BasicType.Set)) {
-      const t = name.match(/<([a-zA-Z0-9<>_ ]+)>/)[1];
+      const t = data.match(/<([a-zA-Z0-9<>_ ]+)>/)[1];
       const itemType = TypeInfo.create(t, reserved);
 
       return new SetType(`Set<${itemType.name}>`, itemType);
     }
 
     if (typeLC.includes(BasicType.Map)) {
-      const match = name.match(
+      const match = data.match(
         /<\s*([a-zA-Z0-9<>_ ]+)\s*,\s*([a-zA-Z0-9<>_ ]+)\s*>/
       );
       const map = {
@@ -133,17 +136,17 @@ export abstract class TypeInfo {
       for (const r of reserved) {
         if (r.name.toLowerCase() === typeLC) {
           if (r.category === "DatabaseType") {
-            return new DatabaseType(name);
+            return new DatabaseType(data);
           } else if (r.category === "FrameworkDefault") {
-            return new FrameworkDefaultType(name);
+            return new FrameworkDefaultType(data);
           } else if (r.category === "Primitive") {
-            return new PrimitiveType(name);
+            return new PrimitiveType(data);
           }
         }
       }
     }
 
-    return new ModelType(name);
+    return new ModelType(data);
   }
 
   public static isArray(type: TypeInfo): type is ArrayType {
@@ -180,7 +183,7 @@ export abstract class TypeInfo {
     return type.isIterable;
   }
 
-  public static isComponentType(type: TypeInfo): type is ComponentType {
+  public static isComponentType(type: TypeInfo) {
     return type.isComponentType;
   }
 
@@ -201,72 +204,22 @@ export abstract class TypeInfo {
       type instanceof UnknownType ||
       type instanceof ModelType ||
       type instanceof EntityType ||
+      type instanceof ControllerType ||
+      type instanceof SourceType ||
+      type instanceof MapperType ||
+      type instanceof UseCaseType ||
+      type instanceof RepositoryType ||
+      type instanceof RepositoryImplType ||
+      type instanceof RepositoryFactoryType ||
+      type instanceof RouteType ||
+      type instanceof RouteIOType ||
       type instanceof ArrayType ||
       type instanceof SetType ||
       type instanceof MapType ||
       type instanceof MultiType ||
-      type instanceof ComponentType ||
       type instanceof ConfigInstructionType ||
       type instanceof PrimitiveType
     );
-  }
-
-  public static extractEntityTypes(type: TypeInfo): EntityType[] {
-    if (type.isArray || type.isSet) {
-      const entities = TypeInfo.extractEntityTypes(type.itemType);
-      return [...entities.flat()];
-    }
-
-    if (type.isMap) {
-      const keys = TypeInfo.extractEntityTypes(type.keyType);
-      const values = TypeInfo.extractEntityTypes(type.valueType);
-      return [...keys, ...values.flat()];
-    }
-
-    if (type.isMultiType) {
-      return type.chain.reduce((list, t) => {
-        if (TypeInfo.isType(t)) {
-          const entities = TypeInfo.extractEntityTypes(type.itemType);
-          list.push(...entities.flat());
-        }
-        return list;
-      }, []);
-    }
-
-    if (type.isEntity) {
-      return [type as EntityType];
-    }
-
-    return [];
-  }
-
-  public static extractModelTypes(type: TypeInfo): ModelType[] {
-    if (type.isArray || type.isSet) {
-      const models = TypeInfo.extractModelTypes(type.itemType);
-      return [...models.flat()];
-    }
-
-    if (type.isMap) {
-      const keys = TypeInfo.extractModelTypes(type.keyType);
-      const values = TypeInfo.extractModelTypes(type.valueType);
-      return [...keys, ...values.flat()];
-    }
-
-    if (type.isMultiType) {
-      return type.chain.reduce((list, t) => {
-        if (TypeInfo.isType(t)) {
-          const models = TypeInfo.extractModelTypes(type.itemType);
-          list.push(...models.flat());
-        }
-        return list;
-      }, []);
-    }
-
-    if (type.isModel) {
-      return [type as ModelType];
-    }
-
-    return [];
   }
 
   constructor(
@@ -288,11 +241,16 @@ export abstract class TypeInfo {
     public readonly isModel?: boolean,
     public readonly isSource?: boolean,
     public readonly isRepository?: boolean,
+    public readonly isRepositoryImpl?: boolean,
+    public readonly isRepositoryFactory?: boolean,
     public readonly isUseCase?: boolean,
     public readonly isController?: boolean,
     public readonly isMapper?: boolean,
+    public readonly isRoute?: boolean,
+    public readonly isRouteIO?: boolean,
     public readonly isConfigInstructionType?: boolean,
     public readonly type?: string,
+    public readonly component?: string,
     public readonly chain?: (TypeInfo | "|" | "&")[]
   ) {}
 
@@ -373,22 +331,10 @@ export class UnknownType {
   }
 }
 
-export class ComponentType {
-  public readonly isComponentType = true;
-
-  constructor(
-    public readonly name: ComponentLabel,
-    public readonly type?: string
-  ) {}
-
-  get ref() {
-    return this.name;
-  }
-}
-
 export class ModelType {
   public readonly isModel = true;
   public readonly isComponentType = true;
+  public readonly component = "model";
   constructor(public readonly name: string, public readonly type = "json") {}
 
   get ref() {
@@ -399,10 +345,121 @@ export class ModelType {
 export class EntityType {
   public readonly isEntity = true;
   public readonly isComponentType = true;
+  public readonly component = "entity";
   constructor(public readonly name: string) {}
 
   get ref() {
     return `Entity<${this.name}>`;
+  }
+}
+
+export class RouteType {
+  public readonly isRoute = true;
+  public readonly isComponentType = true;
+  public readonly component = "route";
+  constructor(public readonly name: string, public readonly type: string) {}
+
+  get ref() {
+    return `Route<${this.name},${this.type}>`;
+  }
+}
+
+export class RouteIOType {
+  public readonly isRouteIO = true;
+  public readonly isComponentType = true;
+  public readonly component = "route_io";
+  constructor(public readonly name: string) {}
+
+  get ref() {
+    return `RouteIO<${this.name}>`;
+  }
+}
+
+export class RouteModelType {
+  public readonly isRouteModel = true;
+  public readonly isComponentType = true;
+  public readonly component = "route_model";
+  constructor(public readonly name: string, public readonly type: string) {}
+
+  get ref() {
+    return `RouteModel<${this.name}>`;
+  }
+}
+
+export class SourceType {
+  public readonly isSource = true;
+  public readonly isComponentType = true;
+  public readonly component = "source";
+  constructor(public readonly name: string, public readonly type: string) {}
+
+  get ref() {
+    return `Source<${this.name},${this.type}>`;
+  }
+}
+
+export class MapperType {
+  public readonly isMapper = true;
+  public readonly isComponentType = true;
+  public readonly component = "mapper";
+  constructor(public readonly name: string, public readonly type: string) {}
+
+  get ref() {
+    return `Mapper<${this.name},${this.type}>`;
+  }
+}
+
+export class UseCaseType {
+  public readonly isUseCase = true;
+  public readonly isComponentType = true;
+  public readonly component = "use_case";
+  constructor(public readonly name: string) {}
+
+  get ref() {
+    return `UseCase<${this.name}>`;
+  }
+}
+
+export class RepositoryType {
+  public readonly isRepository = true;
+  public readonly isComponentType = true;
+  public readonly component = "repository";
+  constructor(public readonly name: string) {}
+
+  get ref() {
+    return `Repository<${this.name}>`;
+  }
+}
+
+export class RepositoryImplType {
+  public readonly isRepositoryImpl = true;
+  public readonly isComponentType = true;
+  public readonly component = "repository_impl";
+  constructor(public readonly name: string) {}
+
+  get ref() {
+    return `RepositoryImpl<${this.name}>`;
+  }
+}
+
+export class RepositoryFactoryType {
+  public readonly isRepositoryFactory = true;
+  public readonly isComponentType = true;
+  public readonly component = "repository_factory";
+  constructor(public readonly name: string) {}
+
+  get ref() {
+    return `RepositoryFactory<${this.name}>`;
+  }
+}
+
+export class ControllerType {
+  public readonly isController = true;
+  public readonly isComponentType = true;
+  public readonly component = "controller";
+  constructor(public readonly name: string) {}
+
+  get ref() {
+    return `Controller<${this.name}>`;
   }
 }
 

@@ -5,7 +5,7 @@ import {
   Component,
   ClassSchema,
   ClassJson,
-  ComponentType,
+  EntityType,
 } from "../../../../core";
 import { Model } from "../model";
 import { EntityData, Entity, EntityElement, EntityAddons } from "./types";
@@ -16,12 +16,8 @@ export class EntityFactory {
     model: Model,
     writeMethod: WriteMethod,
     config: Config,
-    dependencies?: Component[]
+    dependencies: Component[]
   ): Entity {
-    const deps: Component[] = Array.isArray(dependencies)
-      ? [...dependencies]
-      : [];
-
     const { id, name, endpoint } = data;
     const addons = { hasModel: !!model };
     const { defaults } = config.components.entity;
@@ -34,16 +30,19 @@ export class EntityFactory {
     const methods = [];
     const imports = [];
     const generics = [];
+    const inheritance = [];
+    let ctor;
+
+    if (defaults?.common.ctor) {
+      ctor = defaults.common.ctor;
+    }
 
     if (Array.isArray(defaults?.common?.methods)) {
-      defaults.common.methods.forEach((method) => {
-        if (
-          (model && method.meta.includes("is#to_model_method")) ||
-          !method.meta
-        ) {
-          methods.push(method);
-        }
-      });
+      methods.push(...defaults.common.methods);
+    }
+
+    if (defaults?.common?.inheritance) {
+      inheritance.push(defaults.common.inheritance);
     }
 
     if (Array.isArray(defaults?.common?.props)) {
@@ -52,6 +51,10 @@ export class EntityFactory {
 
     if (Array.isArray(data.props)) {
       props.push(...data.props);
+    }
+
+    if (Array.isArray(data.methods)) {
+      methods.push(...data.methods);
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
@@ -64,27 +67,30 @@ export class EntityFactory {
 
     const element = ClassSchema.create(
       {
-        name,
+        name: componentName,
         props,
         methods,
         generics,
         imports,
+        ctor,
+        inheritance,
       } as ClassJson,
       config.reservedTypes,
-      deps,
-      addons
+      {
+        addons,
+        dependencies,
+      }
     );
 
     const component = Component.create<EntityElement, EntityAddons>(
       id || nanoid(),
-      componentName,
-      new ComponentType("entity"),
+      new EntityType(name),
       endpoint,
       componentPath,
       writeMethod,
       addons,
       element,
-      deps
+      dependencies
     );
 
     if (model) {

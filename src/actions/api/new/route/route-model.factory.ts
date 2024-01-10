@@ -1,12 +1,13 @@
 import { nanoid } from "nanoid";
 import { RouteModelAddons, RouteModelData, RouteModelElement } from "./types";
-import { ComponentType } from "../../../../core/type.info";
 import {
   Config,
   WriteMethod,
   Component,
   TypeSchema,
   TypeJson,
+  RouteModelLabel,
+  RouteModelType,
 } from "../../../../core";
 
 export class RouteModelFactory {
@@ -14,9 +15,8 @@ export class RouteModelFactory {
     data: RouteModelData,
     writeMethod: WriteMethod,
     config: Config,
-    dependencies?: Component[]
+    dependencies: Component[]
   ): Component<RouteModelElement, RouteModelAddons> {
-    const deps = Array.isArray(dependencies) ? [...dependencies] : [];
     const { method, name, type, endpoint } = data;
     const addons = { modelType: type };
     const { defaults } = config.components.routeModel;
@@ -69,26 +69,27 @@ export class RouteModelFactory {
 
     const element = TypeSchema.create(
       {
-        name,
+        name: componentName,
         type,
         props,
         generics,
       } as TypeJson,
       config.reservedTypes,
-      deps,
-      addons
+      {
+        addons,
+        dependencies
+      }
     );
 
     const component = Component.create<RouteModelElement, RouteModelAddons>(
       nanoid(),
-      componentName,
-      new ComponentType("route_model", type),
+      new RouteModelType(name, type),
       endpoint,
       componentPath,
       writeMethod,
       addons,
       element,
-      deps
+      dependencies
     );
 
     return component;

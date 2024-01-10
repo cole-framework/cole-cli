@@ -1,10 +1,4 @@
-import {
-  ConfigAddons,
-  ReservedType,
-  ConfigInstruction,
-  ConfigUseInstruction,
-  ConfigDependencyInstruction,
-} from "../../config";
+import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { TypeInfo } from "../../type.info";
 import { Component } from "../component";
 import { SchemaTools } from "../schema.tools";
@@ -27,8 +21,7 @@ export class GenericTools {
   static stringToData(
     str: string,
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ): GenericData {
     let inheritance;
     let name;
@@ -39,29 +32,22 @@ export class GenericTools {
     );
     if (match[1]) {
       let temp = match[1].trim();
-      name = temp;
-      if (ConfigInstruction.isUseInstruction(temp)) {
-        name = TypeInfo.create(
-          ConfigUseInstruction.getValue(temp, addons),
-          reserved
-        );
+      if (ConfigTools.hasInstructions(temp)) {
+        name = ConfigTools.executeInstructions(temp, references, reserved);
+      } else {
+        name = temp;
       }
     }
 
     if (match[3]) {
       let temp = match[3].trim();
 
-      if (ConfigInstruction.isUseInstruction(temp)) {
-        inheritance = TypeInfo.create(
-          ConfigUseInstruction.getValue(temp, addons),
+      if (ConfigTools.hasInstructions(temp)) {
+        inheritance = ConfigTools.executeInstructions(
+          temp,
+          references,
           reserved
         );
-      } else if (ConfigInstruction.isDependencyInstruction(temp)) {
-        const component = ConfigDependencyInstruction.getDependency(
-          temp,
-          dependencies
-        );
-        inheritance = TypeInfo.fromComponent(component);
       } else {
         inheritance = TypeInfo.create(temp, reserved);
       }
@@ -70,17 +56,8 @@ export class GenericTools {
     if (match[5]) {
       let temp = match[5].trim();
 
-      if (ConfigInstruction.isUseInstruction(temp)) {
-        dflt = TypeInfo.create(
-          ConfigUseInstruction.getValue(temp, addons),
-          reserved
-        );
-      } else if (ConfigInstruction.isDependencyInstruction(temp)) {
-        const component = ConfigDependencyInstruction.getDependency(
-          temp,
-          dependencies
-        );
-        dflt = TypeInfo.fromComponent(component);
+      if (ConfigTools.hasInstructions(temp)) {
+        dflt = ConfigTools.executeInstructions(temp, references, reserved);
       } else {
         dflt = TypeInfo.create(temp, reserved);
       }
@@ -98,20 +75,14 @@ export class GenericSchema {
   public static create(
     data: string | GenericJson | GenericData,
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ) {
     let inheritance;
     let name;
     let dflt;
 
     if (typeof data === "string") {
-      const generic = GenericTools.stringToData(
-        data,
-        reserved,
-        dependencies,
-        addons
-      );
+      const generic = GenericTools.stringToData(data, reserved, references);
       inheritance = generic.inheritance;
       name = generic.name;
       dflt = generic.dflt;
@@ -119,28 +90,19 @@ export class GenericSchema {
       name = data.name;
 
       if (typeof data.name === "string") {
-        if (ConfigInstruction.isUseInstruction(data.name)) {
-          name = TypeInfo.create(
-            ConfigUseInstruction.getValue(data.name, addons),
-            reserved
-          );
+        let temp = data.name.trim();
+        if (ConfigTools.hasInstructions(temp)) {
+          name = ConfigTools.executeInstructions(temp, references, reserved);
+        } else {
+          name = temp;
         }
       }
 
       if (typeof data.dflt === "string") {
         let temp = data.dflt.trim();
 
-        if (ConfigInstruction.isUseInstruction(temp)) {
-          dflt = TypeInfo.create(
-            ConfigUseInstruction.getValue(temp, addons),
-            reserved
-          );
-        } else if (ConfigInstruction.isDependencyInstruction(temp)) {
-          const component = ConfigDependencyInstruction.getDependency(
-            temp,
-            dependencies
-          );
-          dflt = TypeInfo.fromComponent(component);
+        if (ConfigTools.hasInstructions(temp)) {
+          dflt = ConfigTools.executeInstructions(temp, references, reserved);
         } else {
           dflt = TypeInfo.create(temp, reserved);
         }
@@ -151,17 +113,12 @@ export class GenericSchema {
       if (typeof data.inheritance === "string") {
         let temp = data.inheritance.trim();
 
-        if (ConfigInstruction.isUseInstruction(temp)) {
-          inheritance = TypeInfo.create(
-            ConfigUseInstruction.getValue(temp, addons),
+        if (ConfigTools.hasInstructions(temp)) {
+          inheritance = ConfigTools.executeInstructions(
+            temp,
+            references,
             reserved
           );
-        } else if (ConfigInstruction.isDependencyInstruction(temp)) {
-          const component = ConfigDependencyInstruction.getDependency(
-            temp,
-            dependencies
-          );
-          inheritance = TypeInfo.fromComponent(component);
         } else {
           inheritance = TypeInfo.create(temp, reserved);
         }

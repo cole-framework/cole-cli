@@ -4,7 +4,7 @@ import {
   Component,
   ClassData,
   ClassSchema,
-  ComponentType,
+  RouteType,
 } from "../../../../core";
 import { RouteData, RouteIO, RouteElement } from "./types";
 
@@ -23,9 +23,8 @@ export class RouteFactory {
       endpoint,
     } = data;
     const { defaults } = config.components.route;
-    const addons: { addons: { io?: string }; path: string } = {
+    const addons: { path: string } = {
       path: data.request.path,
-      addons: {},
     };
     const interfaces = [];
     const methods = [];
@@ -35,8 +34,19 @@ export class RouteFactory {
     let inheritance = [];
     let ctor;
 
+    const componentName = config.components.route.generateName(name, {
+      type: method,
+      method,
+    });
+
+    const componentPath = config.components.route.generatePath({
+      name,
+      type: method,
+      method,
+      endpoint,
+    }).path;
+
     if (io) {
-      addons.addons.io = io.name;
       dependencies.push(io);
     }
 
@@ -102,7 +112,7 @@ export class RouteFactory {
 
     const classData: ClassData = {
       id,
-      name,
+      name: componentName,
       props,
       methods,
       interfaces,
@@ -111,28 +121,14 @@ export class RouteFactory {
       ctor,
     };
 
-    const element = ClassSchema.create(
-      classData,
-      config.reservedTypes,
-      dependencies,
-      addons
-    );
-
-    const componentName = config.components.route.generateName(name, {
-      type: method,
-      method,
+    const element = ClassSchema.create(classData, config.reservedTypes, {
+      addons,
+      dependencies
     });
-    const componentPath = config.components.route.generatePath({
-      name,
-      type: method,
-      method,
-      endpoint,
-    }).path;
 
     const component = Component.create<RouteElement>(
       id,
-      componentName,
-      new ComponentType("route"),
+      new RouteType(name, method),
       endpoint,
       componentPath,
       writeMethod,

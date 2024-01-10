@@ -1,10 +1,10 @@
 import { UseCaseData, UseCaseElement } from "./types";
-import { ComponentType } from "../../../../core/type.info";
 import {
   ClassData,
   ClassSchema,
   Component,
   Config,
+  UseCaseType,
   WriteMethod,
 } from "../../../../core";
 
@@ -14,6 +14,7 @@ export class UseCaseFactory {
     writeMethod: WriteMethod,
     config: Config
   ): Component<UseCaseElement> {
+    const dependencies = [];
     const { id, name, input, output, endpoint } = data;
     const { defaults } = config.components.useCase;
     const addons = { input, output };
@@ -24,6 +25,12 @@ export class UseCaseFactory {
     const imports = [];
     let inheritance = [];
     let ctor;
+
+    const componentName = config.components.useCase.generateName(name);
+    const componentPath = config.components.useCase.generatePath({
+      name,
+      endpoint,
+    }).path;
 
     if (defaults?.common?.ctor) {
       ctor = defaults.common.ctor;
@@ -63,38 +70,30 @@ export class UseCaseFactory {
 
     const classData: ClassData = {
       id,
-      name,
+      name: componentName,
       props,
       methods,
       interfaces,
       generics,
       inheritance,
       ctor,
+      imports,
     };
 
-    const element = ClassSchema.create(
-      classData,
-      config.reservedTypes,
-      [],
-      addons
-    );
-
-    const componentName = config.components.useCase.generateName(name);
-    const componentPath = config.components.useCase.generatePath({
-      name,
-      endpoint,
-    }).path;
+    const element = ClassSchema.create(classData, config.reservedTypes, {
+      addons,
+      dependencies,
+    });
 
     const component = Component.create<UseCaseElement>(
       id,
-      componentName,
-      new ComponentType("use_case"),
+      new UseCaseType(name),
       endpoint,
       componentPath,
       writeMethod,
       null,
       element,
-      []
+      dependencies
     );
 
     return component;

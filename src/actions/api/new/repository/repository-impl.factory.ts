@@ -1,6 +1,6 @@
 import { DataContext, RepositoryData, RepositoryElement } from "./types";
 import { Entity } from "../entity";
-import { ComponentType, TypeInfo } from "../../../../core/type.info";
+import { RepositoryImplType, TypeInfo } from "../../../../core/type.info";
 import {
   AccessType,
   ClassData,
@@ -28,7 +28,13 @@ export class RepositoryImplFactory {
     const generics = [];
     const imports = [];
     let inheritance = [];
-    let ctor = { params: [], supr: null };
+    let ctor: any = { params: [], supr: null };
+
+    const componentName = config.components.repositoryImpl.generateName(name);
+    const componentPath = config.components.repositoryImpl.generatePath({
+      name,
+      endpoint,
+    }).path;
 
     if (defaults?.common?.inheritance) {
       inheritance.push(defaults.common?.inheritance);
@@ -54,16 +60,14 @@ export class RepositoryImplFactory {
       generics.push(...defaults.common.generics);
     }
 
-    console.log("-----", contexts);
-
     if (contexts.length > 0) {
       ctor.supr = {
         params: [
           {
             name: "context",
             type: TypeInfo.createFrameworkType("DataContext", [
-              entity.name,
-              contexts[0].model.name,
+              entity.element.name,
+              contexts[0].model.element.name,
             ]),
             access: AccessType.Protected,
           },
@@ -77,8 +81,8 @@ export class RepositoryImplFactory {
       ctor.params.push({
         name: storage,
         type: TypeInfo.createFrameworkType("DataContext", [
-          entity.name,
-          context.model.name,
+          entity.element.name,
+          context.model.element.name,
         ]),
         access: AccessType.Protected,
       });
@@ -117,32 +121,24 @@ export class RepositoryImplFactory {
     }
     const classData: ClassData = {
       id,
-      name,
+      name: componentName,
       props,
       methods,
       interfaces,
       generics,
       inheritance,
       ctor,
+      imports,
     };
 
-    const element = ClassSchema.create(
-      classData,
-      config.reservedTypes,
-      dependencies,
-      addons
-    );
-
-    const componentName = config.components.repositoryImpl.generateName(name);
-    const componentPath = config.components.repositoryImpl.generatePath({
-      name,
-      endpoint,
-    }).path;
+    const element = ClassSchema.create(classData, config.reservedTypes, {
+      addons,
+      dependencies
+    });
 
     const component = Component.create<RepositoryElement>(
       id,
-      componentName,
-      new ComponentType("repository_impl"),
+      new RepositoryImplType(name),
       endpoint,
       componentPath,
       writeMethod,

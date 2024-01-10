@@ -1,10 +1,8 @@
-import { ComponentType, ConfigLoader, WriteMethod } from "../../../../core";
+import { ConfigLoader, WriteMethod } from "../../../../core";
 import { FileTransport } from "../../../../transport/file.transport";
 import { ApiGenerator } from "../api-generator";
 import { ApiData } from "../api.types";
 import {
-  // NewMapperInteractiveStrategy,
-  NewMapperJsonStrategy,
   NewMapperOptionsStrategy,
 } from "./strategies";
 import { NewMapperOptions } from "./types";
@@ -36,8 +34,6 @@ export const newMapper = async (options: NewMapperOptions) => {
 
   if (!options || Object.keys(options).length === 0) {
     // new NewMapperInteractiveStrategy(config).apply(schema);
-  } else if (options.json) {
-    new NewMapperJsonStrategy(config).apply(schema, options.json);
   } else {
     new NewMapperOptionsStrategy(config).apply(schema, options);
   }

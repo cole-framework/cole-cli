@@ -27,7 +27,7 @@ export enum WriteMethod {
   Patch = "patch",
 }
 
-export enum RouteModelType {
+export enum RouteModelLabel {
   Input = "input",
   Output = "output",
   PathParams = "path_params",

@@ -1,13 +1,13 @@
 import { MapperAddons, MapperData, MapperElement } from "./types";
 import { Entity } from "../entity";
 import { Model } from "../model";
-import { ComponentType } from "../../../../core/type.info";
 import {
   WriteMethod,
   Component,
   ClassData,
   ClassSchema,
   Config,
+  MapperType,
 } from "../../../../core";
 
 export class MapperFactory {
@@ -28,9 +28,23 @@ export class MapperFactory {
     const generics = [];
     const imports = [];
     let inheritance = [];
+    let ctor;
+
+    const componentName = config.components.mapper.generateName(name, {
+      type: storage,
+    });
+    const componentPath = config.components.mapper.generatePath({
+      name,
+      type: storage,
+      endpoint,
+    }).path;
+
+    if (defaults?.common?.ctor) {
+      ctor = defaults.common.ctor;
+    }
 
     if (defaults?.common?.inheritance) {
-      inheritance.push(defaults.common?.inheritance);
+      inheritance.push(defaults.common.inheritance);
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
@@ -87,34 +101,23 @@ export class MapperFactory {
 
     const classData: ClassData = {
       id,
-      name,
+      name: componentName,
       props,
       methods,
       interfaces,
       generics,
       inheritance,
+      ctor,
     };
 
-    const element = ClassSchema.create(
-      classData,
-      config.reservedTypes,
-      dependencies,
-      addons
-    );
-
-    const componentName = config.components.mapper.generateName(name, {
-      type: storage,
+    const element = ClassSchema.create(classData, config.reservedTypes, {
+      addons,
+      dependencies
     });
-    const componentPath = config.components.mapper.generatePath({
-      name,
-      type: storage,
-      endpoint,
-    }).path;
 
     const component = Component.create<MapperElement, MapperAddons>(
       id,
-      componentName,
-      new ComponentType("mapper", storage),
+      new MapperType(name, storage),
       endpoint,
       componentPath,
       writeMethod,

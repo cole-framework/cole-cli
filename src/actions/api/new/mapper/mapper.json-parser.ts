@@ -36,7 +36,7 @@ export class MapperJsonParser {
       }
 
       entity = entitiesRef.find(
-        (e) => e.element.name === data.entity || e.element.name === name
+        (e) => e.type.name === data.entity || e.type.name === name
       );
 
       if (!entity) {
@@ -47,7 +47,8 @@ export class MapperJsonParser {
           },
           null,
           writeMethod.dependency,
-          config
+          config,
+          []
         );
         entities.push(entity);
       }
@@ -55,14 +56,16 @@ export class MapperJsonParser {
       for (const storage of storages) {
         let model;
         if (
-          mappers.find((m) => m.name === data.name && m.type.type === storage)
+          mappers.find(
+            (m) => m.type.name === data.name && m.type.type === storage
+          )
         ) {
           continue;
         }
 
         model = modelsRef.find(
           (m) =>
-            (m.element.name === data.model || m.element.name === name) &&
+            (m.type.name === data.model || m.type.name === name) &&
             m.type.type === storage
         );
 
@@ -74,7 +77,8 @@ export class MapperJsonParser {
               type: storage,
             },
             writeMethod.dependency,
-            config
+            config,
+            []
           );
           models.push(model);
         }
@@ -84,8 +88,14 @@ export class MapperJsonParser {
             name,
             storage,
             endpoint,
-            props: PropTools.arrayToData(props, config.reservedTypes, []),
-            methods: MethodTools.arrayToData(methods, config.reservedTypes, []),
+            props: PropTools.arrayToData(props, config.reservedTypes, {
+              dependencies: [],
+              addons: {},
+            }),
+            methods: MethodTools.arrayToData(methods, config.reservedTypes, {
+              dependencies: [],
+              addons: {},
+            }),
           },
           entity,
           model,
@@ -98,27 +108,29 @@ export class MapperJsonParser {
           if (type.isModel) {
             let model;
             model = modelsRef.find(
-              (m) => m.element.name === type.name && m.type.type === type.type
+              (m) => m.type.name === type.name && m.type.type === type.type
             );
 
             if (!model) {
               model = ModelFactory.create(
                 { name: type.name, endpoint: mapper.endpoint, type: type.type },
                 writeMethod.dependency,
-                config
+                config,
+                []
               );
               models.push(model);
             }
             mapper.addDependency(model);
           } else if (type.isEntity) {
             let e;
-            e = entities.find((m) => m.element.name === type.name);
+            e = entities.find((m) => m.type.name === type.name);
             if (!e) {
               e = EntityFactory.create(
                 { name: type.name, endpoint: mapper.endpoint },
                 null,
                 writeMethod.dependency,
-                config
+                config,
+                []
               );
               entities.push(e);
             }

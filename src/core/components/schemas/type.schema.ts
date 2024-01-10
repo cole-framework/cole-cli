@@ -1,12 +1,5 @@
-import {
-  ConfigAddons,
-  ReservedType,
-  ConfigInstruction,
-  ConfigUseInstruction,
-  ConfigDependencyInstruction,
-} from "../../config";
+import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { TypeInfo, ObjectType, UnknownType } from "../../type.info";
-import { Component } from "../component";
 import { SchemaTools } from "../schema.tools";
 import { ExportData, ExportJson, ExportSchema } from "./export.schema";
 import {
@@ -27,6 +20,7 @@ export type TypeData = {
   props?: (PropData | string)[];
   type?: TypeInfo;
   generics?: GenericData[];
+  alias?: any;
 };
 
 export type TypeJson = {
@@ -36,6 +30,7 @@ export type TypeJson = {
   props?: PropJson[];
   type: string;
   generics?: GenericJson[];
+  alias?: any;
 };
 
 export type TypeConfig = TypeJson & ConfigAddons;
@@ -44,8 +39,7 @@ export class TypeTools {
   static stringToData(
     str: string,
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ): TypeData {
     let type: TypeInfo;
     let name: string;
@@ -57,9 +51,7 @@ export class TypeTools {
     name = match[1].trim();
 
     SchemaTools.splitIgnoringBrackets(match[3], ",").forEach((str) => {
-      generics.push(
-        GenericTools.stringToData(str, reserved, dependencies, addons)
-      );
+      generics.push(GenericTools.stringToData(str, reserved, references));
     });
 
     if (match[5]) {
@@ -71,17 +63,8 @@ export class TypeTools {
         type = new ObjectType();
       } catch (e) {
         const temp = match[5].trim();
-        if (ConfigInstruction.isUseInstruction(temp)) {
-          type = TypeInfo.create(
-            ConfigUseInstruction.getValue(temp, addons),
-            reserved
-          );
-        } else if (ConfigInstruction.isDependencyInstruction(temp)) {
-          const component = ConfigDependencyInstruction.getDependency(
-            temp,
-            dependencies
-          );
-          type = TypeInfo.fromComponent(component);
+        if (ConfigTools.hasInstructions(temp)) {
+          type = ConfigTools.executeInstructions(temp, references, reserved);
         } else {
           type = TypeInfo.create(temp, reserved);
         }
@@ -101,8 +84,7 @@ export class TypeSchema {
   public static create(
     data: string | TypeData | TypeJson,
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ) {
     if (!data) {
       return null;
@@ -110,19 +92,18 @@ export class TypeSchema {
 
     let exp: ExportSchema;
     let type: TypeInfo;
+    let alias: TypeInfo;
     let name: string;
     let props: PropSchema[] = [];
     let generics: GenericSchema[] = [];
 
     if (typeof data === "string") {
-      const tp = TypeTools.stringToData(data, reserved, dependencies, addons);
+      const tp = TypeTools.stringToData(data, reserved, references);
       type = tp.type;
       name = tp.name;
-      props = tp.props.map((p) =>
-        PropSchema.create(p, reserved, dependencies, addons)
-      );
+      props = tp.props.map((p) => PropSchema.create(p, reserved, references));
       generics = tp.generics.map((g) =>
-        GenericSchema.create(g, reserved, dependencies, addons)
+        GenericSchema.create(g, reserved, references)
       );
     } else {
       name = data.name;
@@ -130,17 +111,8 @@ export class TypeSchema {
       if (typeof data.type === "string") {
         let temp = data.type.trim();
 
-        if (ConfigInstruction.isUseInstruction(temp)) {
-          type = TypeInfo.create(
-            ConfigUseInstruction.getValue(temp, addons),
-            reserved
-          );
-        } else if (ConfigInstruction.isDependencyInstruction(temp)) {
-          const component = ConfigDependencyInstruction.getDependency(
-            temp,
-            dependencies
-          );
-          type = TypeInfo.fromComponent(component);
+        if (ConfigTools.hasInstructions(temp)) {
+          type = ConfigTools.executeInstructions(temp, references, reserved);
         } else {
           type = TypeInfo.create(temp, reserved);
         }
@@ -156,12 +128,24 @@ export class TypeSchema {
 
       if (Array.isArray(data.props)) {
         data.props.forEach((p) => {
-          props.push(PropSchema.create(p, reserved, dependencies, addons));
+          props.push(PropSchema.create(p, reserved, references));
         });
+      }
+
+      if (typeof data.alias === "string") {
+        let temp = data.alias.trim();
+
+        if (ConfigTools.hasInstructions(temp)) {
+          alias = ConfigTools.executeInstructions(temp, references, reserved);
+        } else {
+          alias = TypeInfo.create(temp, reserved);
+        }
+      } else if (TypeInfo.isType(data.alias)) {
+        alias = data.alias;
       }
     }
 
-    const t = new TypeSchema(name, exp);
+    const t = new TypeSchema(name, alias, exp);
 
     generics.forEach((g) => t.addGeneric(g));
     props.forEach((p) => t.addProp(p));
@@ -174,7 +158,7 @@ export class TypeSchema {
 
   private constructor(
     public readonly name: string,
-    // public readonly type: TypeInfo,
+    public readonly alias: TypeInfo,
     public readonly exp: ExportSchema
   ) {}
 
@@ -215,19 +199,24 @@ export class TypeSchema {
   }
 
   toObject() {
-    const { __props, __generics, name, exp } = this;
+    const { __props, __generics, name, exp, alias } = this;
 
-    return {
+    return SchemaTools.removeNullUndefined({
       name,
       exp,
+      alias,
       props: __props.map((p) => p.toObject()),
       generics: __generics.map((g) => g.toObject()),
-    };
+    });
   }
 
   listTypes() {
-    const { __props, __generics } = this;
+    const { __props, __generics, alias } = this;
     const types = [];
+
+    if (alias) {
+      types.push(alias);
+    }
 
     __props.forEach((prop) => {
       types.push(prop.type);

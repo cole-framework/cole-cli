@@ -8,6 +8,7 @@ import {
   MethodSchema,
   InterfaceSchema,
 } from "./schemas";
+import { ComponentTools } from "./component.tools";
 
 export interface ElementWithProps {
   props: PropSchema[];
@@ -52,7 +53,6 @@ export type Dependency = {
 
 export type ComponentData<Element, ElementAddons> = {
   id: string;
-  name: string;
   type: TypeInfo;
   path: string;
   write_method: string;
@@ -70,18 +70,16 @@ export class Component<
     ElementAddons = unknown
   >(
     id: string,
-    name: string,
     type: TypeInfo,
     endpoint: string,
     path: string,
     writeMethod: WriteMethod,
     addons: ElementAddons,
     element: Element,
-    dependencies?: (Dependency | Component)[]
+    dependencies: Component[]
   ): Component<Element, ElementAddons> {
     const component = new Component(
       id || nanoid(),
-      name,
       type,
       endpoint,
       path,
@@ -97,11 +95,10 @@ export class Component<
     return component;
   }
 
-  private __dependencies = [];
+  private __dependencies: Dependency[] = [];
 
   protected constructor(
     public readonly id: string,
-    public readonly name: string,
     public readonly type: TypeInfo,
     public readonly endpoint: string,
     public readonly path: string,
@@ -110,21 +107,24 @@ export class Component<
     public readonly element: Element
   ) {}
 
-  addDependency(dependency: Dependency | Component) {
+  addDependency(dependency: Component) {
+    const { id, path, type, element } = dependency;
+
     if (dependency && this.hasDependency(dependency) === false) {
-      const { id, name, path, type } = dependency;
-      this.__dependencies.push({ id, name, path, type });
+      this.__dependencies.push({ id, path, type, name: element.name });
     }
   }
 
-  hasDependency(dependency: Dependency) {
+  hasDependency(dependency: Component) {
     return (
-      this.__dependencies.findIndex(
-        (d) =>
-          d.name === dependency.name &&
-          d.type === dependency.type &&
+      this.__dependencies.findIndex((d) => {
+        return (
+          d.name === dependency.element.name &&
+          d.type.name === dependency.type.name &&
+          d.type.type === dependency.type.type &&
           d.path === dependency.path
-      ) !== -1
+        );
+      }) !== -1
     );
   }
 
@@ -135,7 +135,9 @@ export class Component<
     element.listTypes().forEach((type) => {
       ComponentTools.filterComponentTypes(type).forEach((componentType) => {
         if (
-          dependencies.findIndex((d) => d.name === componentType.name) === -1
+          dependencies.findIndex((d) =>
+            TypeInfo.areIdentical(d.type, componentType)
+          ) === -1
         ) {
           types.push(componentType);
         }
@@ -151,7 +153,6 @@ export class Component<
 
   toObject(): ComponentData<Element, ElementAddons> {
     const {
-      name,
       type,
       id,
       element,
@@ -164,7 +165,6 @@ export class Component<
 
     return SchemaTools.removeNullUndefined({
       id,
-      name,
       endpoint,
       type,
       path,
@@ -173,35 +173,5 @@ export class Component<
       element: element?.toObject(),
       addons,
     });
-  }
-}
-
-export class ComponentTools {
-  static filterComponentTypes(type: TypeInfo): TypeInfo[] {
-    if (TypeInfo.isComponentType(type)) {
-      return [type];
-    }
-
-    if (TypeInfo.isArray(type) || TypeInfo.isSet(type)) {
-      return ComponentTools.filterComponentTypes(type.itemType);
-    }
-
-    if (TypeInfo.isMap(type)) {
-      return [
-        ...ComponentTools.filterComponentTypes(type.keyType),
-        ...ComponentTools.filterComponentTypes(type.valueType),
-      ];
-    }
-
-    if (TypeInfo.isMultiType(type)) {
-      return type.chain.reduce((list, c) => {
-        if (TypeInfo.isType(c)) {
-          list.push(...ComponentTools.filterComponentTypes(c));
-        }
-        return list;
-      }, []);
-    }
-
-    return [];
   }
 }

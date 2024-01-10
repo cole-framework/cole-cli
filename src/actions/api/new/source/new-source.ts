@@ -1,10 +1,9 @@
-import { ComponentType, ConfigLoader, WriteMethod } from "../../../../core";
+import { ConfigLoader, WriteMethod } from "../../../../core";
 import { FileTransport } from "../../../../transport/file.transport";
 import { ApiGenerator } from "../api-generator";
 import { ApiData } from "../api.types";
 import {
   NewSourceInteractiveStrategy,
-  NewSourceJsonStrategy,
   NewSourceOptionsStrategy,
 } from "./strategies";
 import { NewSourceOptions } from "./types";
@@ -36,8 +35,6 @@ export const newSource = async (options: NewSourceOptions) => {
 
   if (!options || Object.keys(options).length === 0) {
     new NewSourceInteractiveStrategy(config).apply(schema);
-  } else if (options.json) {
-    new NewSourceJsonStrategy(config).apply(schema, options.json);
   } else {
     new NewSourceOptionsStrategy(config).apply(schema, options);
   }

@@ -32,20 +32,21 @@ export class EntityJsonParser {
         continue;
       }
 
-      if (entities.find((e) => e.name === name)) {
+      if (entities.find((e) => e.type.name === name)) {
         continue;
       }
 
       if (
         has_model &&
         modelsRef.findIndex(
-          (m) => m.name === name && m.type.type === "json"
+          (m) => m.type.name === name && m.type.type === "json"
         ) === -1
       ) {
         model = ModelFactory.create(
           { name, endpoint, type: "json", props },
           writeMethod.dependency,
-          config
+          config,
+          []
         );
 
         models.push(model);
@@ -55,7 +56,8 @@ export class EntityJsonParser {
         data,
         model,
         writeMethod.component,
-        config
+        config,
+        []
       );
 
       entities.push(entity);
@@ -67,27 +69,29 @@ export class EntityJsonParser {
         if (type.isModel) {
           let model;
           model = modelsRef.find(
-            (m) => m.element.name === type.name && m.type.type === type.type
+            (m) => m.type.name === type.name && m.type.type === type.type
           );
 
           if (!model) {
             model = ModelFactory.create(
               { name: type.name, endpoint: entity.endpoint, type: type.type },
               writeMethod.dependency,
-              config
+              config,
+              []
             );
             models.push(model);
           }
           entity.addDependency(model);
         } else if (type.isEntity) {
           let e;
-          e = entities.find((m) => m.element.name === type.name);
+          e = entities.find((m) => m.type.name === type.name);
           if (!e) {
             e = EntityFactory.create(
               { name: type.name, endpoint: entity.endpoint },
               null,
               writeMethod.dependency,
-              config
+              config,
+              []
             );
             entities.push(e);
           }

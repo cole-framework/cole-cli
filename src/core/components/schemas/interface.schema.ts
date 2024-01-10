@@ -1,12 +1,6 @@
 import { nanoid } from "nanoid";
-import {
-  ReservedType,
-  ConfigInstruction,
-  ConfigUseInstruction,
-  ConfigDependencyInstruction,
-} from "../../config";
+import { ConfigTools, ReservedType } from "../../config";
 import { TypeInfo } from "../../type.info";
-import { Component } from "../component";
 import { SchemaTools } from "../schema.tools";
 import { ExportData, ExportJson, ExportSchema } from "./export.schema";
 import { GenericData, GenericJson, GenericSchema } from "./generic.schema";
@@ -39,8 +33,7 @@ export class InterfaceSchema {
   public static create(
     data: InterfaceData | InterfaceJson,
     reserved: ReservedType[],
-    dependencies: Component[],
-    addons?: { [key: string]: unknown }
+    references?: { [key: string]: unknown; dependencies: any[] }
   ) {
     if (!data) {
       return null;
@@ -54,19 +47,15 @@ export class InterfaceSchema {
     }
 
     if (typeof data.inheritance === "string") {
-      if (ConfigInstruction.isUseInstruction(data.inheritance)) {
-        inheritance = TypeInfo.create(
-          ConfigUseInstruction.getValue(data.inheritance, addons),
+      const temp = data.inheritance;
+      if (ConfigTools.hasInstructions(temp)) {
+        inheritance = ConfigTools.executeInstructions(
+          temp,
+          references,
           reserved
         );
-      } else if (ConfigInstruction.isDependencyInstruction(data.inheritance)) {
-        const component = ConfigDependencyInstruction.getDependency(
-          data.inheritance,
-          dependencies
-        );
-        inheritance = TypeInfo.fromComponent(component);
       } else {
-        inheritance = TypeInfo.create(data.inheritance, reserved);
+        inheritance = TypeInfo.create(temp, reserved);
       }
     } else {
       inheritance = data.inheritance;
@@ -81,21 +70,25 @@ export class InterfaceSchema {
 
     if (Array.isArray(data.props)) {
       data.props.forEach((p) => {
-        intf.addProp(PropSchema.create(p, reserved, dependencies, addons));
+        if (SchemaTools.executeMeta(p, references, reserved)) {
+          intf.addProp(PropSchema.create(p, reserved, references));
+        }
       });
     }
 
     if (Array.isArray(data.methods)) {
       data.methods.forEach((m) => {
-        intf.addMethod(MethodSchema.create(m, reserved, dependencies, addons));
+        if (SchemaTools.executeMeta(m, references, reserved)) {
+          intf.addMethod(MethodSchema.create(m, reserved, references));
+        }
       });
     }
 
     if (Array.isArray(data.generics)) {
       data.generics.forEach((g) => {
-        intf.addGeneric(
-          GenericSchema.create(g, reserved, dependencies, addons)
-        );
+        if (SchemaTools.executeMeta(g, references, reserved)) {
+          intf.addGeneric(GenericSchema.create(g, reserved, references));
+        }
       });
     }
 

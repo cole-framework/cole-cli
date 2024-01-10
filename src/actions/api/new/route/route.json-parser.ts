@@ -1,15 +1,15 @@
 import chalk from "chalk";
-import { pascalCase } from "change-case";
+import { paramCase, pascalCase } from "change-case";
 import {
   Config,
   PropSchema,
-  RouteModelType,
+  RouteModelLabel,
   TypeInfo,
   WriteMethod,
 } from "../../../../core";
 import { Controller } from "../controller";
 import { Entity } from "../entity";
-import { Model } from "../model";
+import { Model, ModelFactory } from "../model";
 import { RouteIOFactory } from "./route-io.factory";
 import { RouteModelFactory } from "./route-model.factory";
 import { RouteFactory } from "./route.factory";
@@ -19,12 +19,12 @@ import { extractParamsFromPath, hasBody, hasParams } from "./utils";
 type RequestModels = {
   pathParams: RouteModel;
   queryParams: RouteModel;
-  body: string | RouteModel;
+  body: RouteModel;
   models: Model[];
 };
 
 type ResponseModels = {
-  body: string | RouteModel;
+  body: RouteModel;
   models: Model[];
 };
 
@@ -61,11 +61,12 @@ export class RouteJsonParser {
           name: pascalCase(`${request.method}_${name}`),
           endpoint,
           method: request.method,
-          type: RouteModelType.PathParams,
+          type: RouteModelLabel.PathParams,
           props: params.pathParams.map((p) => `${p}: string`),
         },
         writeMethod.dependency,
-        config
+        config,
+        []
       );
       models.push(pathParams);
     }
@@ -76,11 +77,12 @@ export class RouteJsonParser {
           name: pascalCase(`${request.method}_${name}`),
           endpoint,
           method: request.method,
-          type: RouteModelType.QueryParams,
+          type: RouteModelLabel.QueryParams,
           props: params.queryParams.map((p) => `${p}: string`),
         },
         writeMethod.dependency,
-        config
+        config,
+        []
       );
       models.push(queryParams);
     }
@@ -89,7 +91,7 @@ export class RouteJsonParser {
       const type = TypeInfo.create(request.body, config.reservedTypes);
       if (type.isModel) {
         body = modelsRef.find(
-          (m) => m.element.name === type.name && m.type.type === type.type
+          (m) => m.type.name === type.name && m.type.type === type.type
         );
 
         if (!body) {
@@ -98,10 +100,11 @@ export class RouteJsonParser {
               name: type.name,
               endpoint,
               method: request.method,
-              type: RouteModelType.RequestBody,
+              type: RouteModelLabel.RequestBody,
             },
             writeMethod.dependency,
-            config
+            config,
+            []
           );
         }
       }
@@ -113,7 +116,10 @@ export class RouteJsonParser {
           PropSchema.create(
             `${key}:${request.body[key]}`,
             config.reservedTypes,
-            []
+            {
+              dependencies: [],
+              addons: {},
+            }
           )
         );
       });
@@ -123,11 +129,12 @@ export class RouteJsonParser {
           name: pascalCase(`${request.method}_${name}`),
           endpoint,
           method: request.method,
-          type: RouteModelType.RequestBody,
+          type: RouteModelLabel.RequestBody,
           props,
         },
         writeMethod.dependency,
-        config
+        config,
+        []
       );
     }
 
@@ -155,7 +162,7 @@ export class RouteJsonParser {
       const type = TypeInfo.create(response, config.reservedTypes);
       if (type.isModel) {
         body = modelsRef.find(
-          (m) => m.element.name === type.name && m.type.type === type.type
+          (m) => m.type.name === type.name && m.type.type === type.type
         );
 
         if (!body) {
@@ -164,10 +171,11 @@ export class RouteJsonParser {
               name: type.name,
               endpoint,
               method: request.method,
-              type: RouteModelType.ResponseBody,
+              type: RouteModelLabel.ResponseBody,
             },
             writeMethod.dependency,
-            config
+            config,
+            []
           );
         }
       }
@@ -184,7 +192,10 @@ export class RouteJsonParser {
 
           Object.keys(resp).forEach((k) => {
             props.push(
-              PropSchema.create(`${k}:${resp[k]}`, config.reservedTypes, [])
+              PropSchema.create(`${k}:${resp[k]}`, config.reservedTypes, {
+                dependencies: [],
+                addons: {},
+              })
             );
           });
 
@@ -193,14 +204,15 @@ export class RouteJsonParser {
               name: pascalCase(`${request.method}_${name}${key}`),
               endpoint,
               method: request.method,
-              type: RouteModelType.ResponseStatusBody,
+              type: RouteModelLabel.ResponseStatusBody,
               props,
             },
             writeMethod.dependency,
-            config
+            config,
+            []
           );
           models.push(model);
-          valueType = TypeInfo.fromComponent(model);
+          valueType = TypeInfo.create(model);
         }
 
         //
@@ -208,7 +220,10 @@ export class RouteJsonParser {
           PropSchema.create(
             { name: key, type: valueType },
             config.reservedTypes,
-            []
+            {
+              dependencies: [],
+              addons: {},
+            }
           )
         );
       });
@@ -218,11 +233,12 @@ export class RouteJsonParser {
           name: pascalCase(`${request.method}_${name}`),
           endpoint,
           method: request.method,
-          type: RouteModelType.ResponseBody,
+          type: RouteModelLabel.ResponseBody,
           props,
         },
         writeMethod.dependency,
-        config
+        config,
+        []
       );
     }
 
@@ -247,15 +263,15 @@ export class RouteJsonParser {
     const route_ios: RouteIO[] = [];
 
     for (const data of list) {
-      let controllerInput: TypeInfo;
-      let controllerOutput: TypeInfo;
+      let input: Model;
+      let output: Model;
       let requestModels: RequestModels;
       let responseModels: ResponseModels;
       let controller: Controller;
       let io;
       const { name, endpoint, request, response } = data;
 
-      if (routes.find((r) => r.name === name)) {
+      if (routes.find((r) => r.type.name === name)) {
         continue;
       }
 
@@ -311,23 +327,49 @@ export class RouteJsonParser {
         responseModels.models.forEach((model) => models.push(model));
       }
 
-      controller = controllersRef.find(
-        (c) => c.element.name === data.controller
-      );
+      controller = controllersRef.find((c) => c.type.name === data.controller);
 
       if (controller) {
         const method = controller.element.findMethod(data.handler);
-        controllerInput = method?.params[0]?.type;
-        controllerOutput = method?.returnType;
+        console.log("WE HAVE COntroller", method);
+
+        if (method?.params[0]) {
+          const param = method.params[0];
+          input = ModelFactory.create(
+            {
+              type: "input",
+              endpoint,
+              name: paramCase(`${method.name} Input`),
+              alias: param.type,
+            },
+            writeMethod.dependency,
+            config,
+            []
+          );
+        }
+
+        if (method?.returnType) {
+          output = ModelFactory.create(
+            {
+              type: "output",
+              endpoint,
+              name: paramCase(`${method.name} Output`),
+              alias: method.returnType,
+            },
+            writeMethod.dependency,
+            config,
+            []
+          );
+        }
       } else {
         // Missing controller
       }
 
-      if (controllerInput || controllerOutput) {
+      if (input || output) {
         io = RouteIOFactory.create(
           data,
-          controllerInput,
-          controllerOutput,
+          input,
+          output,
           requestModels.pathParams,
           requestModels.queryParams,
           requestModels.body,

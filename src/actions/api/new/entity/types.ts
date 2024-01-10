@@ -1,4 +1,5 @@
 import {
+  ClassJson,
   Component,
   ComponentElement,
   ElementWithGenerics,
@@ -15,7 +16,7 @@ export type NewEntityOptions = DefaultCliOptions & {
   props?: string[];
 };
 
-export type EntityJson = {
+export type EntityJson = ClassJson & {
   id?: string;
   name: string;
   endpoint?: string;

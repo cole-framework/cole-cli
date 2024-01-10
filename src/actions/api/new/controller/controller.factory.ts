@@ -3,8 +3,8 @@ import {
   Component,
   ClassData,
   ClassSchema,
-  ComponentType,
   Config,
+  ControllerType,
 } from "../../../../core";
 import { ControllerData, ControllerElement } from "./types";
 
@@ -13,7 +13,7 @@ export class ControllerFactory {
     data: ControllerData,
     writeMethod: WriteMethod,
     config: Config,
-    dependencies?: Component[]
+    dependencies: Component[]
   ): Component<ControllerElement> {
     const { id, name, endpoint } = data;
     const { defaults } = config.components.controller;
@@ -25,6 +25,12 @@ export class ControllerFactory {
     const imports = [];
     let inheritance = [];
     let ctor;
+
+    const componentName = config.components.controller.generateName(name);
+    const componentPath = config.components.controller.generatePath({
+      name,
+      endpoint,
+    }).path;
 
     if (defaults?.common?.ctor) {
       ctor = defaults.common.ctor;
@@ -84,31 +90,24 @@ export class ControllerFactory {
 
     const classData: ClassData = {
       id,
-      name,
+      name: componentName,
       props,
       methods,
       interfaces,
       generics,
       inheritance,
       ctor,
+      imports,
     };
 
-    const element = ClassSchema.create(
-      classData,
-      config.reservedTypes,
+    const element = ClassSchema.create(classData, config.reservedTypes, {
+      addons: {},
       dependencies
-    );
-
-    const componentName = config.components.controller.generateName(name);
-    const componentPath = config.components.controller.generatePath({
-      name,
-      endpoint,
-    }).path;
+    });
 
     const component = Component.create<ControllerElement>(
       id,
-      componentName,
-      new ComponentType("controller"),
+      new ControllerType(name),
       endpoint,
       componentPath,
       writeMethod,
