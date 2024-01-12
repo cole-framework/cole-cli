@@ -1,12 +1,12 @@
-import { WriteMethod } from "../../../core";
-import { ControllerJson } from "./controller/types";
-import { EntityJson } from "./entity/types";
-import { MapperJson } from "./mapper";
-import { ModelJson } from "./model";
-import { RepositoryJson } from "./repository";
-import { RouteJson } from "./route";
-import { SourceJson } from "./source";
-import { UseCaseJson } from "./use-case";
+import { ComponentData, WriteMethod } from "../../../core";
+import { ControllerElement, ControllerJson } from "./controller/types";
+import { EntityAddons, EntityElement, EntityJson } from "./entity/types";
+import { MapperAddons, MapperElement, MapperJson } from "./mapper";
+import { ModelAddons, ModelElement, ModelJson } from "./model";
+import { RepositoryElement, RepositoryJson } from "./repository";
+import { RouteElement, RouteJson } from "./route";
+import { SourceAddons, SourceElement, SourceJson } from "./source";
+import { UseCaseElement, UseCaseJson } from "./use-case";
 
 export type DefaultCliOptions = {
   skipTests?: boolean;
@@ -26,6 +26,20 @@ export type ApiJson = {
   repositories?: RepositoryJson[];
   routes?: RouteJson[];
   controllers?: ControllerJson[];
+};
+
+export type ApiObject = {
+  controllers: ComponentData[];
+  models: ComponentData[];
+  entities: ComponentData[];
+  mappers: ComponentData[];
+  sources: ComponentData[];
+  routes: ComponentData[];
+  route_ios: ComponentData[];
+  use_cases: ComponentData[];
+  repositories: ComponentData[];
+  repository_impls: ComponentData[];
+  repository_factories: ComponentData[];
 };
 
 export type ApiData = {

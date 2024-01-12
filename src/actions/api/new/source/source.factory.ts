@@ -41,8 +41,8 @@ export class SourceFactory {
       ctor = defaults.common.ctor;
     }
 
-    if (defaults?.common?.inheritance) {
-      inheritance.push(defaults.common?.inheritance);
+    if (Array.isArray(defaults?.common?.inheritance)) {
+      inheritance.push(...defaults.common.inheritance);
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
@@ -69,8 +69,8 @@ export class SourceFactory {
       ctor = defaults[storage].ctor;
     }
 
-    if (defaults?.[storage]?.inheritance) {
-      inheritance.push(defaults[storage].inheritance);
+    if (Array.isArray(defaults?.[storage]?.inheritance)) {
+      inheritance.push(...defaults[storage].inheritance);
     }
 
     if (Array.isArray(defaults?.[storage]?.imports)) {
@@ -113,10 +113,14 @@ export class SourceFactory {
       imports,
     };
 
-    const element = ClassSchema.create(classData, config.reservedTypes, {
-      addons,
-      dependencies
-    });
+    const element = ClassSchema.create<SourceElement>(
+      classData,
+      config.reservedTypes,
+      {
+        addons,
+        dependencies,
+      }
+    );
 
     const component = Component.create<SourceElement, SourceAddons>(
       id,

@@ -41,7 +41,7 @@ export type ModelAddons = {
 
 export type ModelElement = ElementWithProps &
   ElementWithGenerics &
-  ComponentElement<any>;
+  ComponentElement;
 
 export type Model = Component<ModelElement, ModelAddons>;
 

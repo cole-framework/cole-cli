@@ -1,4 +1,10 @@
-import { ParamData, ParamJson, ParamSchema, ParamTools } from "./param.schema";
+import {
+  ParamData,
+  ParamJson,
+  ParamObject,
+  ParamSchema,
+  ParamTools,
+} from "./param.schema";
 import { Component } from "../component";
 import { ConfigAddons, ReservedType } from "../../config";
 import { AccessType } from "../../enums";
@@ -11,6 +17,13 @@ export type ConstructorJson = {
   params?: (ParamJson | string)[];
   body?: string;
   supr?: ConstructorJson;
+};
+
+export type ConstructorObject = {
+  access: string;
+  params: ParamObject[];
+  body: string;
+  supr: ConstructorObject;
 };
 
 export type ConstructorData = {
@@ -120,19 +133,20 @@ export class ConstructorSchema {
     return [...this.__params];
   }
 
-  toObject() {
+  toObject(): ConstructorObject {
     const { access, __params, body, supr } = this;
-    const ctr: ConstructorData = {
+    const ctr: ConstructorObject = {
       access,
       params: __params.map((p) => p.toObject()),
       body,
+      supr: supr?.toObject(),
     };
 
     if (supr) {
       ctr.supr = supr.toObject();
     }
 
-    return SchemaTools.removeNullUndefined(ctr);
+    return ctr;
   }
 
   listTypes() {

@@ -39,10 +39,10 @@ export const newSource = async (options: NewSourceOptions) => {
     new NewSourceOptionsStrategy(config).apply(schema, options);
   }
 
-  const result = new ApiGenerator(config, new FileTransport()).generate(schema);
+  // const result = new ApiGenerator(new FileTransport()).generate(schema);
 
-  if (result.isFailure) {
-    console.log(result.failure.error.message);
-    process.exit(1);
-  }
+  // if (result.isFailure) {
+  //   console.log(result.failure.error.message);
+  //   process.exit(1);
+  // }
 };

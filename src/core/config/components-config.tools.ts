@@ -60,7 +60,7 @@ export class ComponentsConfigTools {
         defaults["imports"].forEach((i) => {
           if (Array.isArray(i.list)) {
             i.list.forEach((j) => {
-              if (j && typeof j === "string") {
+              if (j && typeof j === "string" && j.startsWith("{{") === false) {
                 list.push(j);
               }
             });
@@ -68,19 +68,31 @@ export class ComponentsConfigTools {
         });
       } else if (defKey === "props" && Array.isArray(defaults["props"])) {
         defaults["props"].forEach((prop) => {
-          if (prop.type && typeof prop.type === "string") {
+          if (
+            prop.type &&
+            typeof prop.type === "string" &&
+            prop.type.startsWith("{{") === false
+          ) {
             list.push(prop.type);
           }
         });
       } else if (defKey === "methods" && Array.isArray(defaults["methods"])) {
         defaults["methods"].forEach((mth) => {
-          if (mth.return_type && typeof mth.return_type === "string") {
+          if (
+            mth.return_type &&
+            typeof mth.return_type === "string" &&
+            mth.return_type.startsWith("{{") === false
+          ) {
             list.push(mth.return_type);
           }
 
           if (Array.isArray(mth.supr?.params)) {
             mth.supr?.params.forEach((param) => {
-              if (param.type && typeof param.type === "string") {
+              if (
+                param.type &&
+                typeof param.type === "string" &&
+                param.type.startsWith("{{") === false
+              ) {
                 list.push(param.type);
               }
             });
@@ -88,7 +100,11 @@ export class ComponentsConfigTools {
 
           if (Array.isArray(mth.params)) {
             mth.params.forEach((param) => {
-              if (param.type && typeof param.type === "string") {
+              if (
+                param.type &&
+                typeof param.type === "string" &&
+                param.type.startsWith("{{") === false
+              ) {
                 list.push(param.type);
               }
             });
@@ -97,7 +113,11 @@ export class ComponentsConfigTools {
       } else if (defKey === "ctor") {
         if (Array.isArray(defaults["ctor"]?.supr?.params)) {
           defaults["ctor"]?.supr?.params.forEach((param) => {
-            if (param.type && typeof param.type === "string") {
+            if (
+              param.type &&
+              typeof param.type === "string" &&
+              param.type.startsWith("{{") === false
+            ) {
               list.push(param.type);
             }
           });
@@ -105,18 +125,30 @@ export class ComponentsConfigTools {
 
         if (Array.isArray(defaults["ctor"]?.params)) {
           defaults["ctor"].params.forEach((param) => {
-            if (param.type && typeof param.type === "string") {
+            if (
+              param.type &&
+              typeof param.type === "string" &&
+              param.type.startsWith("{{") === false
+            ) {
               list.push(param.type);
             }
           });
         }
       } else if (defKey === "generics" && Array.isArray(defaults["generics"])) {
         defaults["generics"].forEach((generic) => {
-          if (generic.inheritance && typeof generic.inheritance === "string") {
+          if (
+            generic.inheritance &&
+            typeof generic.inheritance === "string" &&
+            generic.inheritance.startsWith("{{") === false
+          ) {
             list.push(generic.inheritance);
           }
 
-          if (generic.dflt && typeof generic.dflt === "string") {
+          if (
+            generic.dflt &&
+            typeof generic.dflt === "string" &&
+            generic.dflt.startsWith("{{") === false
+          ) {
             list.push(generic.dflt);
           }
         });
@@ -125,26 +157,42 @@ export class ComponentsConfigTools {
         Array.isArray(defaults["interfaces"])
       ) {
         defaults["interfaces"].forEach((intf) => {
-          if (intf && typeof intf === "string") {
+          if (
+            intf &&
+            typeof intf === "string" &&
+            intf.startsWith("{{") === false
+          ) {
             list.push(intf);
           }
         });
-      } else if (defKey === "inheritance" && defaults["inheritance"]) {
-        list.push(defaults["inheritance"].name);
-        if (Array.isArray(defaults["inheritance"]["generics"])) {
-          defaults["inheritance"]["generics"].forEach((generic) => {
-            if (
-              generic.inheritance &&
-              typeof generic.inheritance === "string"
-            ) {
-              list.push(generic.inheritance);
-            }
+      } else if (
+        defKey === "inheritance" &&
+        Array.isArray(defaults["inheritance"])
+      ) {
+        defaults["inheritance"].forEach((inth) => {
+          if (inth.name.startsWith("{{") === false) {
+            list.push(inth.name);
+          }
+          if (Array.isArray(inth["generics"])) {
+            inth["generics"].forEach((generic) => {
+              if (
+                generic.inheritance &&
+                typeof generic.inheritance === "string" &&
+                generic.inheritance.startsWith("{{") === false
+              ) {
+                list.push(generic.inheritance);
+              }
 
-            if (generic.dflt && typeof generic.dflt === "string") {
-              list.push(generic.dflt);
-            }
-          });
-        }
+              if (
+                generic.dflt &&
+                typeof generic.dflt === "string" &&
+                generic.dflt.startsWith("{{") === false
+              ) {
+                list.push(generic.dflt);
+              }
+            });
+          }
+        });
       } else {
         const result = ComponentsConfigTools.listTypes(defaults[defKey]);
         list.push(...result);
@@ -154,4 +202,3 @@ export class ComponentsConfigTools {
     return list;
   }
 }
-

@@ -39,7 +39,7 @@ export type SourceAddons = {
 
 export type SourceElement = ElementWithProps &
   ElementWithGenerics &
-  ComponentElement<any>;
+  ComponentElement;
 
 export type Source = Component<SourceElement, SourceAddons>;
 

@@ -1,5 +1,5 @@
 import { TemplateEngine } from "../template/template-engine";
-import { TemplateModel } from "../template";
+// import { TemplateModel } from "../template";
 import { Config, ComponentConfig } from "../config";
 
 type BuildOptions = { useCwd?: boolean; writeMethod: string; force: boolean };
@@ -18,7 +18,7 @@ export class OutputBuilder {
     }
   }
 
-  public build(models: TemplateModel[], options: BuildOptions): any[] {
+  public build(models: any[], options: BuildOptions): any[] {
     return [];
   }
 }

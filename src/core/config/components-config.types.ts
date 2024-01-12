@@ -13,7 +13,7 @@ export type ComponentsConfigData = {
 };
 
 export type FrameworkDefaults = {
-  inheritance?: InheritanceConfig;
+  inheritance?: InheritanceConfig[];
   interfaces?: InterfaceConfig[];
   imports?: ImportConfig[];
   props?: PropConfig[];

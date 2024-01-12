@@ -2,27 +2,67 @@ import { nanoid } from "nanoid";
 import { ConfigTools, ReservedType } from "../../config";
 import { TypeInfo } from "../../type.info";
 import { SchemaTools } from "../schema.tools";
-import { ExportData, ExportJson, ExportSchema } from "./export.schema";
-import { GenericData, GenericJson, GenericSchema } from "./generic.schema";
-import { MethodData, MethodJson, MethodSchema } from "./method.schema";
-import { PropData, PropJson, PropSchema } from "./prop.schema";
+import {
+  ExportData,
+  ExportJson,
+  ExportObject,
+  ExportSchema,
+} from "./export.schema";
+import {
+  GenericData,
+  GenericJson,
+  GenericObject,
+  GenericSchema,
+} from "./generic.schema";
+import {
+  MethodData,
+  MethodJson,
+  MethodObject,
+  MethodSchema,
+} from "./method.schema";
+import { PropData, PropJson, PropObject, PropSchema } from "./prop.schema";
+import {
+  ImportData,
+  ImportJson,
+  ImportObject,
+  ImportSchema,
+} from "./import.schema";
+import {
+  InheritanceData,
+  InheritanceJson,
+  InheritanceObject,
+  InheritanceSchema,
+} from "./inheritance.schema";
+
+export type InterfaceObject = {
+  exp: ExportObject;
+  inheritance: InheritanceObject[];
+  props: PropObject[];
+  methods: MethodObject[];
+  generics: GenericObject[];
+  imports: ImportObject[];
+  name: string;
+  id: string;
+};
 
 export type InterfaceData = {
   exp?: ExportData;
-  inheritance?: TypeInfo;
+  inheritance?: InheritanceData[];
   props: PropData[];
   methods: MethodData[];
   generics?: GenericData[];
+  imports?: ImportData[];
   name: string;
   id?: string;
 };
 
 export type InterfaceJson = {
   exp?: string | boolean | ExportJson;
-  inheritance?: string | TypeInfo;
+  inheritance?: (string | InheritanceJson)[];
   props?: (PropJson | string)[];
   methods?: (MethodJson | string)[];
   generics?: (GenericJson | string)[];
+  imports?: (ImportJson | string)[];
   name?: string;
   id?: string;
 };
@@ -40,25 +80,24 @@ export class InterfaceSchema {
     }
 
     let exp: ExportSchema;
-    let inheritance: TypeInfo;
+    let inheritance: InheritanceSchema[] = [];
 
     if (data.exp) {
       exp = ExportSchema.create(data.exp);
     }
 
-    if (typeof data.inheritance === "string") {
-      const temp = data.inheritance;
-      if (ConfigTools.hasInstructions(temp)) {
-        inheritance = ConfigTools.executeInstructions(
-          temp,
-          references,
-          reserved
-        );
-      } else {
-        inheritance = TypeInfo.create(temp, reserved);
-      }
-    } else {
-      inheritance = data.inheritance;
+    if (Array.isArray(data.inheritance)) {
+      data.inheritance.forEach((i) => {
+        if (typeof i === "string") {
+          inheritance.push(
+            InheritanceSchema.create({ name: i }, reserved, references)
+          );
+        } else {
+          if (SchemaTools.executeMeta(i, references, reserved)) {
+            inheritance.push(InheritanceSchema.create(i, reserved, references));
+          }
+        }
+      });
     }
 
     const intf = new InterfaceSchema(
@@ -95,16 +134,62 @@ export class InterfaceSchema {
     return intf;
   }
 
+  private __imports: ImportSchema[] = [];
   private __props: PropSchema[] = [];
   private __methods: MethodSchema[] = [];
   private __generics: GenericSchema[] = [];
+  private __inheritance: InheritanceSchema[] = [];
 
   private constructor(
     public readonly id: string,
     public readonly name: string,
     public readonly exp: ExportSchema,
-    public readonly inheritance: TypeInfo
-  ) {}
+    inheritance: InheritanceSchema[] = []
+  ) {
+    inheritance.forEach((i) => {
+      this.__inheritance.push(i);
+    });
+  }
+
+  get inheritance() {
+    return [...this.__inheritance];
+  }
+
+  addImport(impt: ImportSchema) {
+    if (this.hasImport(impt) === false) {
+      this.__imports.push(impt);
+    }
+  }
+
+  findImport(impt: ImportData) {
+    const { dflt, path, alias, list } = impt;
+
+    return this.__imports.find(
+      (p) =>
+        p.path === path &&
+        p.alias === alias &&
+        p.dflt === dflt &&
+        impt.list.every((i) => list.includes(i))
+    );
+  }
+
+  hasImport(impt: ImportData) {
+    const { dflt, path, alias, list } = impt;
+
+    return (
+      this.__imports.findIndex(
+        (p) =>
+          p.path === path &&
+          p.alias === alias &&
+          p.dflt === dflt &&
+          impt.list.every((i) => list.includes(i))
+      ) > -1
+    );
+  }
+
+  get imports() {
+    return [...this.__imports];
+  }
 
   addProp(prop: PropSchema) {
     if (this.hasProp(prop.name) === false) {
@@ -160,19 +245,29 @@ export class InterfaceSchema {
     return [...this.__methods];
   }
 
-  toObject() {
-    const { id, name, __methods, __props, __generics, exp, inheritance } = this;
-    const intf: InterfaceData = {
+  toObject(): InterfaceObject {
+    const {
       id,
       name,
-      inheritance,
+      __methods,
+      __props,
+      __generics,
+      __imports,
+      __inheritance,
+      exp,
+    } = this;
+    const intf: InterfaceObject = {
+      id,
+      name,
+      inheritance: __inheritance?.map((i) => i.toObject()),
       exp: exp?.toObject(),
       methods: __methods.map((i) => i.toObject()),
       props: __props.map((p) => p.toObject()),
       generics: __generics.map((g) => g.toObject()),
+      imports: __imports.map((i) => i.toObject()),
     };
 
-    return SchemaTools.removeNullUndefined(intf);
+    return intf;
   }
 
   listTypes() {

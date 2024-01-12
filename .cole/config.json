@@ -124,7 +124,7 @@
           ]
         },
         "mongo": {
-          "inheritance": {
+          "inheritance": [{
             "name": "MongoMapper",
             "generics": [
               {
@@ -134,7 +134,7 @@
                 "dflt": "{{USE DEPENDENCY(WHERE type.isModel IS true).element.name}}"
               }
             ]
-          },
+          }],
           "interfaces": [],
           "imports": [
             {
@@ -175,14 +175,14 @@
               ]
             }
           },
-          "inheritance": {
+          "inheritance": [{
             "name": "MongoCollectionSource",
             "generics": [
               {
-                "dflt": "{{USE DEPENDENCY(WHERE type.isModel IS true).type}}"
+                "dflt": "{{USE DEPENDENCY(WHERE type.isModel IS true).element.name}}"
               }
             ]
-          },
+          }],
           "interfaces": [],
           "imports": [
             {
@@ -205,7 +205,7 @@
           "generics": [
             {
               "meta": "{{IF addons.hasModel IS true}}",
-              "dflt": "{{USE DEPENDENCY(WHERE type.isModel IS true).type}}"
+              "dflt": "{{USE DEPENDENCY(WHERE type.isModel IS true).element.name}}"
             }
           ],
           "methods": [
@@ -322,14 +322,14 @@
               "path": "@cole-framework/api-core"
             }
           ],
-          "inheritance": {
+          "inheritance": [{
             "name": "Respository",
             "generics": [
               {
-                "dflt": "{{USE DEPENDENCY(WHERE type.isEntity IS true).type}}"
+                "dflt": "{{USE DEPENDENCY(WHERE type.isEntity IS true).element.name}}"
               }
             ]
-          }
+          }]
         }
       }
     },
@@ -349,17 +349,17 @@
               "path": "@cole-framework/api-core"
             }
           ],
-          "inheritance": {
+          "inheritance": [{
             "name": "RepositoryImpl",
             "generics": [
               {
-                "dflt": "{{USE DEPENDENCY(WHERE type.isEntity IS true).type}}"
+                "dflt": "{{USE DEPENDENCY(WHERE type.isEntity IS true).element.name}}"
               },
               {
-                "dflt": "{{USE DEPENDENCY(WHERE type.isModel IS true).type}}"
+                "dflt": "{{USE DEPENDENCY(WHERE type.isModel IS true).element.name}}"
               }
             ]
-          }
+          }]
         },
         "mongo": {
           "imports": [

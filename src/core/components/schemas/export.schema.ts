@@ -6,6 +6,8 @@ export type ExportData = {
   alias?: string;
 };
 
+export type ExportObject = ExportData;
+
 export type ExportJson = {
   is_default?: boolean;
   use_wildcard?: boolean;

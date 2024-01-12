@@ -248,6 +248,7 @@ export abstract class TypeInfo {
     public readonly isMapper?: boolean,
     public readonly isRoute?: boolean,
     public readonly isRouteIO?: boolean,
+    public readonly isRouteModel?: boolean,
     public readonly isConfigInstructionType?: boolean,
     public readonly type?: string,
     public readonly component?: string,

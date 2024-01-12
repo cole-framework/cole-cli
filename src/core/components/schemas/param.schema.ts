@@ -7,6 +7,15 @@ import { SchemaTools } from "../schema.tools";
 export const PARAM_REGEX =
   /^(inject)?\s*(private|protected|public)?\s*(readonly)?\s*([a-zA-Z0-9_]+)(\?)?(\s*:\s*([a-zA-Z0-9\[\]\<\>\{\}\|\& ]+))?(\s*=\s*(.+))?$/;
 
+export type ParamObject = {
+  name: string;
+  type: TypeInfo;
+  access: string;
+  is_optional: boolean;
+  is_readonly: boolean;
+  value: any;
+};
+
 export type ParamData = {
   name?: string;
   type?: TypeInfo;
@@ -235,7 +244,7 @@ export class ParamSchema {
     public readonly value: any
   ) {}
 
-  toObject() {
+  toObject(): ParamObject {
     const {
       name,
       type,

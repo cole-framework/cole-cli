@@ -40,7 +40,7 @@ export type MapperAddons = {
 
 export type MapperElement = ElementWithProps &
   ElementWithGenerics &
-  ComponentElement<any>;
+  ComponentElement;
 
 export type Mapper = Component<MapperElement, MapperAddons>;
 

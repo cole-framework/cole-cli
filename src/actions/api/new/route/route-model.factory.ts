@@ -67,7 +67,7 @@ export class RouteModelFactory {
       props.push(...data.props);
     }
 
-    const element = TypeSchema.create(
+    const element = TypeSchema.create<RouteModelElement>(
       {
         name: componentName,
         type,
@@ -77,7 +77,7 @@ export class RouteModelFactory {
       config.reservedTypes,
       {
         addons,
-        dependencies
+        dependencies,
       }
     );
 

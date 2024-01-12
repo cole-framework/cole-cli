@@ -28,7 +28,7 @@ export type UseCaseData = UseCaseJson;
 export type UseCaseElement = ElementWithProps &
   ElementWithMethods &
   ElementWithGenerics &
-  ComponentElement<any>;
+  ComponentElement;
 
 export type UseCase = Component<UseCaseElement>;
 

@@ -36,8 +36,8 @@ export class ControllerFactory {
       ctor = defaults.common.ctor;
     }
 
-    if (defaults?.common?.inheritance) {
-      inheritance.push(defaults.common.inheritance);
+    if (Array.isArray(defaults?.common?.inheritance)) {
+      inheritance.push(...defaults.common.inheritance);
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
@@ -100,10 +100,14 @@ export class ControllerFactory {
       imports,
     };
 
-    const element = ClassSchema.create(classData, config.reservedTypes, {
-      addons: {},
-      dependencies
-    });
+    const element = ClassSchema.create<ControllerElement>(
+      classData,
+      config.reservedTypes,
+      {
+        addons: {},
+        dependencies,
+      }
+    );
 
     const component = Component.create<ControllerElement>(
       id,

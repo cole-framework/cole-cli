@@ -57,7 +57,7 @@ export type NewRepositoryJson = {
 export type RepositoryElement = ElementWithProps &
   ElementWithMethods &
   ElementWithGenerics &
-  ComponentElement<any>;
+  ComponentElement;
 
 export type Repository = Component<RepositoryElement>;
 export type RepositoryImpl = Component<RepositoryElement>;

@@ -1,8 +1,10 @@
 import chalk from "chalk";
 import { ConfigLoader, LangLoader, WriteMethod } from "../../../../core";
-import { ApiData, DefaultCliOptions } from "../api.types";
+import { ApiConfig, DefaultCliOptions } from "../api.types";
 import { existsSync, readFileSync } from "fs";
 import { ApiJsonParser } from "../api-json.parser";
+import { ApiGenerator } from "../api-generator";
+import { FileTransport } from "../../../../transport/file.transport";
 
 export const fromJson = async (options: DefaultCliOptions) => {
   const { content: config, failure } = ConfigLoader.load();
@@ -12,21 +14,18 @@ export const fromJson = async (options: DefaultCliOptions) => {
     process.exit(1);
   }
 
-  const schema: ApiData = {
-    config: {
-      skip_tests:
-        options.skipTests === undefined
-          ? config.general.skipTests
-          : options.skipTests,
-      with_dependencies:
-        options.withDeps === undefined
-          ? config.general.withDependencies
-          : options.withDeps,
-      use_cwd: false,
-      force: options.force,
-      write_method: options.force ? WriteMethod.Overwrite : WriteMethod.Write,
-    },
-    components: [],
+  const apiConfig: ApiConfig = {
+    skip_tests:
+      options.skipTests === undefined
+        ? config.general.skipTests
+        : options.skipTests,
+    with_dependencies:
+      options.withDeps === undefined
+        ? config.general.withDependencies
+        : options.withDeps,
+    use_cwd: false,
+    force: options.force,
+    write_method: options.force ? WriteMethod.Overwrite : WriteMethod.Write,
   };
 
   const { content: texts } = await LangLoader.load();
@@ -41,9 +40,11 @@ export const fromJson = async (options: DefaultCliOptions) => {
   try {
     const data = readFileSync(options.json, "utf-8");
     const json = JSON.parse(data);
-    const result = new ApiJsonParser(schema.config, config, texts).build(json);
+    const schema = new ApiJsonParser(apiConfig, config, texts).build(json);
 
-    console.log("->", JSON.stringify(result, null, 2));
+    const result = new ApiGenerator(new FileTransport()).generate(schema);
+
+    console.log("->", JSON.stringify(schema, null, 2));
   } catch (error) {
     console.log(error);
     process.exit(1);

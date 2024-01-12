@@ -63,8 +63,8 @@ export class RouteIOFactory {
       ctor = defaults.common.ctor;
     }
 
-    if (defaults?.common?.inheritance) {
-      inheritance.push(defaults.common?.inheritance);
+    if (Array.isArray(defaults?.common?.inheritance)) {
+      inheritance.push(...defaults.common.inheritance);
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
@@ -87,8 +87,8 @@ export class RouteIOFactory {
       generics.push(...defaults.common.generics);
     }
 
-    if (defaults?.[method]?.inheritance) {
-      inheritance.push(defaults[method].inheritance);
+    if (Array.isArray(defaults?.[method]?.inheritance)) {
+      inheritance.push(...defaults[method].inheritance);
     }
 
     if (Array.isArray(defaults?.[method]?.imports)) {
@@ -131,10 +131,14 @@ export class RouteIOFactory {
       imports,
     };
 
-    const element = ClassSchema.create(classData, config.reservedTypes, {
-      addons,
-      dependencies,
-    });
+    const element = ClassSchema.create<RouteElement>(
+      classData,
+      config.reservedTypes,
+      {
+        addons,
+        dependencies,
+      }
+    );
 
     const component = Component.create<RouteElement>(
       id,

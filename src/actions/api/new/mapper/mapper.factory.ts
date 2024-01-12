@@ -43,8 +43,8 @@ export class MapperFactory {
       ctor = defaults.common.ctor;
     }
 
-    if (defaults?.common?.inheritance) {
-      inheritance.push(defaults.common.inheritance);
+    if (Array.isArray(defaults?.common?.inheritance)) {
+      inheritance.push(...defaults.common.inheritance);
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
@@ -67,8 +67,8 @@ export class MapperFactory {
       generics.push(...defaults.common.generics);
     }
 
-    if (defaults?.[storage]?.inheritance) {
-      inheritance.push(defaults[storage].inheritance);
+    if (Array.isArray(defaults?.[storage]?.inheritance)) {
+      inheritance.push(...defaults[storage].inheritance);
     }
 
     if (Array.isArray(defaults?.[storage]?.imports)) {
@@ -110,7 +110,7 @@ export class MapperFactory {
       ctor,
     };
 
-    const element = ClassSchema.create(classData, config.reservedTypes, {
+    const element = ClassSchema.create<MapperElement>(classData, config.reservedTypes, {
       addons,
       dependencies
     });

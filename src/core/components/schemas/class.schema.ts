@@ -1,26 +1,61 @@
-import { ExportData, ExportJson, ExportSchema } from "./export.schema";
-import { GenericData, GenericJson, GenericSchema } from "./generic.schema";
-import { MethodData, MethodJson, MethodSchema } from "./method.schema";
-import { PropData, PropJson, PropSchema } from "./prop.schema";
+import {
+  ExportData,
+  ExportJson,
+  ExportObject,
+  ExportSchema,
+} from "./export.schema";
+import {
+  GenericData,
+  GenericJson,
+  GenericObject,
+  GenericSchema,
+} from "./generic.schema";
+import {
+  MethodData,
+  MethodJson,
+  MethodObject,
+  MethodSchema,
+} from "./method.schema";
+import { PropData, PropJson, PropObject, PropSchema } from "./prop.schema";
 import {
   ConstructorData,
   ConstructorJson,
+  ConstructorObject,
   ConstructorSchema,
 } from "./constructor.schema";
 import {
   InterfaceData,
   InterfaceJson,
+  InterfaceObject,
   InterfaceSchema,
 } from "./interface.schema";
 import {
   InheritanceData,
   InheritanceJson,
+  InheritanceObject,
   InheritanceSchema,
 } from "./inheritance.schema";
-import { ImportData, ImportJson, ImportSchema } from "./import.schema";
-import { ConfigTools, ReservedType } from "../../config";
+import {
+  ImportData,
+  ImportJson,
+  ImportObject,
+  ImportSchema,
+} from "./import.schema";
+import { ReservedType } from "../../config";
 import { SchemaTools } from "../schema.tools";
 import { TypeInfo } from "../../type.info";
+
+export type ClassObject = {
+  exp?: ExportObject;
+  ctor?: ConstructorObject;
+  interfaces?: InterfaceObject[];
+  inheritance?: InheritanceObject[];
+  props?: PropObject[];
+  methods?: MethodObject[];
+  generics?: GenericObject[];
+  imports?: ImportObject[];
+  name: string;
+};
 
 export type ClassData = {
   exp?: ExportData;
@@ -39,7 +74,7 @@ export type ClassJson = {
   exp?: string | boolean | ExportJson;
   ctor?: string | ConstructorJson;
   interfaces?: (string | InterfaceJson)[];
-  inheritance?: string | InheritanceJson;
+  inheritance?: (string | InheritanceJson)[];
   props?: (PropJson | string)[];
   methods?: (MethodJson | string)[];
   generics?: (GenericJson | string)[];
@@ -49,11 +84,11 @@ export type ClassJson = {
 };
 
 export class ClassSchema {
-  public static create(
+  public static create<T>(
     data: ClassData | ClassJson,
     reserved: ReservedType[],
     references?: { [key: string]: unknown; dependencies: any[] }
-  ) {
+  ): T {
     if (!data) {
       return null;
     }
@@ -91,10 +126,9 @@ export class ClassSchema {
     if (Array.isArray(data.interfaces)) {
       data.interfaces.forEach((i) => {
         if (SchemaTools.executeMeta(i, references, reserved)) {
-          inheritance.push(InheritanceSchema.create(i, reserved, references));
+          cls.addInterface(InterfaceSchema.create(i, reserved, references));
         }
 
-        cls.addInterface(InterfaceSchema.create(i, reserved, references));
       });
     }
 
@@ -122,7 +156,7 @@ export class ClassSchema {
       });
     }
 
-    return cls;
+    return cls as T;
   }
 
   private __imports: ImportSchema[] = [];
@@ -255,7 +289,7 @@ export class ClassSchema {
     return [...this.__interfaces];
   }
 
-  toObject() {
+  toObject(): ClassObject {
     const {
       name,
       ctor,
@@ -265,8 +299,9 @@ export class ClassSchema {
       __props,
       __generics,
       __interfaces,
+      __imports,
     } = this;
-    const cls: ClassData = {
+    const cls: ClassObject = {
       name,
       inheritance: __inheritance?.map((i) => i.toObject()),
       ctor: ctor?.toObject(),
@@ -275,9 +310,10 @@ export class ClassSchema {
       props: __props.map((p) => p.toObject()),
       generics: __generics.map((g) => g.toObject()),
       interfaces: __interfaces.map((i) => i.toObject()),
+      imports: __imports.map((i) => i.toObject()),
     };
 
-    return SchemaTools.removeNullUndefined(cls);
+    return cls;
   }
 
   listTypes() {

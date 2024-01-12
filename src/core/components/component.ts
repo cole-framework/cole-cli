@@ -7,6 +7,15 @@ import {
   GenericSchema,
   MethodSchema,
   InterfaceSchema,
+  MethodObject,
+  PropObject,
+  GenericObject,
+  InterfaceObject,
+  ImportObject,
+  ConstructorObject,
+  InheritanceObject,
+  ExportObject,
+  FunctionObject,
 } from "./schemas";
 import { ComponentTools } from "./component.tools";
 
@@ -38,8 +47,21 @@ export interface ElementWithInterfaces {
   hasInterface(name: string): boolean;
 }
 
-export interface ComponentElement<ElementObject = any> {
+export type ElementObject = {
   name: string;
+  exp?: ExportObject;
+  inheritance?: InheritanceObject[];
+  ctor?: ConstructorObject;
+  methods?: MethodObject[];
+  props?: PropObject[];
+  generics?: GenericObject[];
+  interfaces?: InterfaceObject[];
+  imports?: ImportObject[];
+  functions?: FunctionObject[];
+  alias?: any;
+};
+
+export interface ComponentElement extends ElementObject {
   toObject(): ElementObject;
   listTypes(): TypeInfo[];
 }
@@ -51,7 +73,7 @@ export type Dependency = {
   path: string;
 };
 
-export type ComponentData<Element, ElementAddons> = {
+export type ComponentData<Element = ElementObject, ElementAddons = unknown> = {
   id: string;
   type: TypeInfo;
   path: string;
@@ -151,7 +173,7 @@ export class Component<
     return [...this.__dependencies];
   }
 
-  toObject(): ComponentData<Element, ElementAddons> {
+  toObject(): ComponentData<ElementObject, ElementAddons> {
     const {
       type,
       id,

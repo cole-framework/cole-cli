@@ -36,8 +36,8 @@ export class UseCaseFactory {
       ctor = defaults.common.ctor;
     }
 
-    if (defaults?.common?.inheritance) {
-      inheritance.push(defaults.common.inheritance);
+    if (Array.isArray(defaults?.common?.inheritance)) {
+      inheritance.push(...defaults.common.inheritance);
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
@@ -80,10 +80,14 @@ export class UseCaseFactory {
       imports,
     };
 
-    const element = ClassSchema.create(classData, config.reservedTypes, {
-      addons,
-      dependencies,
-    });
+    const element = ClassSchema.create<UseCaseElement>(
+      classData,
+      config.reservedTypes,
+      {
+        addons,
+        dependencies,
+      }
+    );
 
     const component = Component.create<UseCaseElement>(
       id,

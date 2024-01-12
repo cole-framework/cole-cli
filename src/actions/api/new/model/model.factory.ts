@@ -64,7 +64,7 @@ export class ModelFactory {
       props.push(...data.props);
     }
 
-    const element = TypeSchema.create(
+    const element = TypeSchema.create<ModelElement>(
       {
         name: componentName,
         type,

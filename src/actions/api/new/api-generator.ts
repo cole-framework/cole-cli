@@ -1,75 +1,30 @@
-import { OutputBuilderFactory } from "./output-builder.factory";
 import { Transport } from "../../../transport/transport";
 import {
+  ComponentData,
   Config,
   Failure,
   Result,
   SourceCodeWriter,
-  TemplateEngine,
-  TemplateModel,
 } from "../../../core";
+import { ApiConfig, ApiObject } from "./api.types";
+import { FileTemplateModel } from "../../../core/template/file.template-model";
+import { ApiSchema } from "./api.schema";
+
+export const updateTemplateModel = (
+  files: Map<string, FileTemplateModel>,
+  data: ComponentData
+) => {
+  let file = files.get(data.path);
+
+  if (!file) {
+    file = new FileTemplateModel(data.path, data.write_method);
+    files.set(data.path, file);
+  }
+  file.update(data);
+};
 
 export class ApiGenerator {
-  protected outputBuilderFactory: OutputBuilderFactory;
-  protected templateEngine: TemplateEngine;
-
-  constructor(protected config: Config, protected transport: Transport) {
-    this.outputBuilderFactory = new OutputBuilderFactory();
-    this.templateEngine = new TemplateEngine();
-  }
-
-  protected isTestableComponent(type: string) {
-    return true;
-  }
-
-  protected createComponentOutputs(
-    type: string,
-    templateModels: TemplateModel[],
-    apiModel: any
-  ): any[] {
-    const outputs: any[] = [];
-    const { outputBuilderFactory, config } = this;
-    const {
-      config: { use_cwd, write_method, force },
-    } = apiModel;
-    const builder = outputBuilderFactory.create(type, config);
-
-    if (builder) {
-      const componentOutputs = builder.build(templateModels, {
-        useCwd: use_cwd,
-        force,
-        writeMethod: write_method,
-      });
-      outputs.push(...componentOutputs);
-    }
-
-    return outputs;
-  }
-
-  protected createTemplateModels(
-    components: any[],
-    apiModel: any
-  ): TemplateModel[] {
-    const templateModels = [];
-
-    // for (const model of components) {
-    //   const templateModel = templateModelFactory.create(model, apiModel);
-    //   templateModels.push(templateModel);
-    // }
-
-    return templateModels;
-  }
-
-  protected createUnitTestTemplateModels(
-    models: TemplateModel[],
-    apiModel: any
-  ): TemplateModel[] {
-    // return models.map((model) =>
-    //   unitTestTemplateModelFactory.create(model, apiModel)
-    // );
-    return [];
-  }
-
+  constructor(protected transport: Transport) {}
   protected writeFiles(outputs: any[]): Result {
     const { transport } = this;
     const codeWriter = new SourceCodeWriter(transport);
@@ -82,18 +37,38 @@ export class ApiGenerator {
       : Result.withoutContent();
   }
 
-  public generate(schema: any): Result {
-    const { config } = this;
+  protected createTemplateModels(api: ApiObject) {
+    const templateModels = new Map<string, FileTemplateModel>();
 
-    // create and complete the api model based on the provided schema
-    //const apiSchema = new ApiModelFactory(config).create(data);
-    const componentTypes = Object.keys(schema.components) || [];
-    const outputs: any[] = [];
+    api.controllers.forEach((item) =>
+      updateTemplateModel(templateModels, item)
+    );
+    api.entities.forEach((item) => updateTemplateModel(templateModels, item));
+    api.mappers.forEach((item) => updateTemplateModel(templateModels, item));
+    api.models.forEach((item) => updateTemplateModel(templateModels, item));
+    api.repositories.forEach((item) =>
+      updateTemplateModel(templateModels, item)
+    );
+    api.repository_factories.forEach((item) =>
+      updateTemplateModel(templateModels, item)
+    );
+    api.repository_impls.forEach((item) =>
+      updateTemplateModel(templateModels, item)
+    );
+    api.route_ios.forEach((item) => updateTemplateModel(templateModels, item));
+    api.routes.forEach((item) => updateTemplateModel(templateModels, item));
+    api.sources.forEach((item) => updateTemplateModel(templateModels, item));
+    api.use_cases.forEach((item) => updateTemplateModel(templateModels, item));
 
-    // generate models based on strategy
-    // strategy selected based on
+    return Array.from(templateModels, ([, value]) => value);
+  }
 
-    console.log(JSON.stringify(schema, null, " "));
+  public generate(api: ApiSchema): Result {
+    const obj = api.toObject();
+    const models = this.createTemplateModels(obj);
+
+    console.log(JSON.stringify(models, null, 2));
+
     return Result.withoutContent();
   }
 }

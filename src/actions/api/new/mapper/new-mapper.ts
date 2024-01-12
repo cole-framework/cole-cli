@@ -2,9 +2,7 @@ import { ConfigLoader, WriteMethod } from "../../../../core";
 import { FileTransport } from "../../../../transport/file.transport";
 import { ApiGenerator } from "../api-generator";
 import { ApiData } from "../api.types";
-import {
-  NewMapperOptionsStrategy,
-} from "./strategies";
+import { NewMapperOptionsStrategy } from "./strategies";
 import { NewMapperOptions } from "./types";
 
 export const newMapper = async (options: NewMapperOptions) => {
@@ -38,10 +36,10 @@ export const newMapper = async (options: NewMapperOptions) => {
     new NewMapperOptionsStrategy(config).apply(schema, options);
   }
 
-  const result = new ApiGenerator(config, new FileTransport()).generate(schema);
+  // const result = new ApiGenerator(new FileTransport()).generate(schema);
 
-  if (result.isFailure) {
-    console.log(result.failure.error);
-    process.exit(1);
-  }
+  // if (result.isFailure) {
+  //   console.log(result.failure.error);
+  //   process.exit(1);
+  // }
 };

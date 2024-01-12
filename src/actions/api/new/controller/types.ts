@@ -37,6 +37,6 @@ export type ControllerData = ClassJson & {
 
 export type ControllerElement = ElementWithProps &
   ElementWithMethods &
-  ComponentElement<any>;
+  ComponentElement;
 
 export type Controller = Component<ControllerElement>;

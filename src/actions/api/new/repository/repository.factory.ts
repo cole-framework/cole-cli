@@ -38,8 +38,8 @@ export class RepositoryComponentFactory {
       ctor = defaults.common.ctor;
     }
 
-    if (defaults?.common?.inheritance) {
-      inheritance.push(defaults.common.inheritance);
+    if (Array.isArray(defaults?.common?.inheritance)) {
+      inheritance.push(...defaults.common.inheritance);
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
@@ -82,10 +82,14 @@ export class RepositoryComponentFactory {
       ctor,
     };
 
-    const element = ClassSchema.create(classData, config.reservedTypes, {
-      addons,
-      dependencies
-    });
+    const element = ClassSchema.create<RepositoryElement>(
+      classData,
+      config.reservedTypes,
+      {
+        addons,
+        dependencies,
+      }
+    );
 
     const component = Component.create<RepositoryElement>(
       id,

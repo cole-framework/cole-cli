@@ -1,18 +1,36 @@
 import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { AccessType } from "../../enums";
 import { TypeInfo, UnknownType } from "../../type.info";
-import { Component } from "../component";
 import { SchemaTools } from "../schema.tools";
 import {
   GenericData,
   GenericJson,
   GenericTools,
   GenericSchema,
+  GenericObject,
 } from "./generic.schema";
-import { ParamData, ParamJson, ParamTools, ParamSchema } from "./param.schema";
+import {
+  ParamData,
+  ParamJson,
+  ParamTools,
+  ParamSchema,
+  ParamObject,
+} from "./param.schema";
 
 export const METHOD_REGEX =
   /^(static|async|private|protected|public)?\s*(static|async|private|protected|public)?\s*(async|static|private|protected|public)?\s*([a-zA-Z0-9_]+)(\s*\<(.+)\>\s*)?(\((.*)\))?(\s*:\s*([a-zA-Z0-9\[\]\<\>\{\\}]+))?(\s*=>\s*(.*))?$/;
+
+export type MethodObject = {
+  access: string;
+  name: string;
+  return_type: TypeInfo;
+  is_async: boolean;
+  is_static: boolean;
+  params: ParamObject[];
+  body: string;
+  supr: MethodObject;
+  generics: GenericObject[];
+};
 
 export type MethodData = {
   access?: string;
@@ -356,20 +374,32 @@ export class MethodSchema {
     return [...this.__generics];
   }
 
-  toObject() {
-    const { access, __params, __generics, body, supr } = this;
-    const mth: MethodData = {
+  toObject(): MethodObject {
+    const {
+      access,
+      __params,
+      __generics,
+      body,
+      supr,
+      isAsync,
+      isStatic,
+      name,
+      returnType,
+    } = this;
+
+    const mth: MethodObject = {
       access,
       params: __params.map((p) => p.toObject()),
       generics: __generics.map((g) => g.toObject()),
       body,
+      supr: supr?.toObject(),
+      is_async: isAsync,
+      is_static: isStatic,
+      name,
+      return_type: returnType,
     };
 
-    if (supr) {
-      mth.supr = supr.toObject();
-    }
-
-    return SchemaTools.removeNullUndefined(mth);
+    return mth;
   }
 
   listTypes() {

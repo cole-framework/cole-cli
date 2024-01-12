@@ -2,11 +2,20 @@ import { camelCase } from "change-case";
 import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { AccessType } from "../../enums";
 import { TypeInfo, UnknownType } from "../../type.info";
-import { Component } from "../component";
 import { SchemaTools } from "../schema.tools";
 
 export const PROP_REGEX =
   /^(inject)?\s*(private|protected|public)?\s*(static|readonly)?\s*([a-zA-Z0-9_]+)(\?)?(\s*:\s*([a-zA-Z0-9\[\]\<\>\{\}\|\& ]+))?(\s*=\s*(.+))?$/;
+
+export type PropObject = {
+  name: string;
+  type: TypeInfo;
+  access: string;
+  is_optional: boolean;
+  is_readonly: boolean;
+  is_static: boolean;
+  value: any;
+};
 
 export type PropData = {
   name?: string;
@@ -247,7 +256,7 @@ export class PropSchema {
     public readonly value: any
   ) {}
 
-  toObject() {
+  toObject(): PropObject {
     const {
       name,
       type,

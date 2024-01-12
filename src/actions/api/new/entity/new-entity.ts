@@ -37,10 +37,10 @@ export const newEntity = async (options: NewEntityOptions) => {
     // new NewEntityInteractiveStrategy(config).apply(schema);
   }
 
-  const result = new ApiGenerator(config, new FileTransport()).generate(schema);
+  // const result = new ApiGenerator(new FileTransport()).generate(schema);
 
-  if (result.isFailure) {
-    console.log(result.failure.error);
-    process.exit(1);
-  }
+  // if (result.isFailure) {
+  //   console.log(result.failure.error);
+  //   process.exit(1);
+  // }
 };

@@ -2,6 +2,11 @@ import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { TypeInfo } from "../../type.info";
 import { Component } from "../component";
 import { SchemaTools } from "../schema.tools";
+import {
+  InheritanceData,
+  InheritanceObject,
+  InheritanceSchema,
+} from "./inheritance.schema";
 
 export type GenericJson = {
   name?: string;
@@ -9,10 +14,16 @@ export type GenericJson = {
   dflt?: string; // default type, may use multiple with & or |
 };
 
+export type GenericObject = {
+  name: string;
+  inheritance: InheritanceObject;
+  dflt: string;
+};
+
 export type GenericData = {
   name?: string;
-  inheritance?: TypeInfo; // extends types, may use multiple with & or |
-  dflt?: TypeInfo; // default type, may use multiple with & or |
+  inheritance?: InheritanceData; // extends types, may use multiple with & or |
+  dflt?: string; // default type, may use multiple with & or |
 };
 
 export type GenericConfig = GenericJson & ConfigAddons;
@@ -104,7 +115,7 @@ export class GenericSchema {
         if (ConfigTools.hasInstructions(temp)) {
           dflt = ConfigTools.executeInstructions(temp, references, reserved);
         } else {
-          dflt = TypeInfo.create(temp, reserved);
+          dflt = temp;
         }
       } else {
         dflt = data.dflt;
@@ -120,10 +131,14 @@ export class GenericSchema {
             reserved
           );
         } else {
-          inheritance = TypeInfo.create(temp, reserved);
+          inheritance = InheritanceSchema.create(temp, reserved, references);
         }
       } else {
-        inheritance = data.inheritance;
+        inheritance = InheritanceSchema.create(
+          data.inheritance,
+          reserved,
+          references
+        );
       }
     }
 
@@ -132,17 +147,17 @@ export class GenericSchema {
 
   constructor(
     public readonly name: string,
-    public readonly inheritance?: TypeInfo,
-    public readonly dflt?: TypeInfo
+    public readonly inheritance?: InheritanceSchema,
+    public readonly dflt?: string
   ) {}
 
-  toObject() {
+  toObject(): GenericObject {
     const { name, dflt, inheritance } = this;
-    return SchemaTools.removeNullUndefined({
+    return {
       name,
       dflt,
-      inheritance,
-    });
+      inheritance: inheritance?.toObject(),
+    };
   }
 
   listTypes() {

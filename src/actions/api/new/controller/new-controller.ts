@@ -40,10 +40,10 @@ export const newController = async (options: NewControllerOptions) => {
     new NewControllerInteractiveStrategy(config).apply(schema);
   }
 
-  const result = new ApiGenerator(config, new FileTransport()).generate(schema);
+  // const result = new ApiGenerator(new FileTransport()).generate(schema);
 
-  if (result.isFailure) {
-    console.log(result.failure.error.message);
-    process.exit(1);
-  }
+  // if (result.isFailure) {
+  //   console.log(result.failure.error.message);
+  //   process.exit(1);
+  // }
 };

@@ -36,8 +36,8 @@ export class RepositoryImplFactory {
       endpoint,
     }).path;
 
-    if (defaults?.common?.inheritance) {
-      inheritance.push(defaults.common?.inheritance);
+    if (Array.isArray(defaults?.common?.inheritance)) {
+      inheritance.push(...defaults.common.inheritance);
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
@@ -87,8 +87,8 @@ export class RepositoryImplFactory {
         access: AccessType.Protected,
       });
 
-      if (defaults?.[storage]?.inheritance) {
-        inheritance.push(defaults[storage].inheritance);
+      if (Array.isArray(defaults?.[storage]?.inheritance)) {
+        inheritance.push(...defaults[storage].inheritance);
       }
 
       if (Array.isArray(defaults?.[storage]?.imports)) {
@@ -131,10 +131,14 @@ export class RepositoryImplFactory {
       imports,
     };
 
-    const element = ClassSchema.create(classData, config.reservedTypes, {
-      addons,
-      dependencies
-    });
+    const element = ClassSchema.create<RepositoryElement>(
+      classData,
+      config.reservedTypes,
+      {
+        addons,
+        dependencies,
+      }
+    );
 
     const component = Component.create<RepositoryElement>(
       id,

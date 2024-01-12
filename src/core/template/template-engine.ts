@@ -25,7 +25,6 @@ import {
   RelativePathHelper,
   RenderHelper,
 } from "./template-helpers";
-import { TemplateModel } from "./template.types";
 
 export class TemplateEngine {
   protected templates = new Map<string, Handlebars.TemplateDelegate>();
@@ -74,7 +73,7 @@ export class TemplateEngine {
 
   public generateOutput(
     templatePath: string,
-    model: TemplateModel,
+    model: any,
     opts?: Handlebars.RuntimeOptions
   ): string {
     const tmplpath = path.parse(templatePath);

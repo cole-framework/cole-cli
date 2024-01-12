@@ -1,14 +1,26 @@
 import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { TypeInfo, ObjectType, UnknownType } from "../../type.info";
 import { SchemaTools } from "../schema.tools";
-import { ExportData, ExportJson, ExportSchema } from "./export.schema";
+import {
+  ExportData,
+  ExportJson,
+  ExportObject,
+  ExportSchema,
+} from "./export.schema";
 import {
   GenericData,
   GenericJson,
   GenericTools,
   GenericSchema,
+  GenericObject,
 } from "./generic.schema";
-import { PropData, PropJson, PropSchema } from "./prop.schema";
+import {
+  ImportData,
+  ImportJson,
+  ImportObject,
+  ImportSchema,
+} from "./import.schema";
+import { PropData, PropJson, PropObject, PropSchema } from "./prop.schema";
 
 export const TYPE_REGEX =
   /([a-zA-Z0-9_]+)\s*(<([a-zA-Z0-9_, \<\>\[\]\(\)]+)>)?(\s*=\s*(.+))?/;
@@ -20,7 +32,17 @@ export type TypeData = {
   props?: (PropData | string)[];
   type?: TypeInfo;
   generics?: GenericData[];
+  imports?: ImportData[];
   alias?: any;
+};
+
+export type TypeObject = {
+  exp?: ExportObject;
+  name: string;
+  props?: PropObject[];
+  generics?: GenericObject[];
+  alias?: any;
+  imports?: ImportObject[];
 };
 
 export type TypeJson = {
@@ -30,6 +52,7 @@ export type TypeJson = {
   props?: PropJson[];
   type: string;
   generics?: GenericJson[];
+  imports?: ImportJson[];
   alias?: any;
 };
 
@@ -81,7 +104,7 @@ export class TypeTools {
 }
 
 export class TypeSchema {
-  public static create(
+  public static create<T>(
     data: string | TypeData | TypeJson,
     reserved: ReservedType[],
     references?: { [key: string]: unknown; dependencies: any[] }
@@ -150,9 +173,10 @@ export class TypeSchema {
     generics.forEach((g) => t.addGeneric(g));
     props.forEach((p) => t.addProp(p));
 
-    return t;
+    return t as T;
   }
 
+  private __imports: ImportSchema[] = [];
   private __props: PropSchema[] = [];
   private __generics: GenericSchema[] = [];
 
@@ -161,6 +185,42 @@ export class TypeSchema {
     public readonly alias: TypeInfo,
     public readonly exp: ExportSchema
   ) {}
+
+  addImport(impt: ImportSchema) {
+    if (this.hasImport(impt) === false) {
+      this.__imports.push(impt);
+    }
+  }
+
+  findImport(impt: ImportData) {
+    const { dflt, path, alias, list } = impt;
+
+    return this.__imports.find(
+      (p) =>
+        p.path === path &&
+        p.alias === alias &&
+        p.dflt === dflt &&
+        impt.list.every((i) => list.includes(i))
+    );
+  }
+
+  hasImport(impt: ImportData) {
+    const { dflt, path, alias, list } = impt;
+
+    return (
+      this.__imports.findIndex(
+        (p) =>
+          p.path === path &&
+          p.alias === alias &&
+          p.dflt === dflt &&
+          impt.list.every((i) => list.includes(i))
+      ) > -1
+    );
+  }
+
+  get imports() {
+    return [...this.__imports];
+  }
 
   addProp(prop: PropSchema) {
     if (this.hasProp(prop.name) === false) {
@@ -198,16 +258,17 @@ export class TypeSchema {
     return [...this.__generics];
   }
 
-  toObject() {
-    const { __props, __generics, name, exp, alias } = this;
+  toObject(): TypeObject {
+    const { __props, __generics, name, exp, alias, __imports } = this;
 
-    return SchemaTools.removeNullUndefined({
+    return {
       name,
-      exp,
+      exp: exp?.toObject(),
       alias,
       props: __props.map((p) => p.toObject()),
       generics: __generics.map((g) => g.toObject()),
-    });
+      imports: __imports.map((i) => i.toObject()),
+    };
   }
 
   listTypes() {

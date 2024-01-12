@@ -10,7 +10,7 @@ import DefaultConfig from "../../defaults/default.config.json";
 import { fetchData } from "../../core/tools/files.tools";
 import { dirname, join } from "path";
 import { InitOptions } from "./types";
-import { DefaultTemplates } from "../../defaults/default.templates";
+
 import { ConfigData, ConfigLoader, InteractionPrompts } from "../../core";
 
 export const init = async (options: InitOptions) => {
@@ -61,12 +61,12 @@ export const init = async (options: InitOptions) => {
     mkdirSync(dirname(templatesPath), { recursive: true });
   }
 
-  for (const template of DefaultTemplates) {
-    const path = configData.components[template.name]?.templatePath;
-    const templatePath = path
-      ? join(templatesPath, path)
-      : join(templatesPath, template.filename);
+  // for (const template of DefaultTemplates) {
+  //   const path = configData.components[template.name]?.templatePath;
+  //   const templatePath = path
+  //     ? join(templatesPath, path)
+  //     : join(templatesPath, template.filename);
 
-    writeFileSync(templatePath, template.content);
-  }
+  //   writeFileSync(templatePath, template.content);
+  // }
 };

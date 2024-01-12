@@ -41,8 +41,8 @@ export class EntityFactory {
       methods.push(...defaults.common.methods);
     }
 
-    if (defaults?.common?.inheritance) {
-      inheritance.push(defaults.common.inheritance);
+    if (Array.isArray(defaults?.common?.inheritance)) {
+      inheritance.push(...defaults.common.inheritance);
     }
 
     if (Array.isArray(defaults?.common?.props)) {
@@ -65,7 +65,7 @@ export class EntityFactory {
       generics.push(...defaults.common.generics);
     }
 
-    const element = ClassSchema.create(
+    const element = ClassSchema.create<EntityElement>(
       {
         name: componentName,
         props,

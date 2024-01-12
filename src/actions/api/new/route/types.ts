@@ -75,11 +75,11 @@ export type RouteModelData = {
 export type RouteElement = ElementWithProps &
   ElementWithMethods &
   ElementWithGenerics &
-  ComponentElement<any>;
+  ComponentElement;
 
 export type RouteModelElement = ElementWithProps &
   ElementWithGenerics &
-  ComponentElement<any>;
+  ComponentElement;
 
 export type RouteModelAddons = {
   modelType: string;

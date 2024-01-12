@@ -1,6 +1,16 @@
 import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { SchemaTools } from "../schema.tools";
-import { GenericData, GenericJson, GenericSchema } from "./generic.schema";
+import {
+  GenericData,
+  GenericJson,
+  GenericObject,
+  GenericSchema,
+} from "./generic.schema";
+
+export type InheritanceObject = {
+  generics: GenericObject[];
+  name: string;
+};
 
 export type InheritanceData = {
   generics?: GenericData[];
@@ -80,7 +90,7 @@ export class InheritanceSchema {
       this.__generics.findIndex(
         (g) =>
           g.name === generic.name &&
-          g.dflt?.name === generic.dflt?.name &&
+          g.dflt === generic.dflt &&
           g.inheritance?.name === generic.inheritance?.name
       ) !== -1
     );
@@ -90,14 +100,14 @@ export class InheritanceSchema {
     return [...this.__generics];
   }
 
-  toObject() {
+  toObject(): InheritanceObject {
     const { name, __generics } = this;
-    const intf: InheritanceData = {
+    const intf: InheritanceObject = {
       name,
       generics: __generics.map((g) => g.toObject()),
     };
 
-    return SchemaTools.removeNullUndefined(intf);
+    return intf;
   }
 
   listTypes() {

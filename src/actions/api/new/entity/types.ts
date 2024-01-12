@@ -33,7 +33,7 @@ export type EntityAddons = {
 
 export type EntityElement = ElementWithProps &
   ElementWithGenerics &
-  ComponentElement<any>;
+  ComponentElement;
 
 export type Entity = Component<EntityElement, EntityAddons>;
 

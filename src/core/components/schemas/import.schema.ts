@@ -1,10 +1,18 @@
 import { ConfigAddons } from "../../config";
+import { SchemaTools } from "../schema.tools";
 
 export type ImportData = {
   dflt?: string;
   path?: string;
   list?: string[];
   alias?: string;
+};
+
+export type ImportObject = {
+  dflt: string;
+  path: string;
+  list: string[];
+  alias: string;
 };
 
 export type ImportJson = {
@@ -77,7 +85,7 @@ export class ImportSchema {
     public readonly alias: string
   ) {}
 
-  toObject() {
+  toObject(): ImportObject {
     const { dflt, path, list, alias } = this;
 
     return {

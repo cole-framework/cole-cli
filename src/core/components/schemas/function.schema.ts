@@ -1,15 +1,22 @@
 import { TypeInfo, UnknownType } from "../../type.info";
-import { ParamData, ParamJson, ParamSchema, ParamTools } from "./param.schema";
+import {
+  ParamData,
+  ParamJson,
+  ParamObject,
+  ParamSchema,
+  ParamTools,
+} from "./param.schema";
 
 import {
   GenericData,
   GenericJson,
+  GenericObject,
   GenericSchema,
   GenericTools,
 } from "./generic.schema";
 import { ConfigTools, ReservedType } from "../../config";
-import { Component } from "../component";
 import { SchemaTools } from "../schema.tools";
+import { ExportData, ExportJson, ExportObject, ExportSchema } from "./export.schema";
 
 export const foo = <T extends string | number>(foo: T) => {
   foo;
@@ -18,7 +25,18 @@ export const foo = <T extends string | number>(foo: T) => {
 export const FUNCTION_REGEX =
   /^(async)?\s*([a-zA-Z0-9_]+)(\s*\<(.+)\>\s*)?(\((.*)\))?(\s*:\s*([a-zA-Z0-9\[\]\<\>\{\\}]+))?(\s*=>\s*(.*))?$/;
 
+export type FunctionObject = {
+  exp: ExportObject;
+  name: string;
+  return_type: TypeInfo;
+  is_async: boolean;
+  params: ParamObject[];
+  body: string;
+  generics: GenericObject[];
+};
+
 export type FunctionData = {
+  exp?: ExportData;
   name?: string;
   return_type?: TypeInfo;
   is_async?: boolean;
@@ -28,6 +46,7 @@ export type FunctionData = {
 };
 
 export type FunctionJson = {
+  exp?: string | boolean | ExportJson;
   name?: string;
   return_type?: string;
   is_async?: boolean;
@@ -111,6 +130,7 @@ export class FunctionSchema {
       return null;
     }
 
+    let exp: ExportSchema;
     let name: string;
     let params: ParamSchema[] = [];
     let returnType: TypeInfo;
@@ -135,6 +155,10 @@ export class FunctionSchema {
       name = data.name;
       isAsync = data.is_async;
       body = data.body;
+
+      if (data.exp) {
+        exp = ExportSchema.create(data.exp);
+      }
 
       const tempName = data.name.trim();
       if (ConfigTools.hasInstructions(tempName)) {
@@ -198,7 +222,7 @@ export class FunctionSchema {
       }
     }
 
-    const fn = new FunctionSchema(name, returnType, isAsync, body);
+    const fn = new FunctionSchema(exp, name, returnType, isAsync, body);
 
     params.forEach((param) => {
       fn.addParam(param);
@@ -215,6 +239,7 @@ export class FunctionSchema {
   private __generics: GenericSchema[] = [];
 
   private constructor(
+    public readonly exp: ExportSchema,
     public readonly name: string,
     public readonly returnType: TypeInfo,
     public readonly isAsync: boolean,
@@ -257,15 +282,19 @@ export class FunctionSchema {
     return [...this.__generics];
   }
 
-  toObject() {
-    const { __params, __generics, body } = this;
-    const fn: FunctionData = {
+  toObject(): FunctionObject {
+    const { __params, __generics, body, name, isAsync, returnType, exp } = this;
+    const fn: FunctionObject = {
+      exp: exp?.toObject(),
       params: __params.map((p) => p.toObject()),
       generics: __generics.map((g) => g.toObject()),
       body,
+      name,
+      is_async: isAsync,
+      return_type: returnType,
     };
 
-    return SchemaTools.removeNullUndefined(fn);
+    return fn;
   }
 
   listTypes() {
