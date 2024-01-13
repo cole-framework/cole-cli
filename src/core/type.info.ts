@@ -5,6 +5,7 @@ import { ReservedType } from "./config";
 
 export type ComponentLabel =
   | "model"
+  | "tool"
   | "entity"
   | "use_case"
   | "controller"
@@ -57,6 +58,9 @@ export abstract class TypeInfo {
         case "entity": {
           return new EntityType(data.name);
         }
+        case "tool": {
+          return new ToolType(data.name);
+        }
         default: {
           return new UnknownType();
         }
@@ -66,6 +70,11 @@ export abstract class TypeInfo {
     const entityMatch = data.match(/^entity\s*<\s*(\w+)\s*>/i);
     if (entityMatch) {
       return new EntityType(entityMatch[1]);
+    }
+    
+    const toolMatch = data.match(/^tool\s*<\s*(\w+)\s*>/i);
+    if (toolMatch) {
+      return new EntityType(toolMatch[1]);
     }
 
     const modelMatch = data.match(/^model\s*<\s*(\w+)\s*,?\s*(\w+)?\s*>/i);
@@ -204,6 +213,7 @@ export abstract class TypeInfo {
       type instanceof UnknownType ||
       type instanceof ModelType ||
       type instanceof EntityType ||
+      type instanceof ToolType ||
       type instanceof ControllerType ||
       type instanceof SourceType ||
       type instanceof MapperType ||
@@ -238,6 +248,7 @@ export abstract class TypeInfo {
     public readonly isMultiType?: boolean,
     public readonly isComponentType?: boolean,
     public readonly isEntity?: boolean,
+    public readonly isTool?: boolean,
     public readonly isModel?: boolean,
     public readonly isSource?: boolean,
     public readonly isRepository?: boolean,
@@ -340,6 +351,17 @@ export class ModelType {
 
   get ref() {
     return `Model<${this.name},${this.type}>`;
+  }
+}
+
+export class ToolType {
+  public readonly isTool = true;
+  public readonly isComponentType = true;
+  public readonly component = "tool";
+  constructor(public readonly name: string) {}
+
+  get ref() {
+    return `Tool<${this.name}>`;
   }
 }
 

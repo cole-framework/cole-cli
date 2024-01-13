@@ -7,9 +7,11 @@ import { Model } from "./model";
 import { Repository, RepositoryImpl, RepositoryFactory } from "./repository";
 import { Route, RouteIO } from "./route";
 import { Source } from "./source";
+import { Tool } from "./tool";
 import { UseCase } from "./use-case";
 
 export class ApiSchema {
+  public readonly tools = new ApiComponentCollection<Tool>();
   public readonly models = new ApiComponentCollection<Model>();
   public readonly entities = new ApiComponentCollection<Entity>();
   public readonly mappers = new ApiComponentCollection<Mapper>();
@@ -29,8 +31,9 @@ export class ApiSchema {
       models,
       entities,
       mappers,
-      sources,
       routes,
+      sources,
+      tools,
       route_ios,
       controllers,
       use_cases,
@@ -40,6 +43,7 @@ export class ApiSchema {
     } = this;
 
     return {
+      tools: tools.toArray().map((i) => i.toObject()),
       controllers: controllers.toArray().map((i) => i.toObject()),
       models: models.toArray().map((i) => i.toObject()),
       entities: entities.toArray().map((i) => i.toObject()),

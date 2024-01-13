@@ -19,6 +19,7 @@ import { RepositoryJsonParser } from "./repository/repository.json-parser";
 import { ApiConfig, ApiJson } from "./api.types";
 import { Controller, ControllerJson } from "./controller/types";
 import { Entity, EntityJson } from "./entity/types";
+import { ToolJson, ToolJsonParser } from "./tool";
 
 export class ApiJsonParser {
   private apiSchema = new ApiSchema();
@@ -52,6 +53,27 @@ export class ApiJsonParser {
       list,
       apiSchema.models.toArray()
     );
+
+    result.entities.forEach((e) => {
+      apiSchema.entities.add(e);
+    });
+
+    result.models.forEach((m) => {
+      apiSchema.models.add(m);
+    });
+  }
+
+  parseTools(list: ToolJson[]) {
+    const { apiSchema, config, texts, writeMethod } = this;
+    const result = new ToolJsonParser(config, texts, writeMethod).build(
+      list,
+      apiSchema.models.toArray(),
+      apiSchema.entities.toArray()
+    );
+
+    result.tools.forEach((t) => {
+      apiSchema.tools.add(t);
+    });
 
     result.entities.forEach((e) => {
       apiSchema.entities.add(e);
@@ -219,6 +241,7 @@ export class ApiJsonParser {
     this.parseRepositories(json.repositories || []);
     this.parseControllers(json.controllers || []);
     this.parseRoutes(json.routes || []);
+    this.parseTools(json.tools || []);
 
     return this.apiSchema;
   }

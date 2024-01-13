@@ -4,8 +4,6 @@ import {
   ComponentElement,
   ElementWithGenerics,
   ElementWithProps,
-  GenericJson,
-  PropJson,
 } from "../../../../core";
 import { ApiJson, DefaultCliOptions } from "../api.types";
 
@@ -17,12 +15,8 @@ export type NewEntityOptions = DefaultCliOptions & {
 };
 
 export type EntityJson = ClassJson & {
-  id?: string;
-  name: string;
   endpoint?: string;
   has_model?: boolean;
-  props?: (PropJson | string)[];
-  generics?: GenericJson[];
 };
 
 export type EntityData = EntityJson;

@@ -1,12 +1,13 @@
 import { ComponentData, WriteMethod } from "../../../core";
-import { ControllerElement, ControllerJson } from "./controller/types";
-import { EntityAddons, EntityElement, EntityJson } from "./entity/types";
-import { MapperAddons, MapperElement, MapperJson } from "./mapper";
-import { ModelAddons, ModelElement, ModelJson } from "./model";
-import { RepositoryElement, RepositoryJson } from "./repository";
-import { RouteElement, RouteJson } from "./route";
-import { SourceAddons, SourceElement, SourceJson } from "./source";
-import { UseCaseElement, UseCaseJson } from "./use-case";
+import { ControllerJson } from "./controller/types";
+import { EntityJson } from "./entity/types";
+import { MapperJson } from "./mapper";
+import { ModelJson } from "./model";
+import { RepositoryJson } from "./repository";
+import { RouteJson } from "./route";
+import { SourceJson } from "./source";
+import { ToolJson } from "./tool";
+import { UseCaseJson } from "./use-case";
 
 export type DefaultCliOptions = {
   skipTests?: boolean;
@@ -26,6 +27,7 @@ export type ApiJson = {
   repositories?: RepositoryJson[];
   routes?: RouteJson[];
   controllers?: ControllerJson[];
+  tools?: ToolJson[];
 };
 
 export type ApiObject = {
@@ -40,6 +42,7 @@ export type ApiObject = {
   repositories: ComponentData[];
   repository_impls: ComponentData[];
   repository_factories: ComponentData[];
+  tools: ComponentData[];
 };
 
 export type ApiData = {

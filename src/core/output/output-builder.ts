@@ -11,7 +11,7 @@ export class OutputBuilder {
     this.templateEngine = new TemplateEngine();
     if (config.components[type]) {
       const component: ComponentConfig = config.components[type];
-      this.templateEngine.registerTemplate(component.templatePath, {
+      this.templateEngine.registerTemplate('', {
         partial: true,
         name: type,
       });

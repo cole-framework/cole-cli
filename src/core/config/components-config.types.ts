@@ -27,7 +27,6 @@ export type ComponentConfigData = {
   type?: string;
   name_pattern?: string;
   path_pattern?: string;
-  template_path?: string;
   defaults?: {
     common?: FrameworkDefaults;
     [key: string]: FrameworkDefaults;

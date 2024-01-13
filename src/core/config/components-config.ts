@@ -13,14 +13,13 @@ export class ComponentConfig {
     type: string,
     data: ComponentConfigData
   ): ComponentConfig {
-    const { name_pattern, path_pattern, template_path, defaults } = data;
+    const { name_pattern, path_pattern, defaults } = data;
 
     return new ComponentConfig(
       root,
       type,
       name_pattern,
       path_pattern,
-      template_path,
       defaults
     );
   }
@@ -30,7 +29,6 @@ export class ComponentConfig {
     public type: string,
     public namePattern: string,
     public pathPattern: string,
-    public templatePath: string,
     public defaults: {
       common?: FrameworkDefaults;
       [key: string]: FrameworkDefaults;
