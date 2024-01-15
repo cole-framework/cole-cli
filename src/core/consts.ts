@@ -3,6 +3,7 @@ import path from "path";
 
 export const configDirname = ".cole";
 export const configFilename = "config.json";
+export const stateFilename = "state.json";
 export const langFilename = "lang.json";
 export const mapFilename = "map.json";
 export const sessionDirname = "sessions";
@@ -60,6 +61,13 @@ export const localSessionPath = path.join(
   process.cwd(),
   configDirname,
   sessionDirname
+);
+
+export const localStatePath = path.join(
+  process.cwd(),
+  configDirname,
+  sessionDirname,
+  stateFilename
 );
 
 export const standardTypes = [

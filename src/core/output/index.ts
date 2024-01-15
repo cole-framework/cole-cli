@@ -1,2 +1,2 @@
-export * from "./output-builder";
+export * from "./file.output";
 export * from "./source-code-writer";

@@ -27,7 +27,9 @@
     "commander": "^10.0.0",
     "enquirer": "^2.3.6",
     "handlebars": "^4.7.7",
-    "nanoid": "3.3.4"
+    "nanoid": "3.3.4",
+    "prettier": "^3.2.2",
+    "proper-lockfile": "^4.1.2"
   },
   "devDependencies": {
     "@types/handlebars": "^4.1.0",

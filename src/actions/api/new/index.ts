@@ -9,4 +9,3 @@ export * from "./use-case";
 
 export * from "./from-json";
 export * from "./api-generator";
-export * from "./output-builder.factory";

@@ -10,3 +10,5 @@ export * from "./enums";
 export * from "./failure";
 export * from "./result";
 export * from "./type.info";
+export * from "./state-manager";
+export * from "./worker-pool";
