@@ -6,6 +6,13 @@ export type ExportData = {
   alias?: string;
 };
 
+export type ExportConfig =
+  | boolean
+  | string
+  | {
+      is_default?: boolean;
+    };
+
 export type ExportObject = ExportData;
 
 export type ExportJson = {

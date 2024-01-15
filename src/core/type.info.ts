@@ -47,6 +47,8 @@ export abstract class TypeInfo {
       return new UnknownType();
     }
 
+    const typeLC = data.toLowerCase();
+
     if (data.type?.name) {
       switch (data.type.name) {
         case "model": {
@@ -67,17 +69,17 @@ export abstract class TypeInfo {
       }
     }
 
-    const entityMatch = data.match(/^entity\s*<\s*(\w+)\s*>/i);
+    const entityMatch = typeLC.match(/^entity\s*<\s*(\w+)\s*>/i);
     if (entityMatch) {
       return new EntityType(entityMatch[1]);
     }
-    
-    const toolMatch = data.match(/^tool\s*<\s*(\w+)\s*>/i);
+
+    const toolMatch = typeLC.match(/^tool\s*<\s*(\w+)\s*>/i);
     if (toolMatch) {
       return new EntityType(toolMatch[1]);
     }
 
-    const modelMatch = data.match(/^model\s*<\s*(\w+)\s*,?\s*(\w+)?\s*>/i);
+    const modelMatch = typeLC.match(/^model\s*<\s*(\w+)\s*,?\s*(\w+)?\s*>/i);
     if (modelMatch) {
       return new ModelType(modelMatch[1], modelMatch[2]?.toLowerCase());
     }
@@ -105,8 +107,6 @@ export abstract class TypeInfo {
         ch
       );
     }
-
-    const typeLC = data.toLowerCase();
 
     if (typeLC.includes(BasicType.Array) || typeLC.includes("[]")) {
       const t = /^array\s*<\s*([a-zA-Z0-9<>_ ]+)\s*>/.test(typeLC)
@@ -181,7 +181,7 @@ export abstract class TypeInfo {
   public static isFrameworkDefault(
     type: TypeInfo
   ): type is FrameworkDefaultType {
-    return type.isFrameworkDefault;
+    return type.isFrameworkDefaultType;
   }
 
   public static isMultiType(type: TypeInfo): type is MultiType {
@@ -244,7 +244,7 @@ export abstract class TypeInfo {
     public readonly isPrimitive?: boolean,
     public readonly isUnknownType?: boolean,
     public readonly isDatabaseType?: boolean,
-    public readonly isFrameworkDefault?: boolean,
+    public readonly isFrameworkDefaultType?: boolean,
     public readonly isMultiType?: boolean,
     public readonly isComponentType?: boolean,
     public readonly isEntity?: boolean,
@@ -347,7 +347,10 @@ export class ModelType {
   public readonly isModel = true;
   public readonly isComponentType = true;
   public readonly component = "model";
-  constructor(public readonly name: string, public readonly type = "json") {}
+  constructor(
+    public readonly name: string,
+    public readonly type = "json"
+  ) {}
 
   get ref() {
     return `Model<${this.name},${this.type}>`;
@@ -380,7 +383,10 @@ export class RouteType {
   public readonly isRoute = true;
   public readonly isComponentType = true;
   public readonly component = "route";
-  constructor(public readonly name: string, public readonly type: string) {}
+  constructor(
+    public readonly name: string,
+    public readonly type: string
+  ) {}
 
   get ref() {
     return `Route<${this.name},${this.type}>`;
@@ -402,7 +408,10 @@ export class RouteModelType {
   public readonly isRouteModel = true;
   public readonly isComponentType = true;
   public readonly component = "route_model";
-  constructor(public readonly name: string, public readonly type: string) {}
+  constructor(
+    public readonly name: string,
+    public readonly type: string
+  ) {}
 
   get ref() {
     return `RouteModel<${this.name}>`;
@@ -413,7 +422,10 @@ export class SourceType {
   public readonly isSource = true;
   public readonly isComponentType = true;
   public readonly component = "source";
-  constructor(public readonly name: string, public readonly type: string) {}
+  constructor(
+    public readonly name: string,
+    public readonly type: string
+  ) {}
 
   get ref() {
     return `Source<${this.name},${this.type}>`;
@@ -424,7 +436,10 @@ export class MapperType {
   public readonly isMapper = true;
   public readonly isComponentType = true;
   public readonly component = "mapper";
-  constructor(public readonly name: string, public readonly type: string) {}
+  constructor(
+    public readonly name: string,
+    public readonly type: string
+  ) {}
 
   get ref() {
     return `Mapper<${this.name},${this.type}>`;

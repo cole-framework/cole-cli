@@ -6,6 +6,7 @@ import {
   ElementWithGenerics,
   ComponentElement,
   Component,
+  ElementWithImports,
 } from "../../../../core";
 import { DefaultCliOptions } from "../api.types";
 
@@ -25,7 +26,8 @@ export type UseCaseJson = ClassJson & {
 
 export type UseCaseData = UseCaseJson;
 
-export type UseCaseElement = ElementWithProps &
+export type UseCaseElement = ElementWithImports &
+  ElementWithProps &
   ElementWithMethods &
   ElementWithGenerics &
   ComponentElement;

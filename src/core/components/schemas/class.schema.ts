@@ -46,6 +46,7 @@ import { SchemaTools } from "../schema.tools";
 import { TypeInfo } from "../../type.info";
 
 export type ClassObject = {
+  is_abstract?: boolean;
   exp?: ExportObject;
   ctor?: ConstructorObject;
   interfaces?: InterfaceObject[];
@@ -58,6 +59,7 @@ export type ClassObject = {
 };
 
 export type ClassData = {
+  is_abstract?: boolean;
   exp?: ExportData;
   ctor?: ConstructorData;
   interfaces?: InterfaceData[];
@@ -71,6 +73,7 @@ export type ClassData = {
 };
 
 export type ClassJson = {
+  is_abstract?: boolean;
   exp?: string | boolean | ExportJson;
   ctor?: string | ConstructorJson;
   interfaces?: (string | InterfaceJson)[];
@@ -121,14 +124,19 @@ export class ClassSchema {
       });
     }
 
-    const cls = new ClassSchema(data.name, exp, ctor, inheritance);
+    const cls = new ClassSchema(
+      data.is_abstract || false,
+      data.name,
+      exp,
+      ctor,
+      inheritance
+    );
 
     if (Array.isArray(data.interfaces)) {
       data.interfaces.forEach((i) => {
         if (SchemaTools.executeMeta(i, references, reserved)) {
           cls.addInterface(InterfaceSchema.create(i, reserved, references));
         }
-
       });
     }
 
@@ -156,6 +164,14 @@ export class ClassSchema {
       });
     }
 
+    if (Array.isArray(data.imports)) {
+      data.imports.forEach((i) => {
+        if (SchemaTools.executeMeta(i, references, reserved)) {
+          cls.addImport(ImportSchema.create(i, reserved, references));
+        }
+      });
+    }
+
     return cls as T;
   }
 
@@ -167,6 +183,7 @@ export class ClassSchema {
   private __inheritance: InheritanceSchema[] = [];
 
   private constructor(
+    public readonly isAbstract: boolean,
     public readonly name: string,
     public readonly exp: ExportSchema,
     public readonly ctor: ConstructorSchema,
@@ -294,6 +311,7 @@ export class ClassSchema {
       name,
       ctor,
       exp,
+      isAbstract,
       __inheritance,
       __methods,
       __props,
@@ -301,7 +319,9 @@ export class ClassSchema {
       __interfaces,
       __imports,
     } = this;
+
     const cls: ClassObject = {
+      is_abstract: isAbstract,
       name,
       inheritance: __inheritance?.map((i) => i.toObject()),
       ctor: ctor?.toObject(),

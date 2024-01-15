@@ -4,7 +4,6 @@ import { ApiConfig, DefaultCliOptions } from "../api.types";
 import { existsSync, readFileSync } from "fs";
 import { ApiJsonParser } from "../api-json.parser";
 import { ApiGenerator } from "../api-generator";
-import { FileTransport } from "../../../../transport/file.transport";
 
 export const fromJson = async (options: DefaultCliOptions) => {
   const { content: config, failure } = ConfigLoader.load();
@@ -42,9 +41,9 @@ export const fromJson = async (options: DefaultCliOptions) => {
     const json = JSON.parse(data);
     const schema = new ApiJsonParser(apiConfig, config, texts).build(json);
 
-    const result = new ApiGenerator(new FileTransport()).generate(schema);
+    const result = new ApiGenerator(config).generate(schema);
 
-    console.log("->", JSON.stringify(schema, null, 2));
+    // console.log("->", JSON.stringify(schema, null, 2));
   } catch (error) {
     console.log(error);
     process.exit(1);

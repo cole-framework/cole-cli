@@ -7,6 +7,7 @@ import {
   ElementWithGenerics,
   ComponentElement,
   Component,
+  ElementWithImports,
 } from "../../../../core";
 import { DefaultCliOptions } from "../api.types";
 
@@ -72,12 +73,14 @@ export type RouteModelData = {
   generics?: GenericJson[];
 };
 
-export type RouteElement = ElementWithProps &
+export type RouteElement = ElementWithImports &
+  ElementWithProps &
   ElementWithMethods &
   ElementWithGenerics &
   ComponentElement;
 
-export type RouteModelElement = ElementWithProps &
+export type RouteModelElement = ElementWithImports &
+  ElementWithProps &
   ElementWithGenerics &
   ComponentElement;
 

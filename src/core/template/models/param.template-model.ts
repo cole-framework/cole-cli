@@ -4,7 +4,7 @@ import { ParamObject } from "../../components/schemas";
 export class ParamTemplateModel {
   static create(schema: ParamObject, dependencies: Dependency[]) {
     const { access, name, type, is_optional, is_readonly, value } = schema;
-    let t = "unknown";
+    let t = "any";
 
     if (type && type.isComponentType) {
       const dependency = dependencies.find(
@@ -18,9 +18,11 @@ export class ParamTemplateModel {
       }
     } else if (
       type &&
-      (type.isPrimitive || type.isDatabaseType || type.isFrameworkDefault)
+      (type.isPrimitive || type.isDatabaseType || type.isFrameworkDefaultType)
     ) {
       t = type.name;
+    } else if (typeof type === "string") {
+      t = type;
     }
 
     return new ParamTemplateModel(

@@ -5,7 +5,7 @@ export class PropTemplateModel {
   static create(schema: PropObject, dependencies: Dependency[]) {
     const { access, name, type, is_optional, is_readonly, is_static, value } =
       schema;
-    let t = "unknown";
+    let t = "any";
 
     if (type && type.isComponentType) {
       const dependency = dependencies.find(
@@ -19,7 +19,7 @@ export class PropTemplateModel {
       }
     } else if (
       type &&
-      (type.isPrimitive || type.isDatabaseType || type.isFrameworkDefault)
+      (type.isPrimitive || type.isDatabaseType || type.isFrameworkDefaultType)
     ) {
       t = type.name;
     }

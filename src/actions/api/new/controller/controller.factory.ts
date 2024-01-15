@@ -25,6 +25,7 @@ export class ControllerFactory {
     const imports = [];
     let inheritance = [];
     let ctor;
+    let exp;
 
     const componentName = config.components.controller.generateName(name);
     const componentPath = config.components.controller.generatePath({
@@ -36,12 +37,19 @@ export class ControllerFactory {
       ctor = defaults.common.ctor;
     }
 
+    if (defaults?.common?.exp) {
+      exp = defaults.common.exp;
+    }
+
     if (Array.isArray(defaults?.common?.inheritance)) {
       inheritance.push(...defaults.common.inheritance);
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
-      imports.push(...defaults.common.imports);
+      defaults.common.imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.common?.interfaces)) {
@@ -98,6 +106,9 @@ export class ControllerFactory {
       inheritance,
       ctor,
       imports,
+      exp,
+      is_abstract:
+        config.components.controller.elementType === "abstract_class",
     };
 
     const element = ClassSchema.create<ControllerElement>(

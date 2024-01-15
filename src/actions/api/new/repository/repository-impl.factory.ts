@@ -1,4 +1,9 @@
-import { DataContext, RepositoryData, RepositoryElement } from "./types";
+import {
+  DataContext,
+  Repository,
+  RepositoryData,
+  RepositoryElement,
+} from "./types";
 import { Entity } from "../entity";
 import { RepositoryImplType, TypeInfo } from "../../../../core/type.info";
 import {
@@ -14,11 +19,12 @@ export class RepositoryImplFactory {
   static create(
     data: RepositoryData,
     entity: Entity,
+    repository: Repository,
     contexts: DataContext[],
     writeMethod: WriteMethod,
     config: Config
   ): Component<RepositoryElement> {
-    const dependencies: Component[] = [entity];
+    const dependencies: Component[] = [entity, repository];
     const { id, name, endpoint } = data;
     const { defaults } = config.components.repositoryImpl;
     const addons = { contexts };
@@ -29,6 +35,7 @@ export class RepositoryImplFactory {
     const imports = [];
     let inheritance = [];
     let ctor: any = { params: [], supr: null };
+    let exp;
 
     const componentName = config.components.repositoryImpl.generateName(name);
     const componentPath = config.components.repositoryImpl.generatePath({
@@ -36,16 +43,32 @@ export class RepositoryImplFactory {
       endpoint,
     }).path;
 
+    if (defaults?.common?.exp) {
+      exp = defaults.common.exp;
+    }
+
+    if (defaults?.common?.ctor) {
+      if (Array.isArray(defaults.common.ctor.params)) {
+        ctor.params.push(...defaults.common.ctor.params);
+      }
+      if (defaults.common.ctor.supr) {
+        ctor.supr = defaults.common.ctor.supr;
+      }
+    }
+
     if (Array.isArray(defaults?.common?.inheritance)) {
       inheritance.push(...defaults.common.inheritance);
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
-      imports.push(...defaults.common.imports);
+      defaults.common.imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.common?.interfaces)) {
-      imports.push(...defaults.common.interfaces);
+      interfaces.push(...defaults.common.interfaces);
     }
 
     if (Array.isArray(defaults?.common?.methods)) {
@@ -60,39 +83,23 @@ export class RepositoryImplFactory {
       generics.push(...defaults.common.generics);
     }
 
-    if (contexts.length > 0) {
-      ctor.supr = {
-        params: [
-          {
-            name: "context",
-            type: TypeInfo.createFrameworkType("DataContext", [
-              entity.element.name,
-              contexts[0].model.element.name,
-            ]),
-            access: AccessType.Protected,
-          },
-        ],
-      };
-    }
-
     for (const context of contexts) {
       const storage = context.model.type.type;
       dependencies.push(context.model);
-      ctor.params.push({
-        name: storage,
-        type: TypeInfo.createFrameworkType("DataContext", [
-          entity.element.name,
-          context.model.element.name,
-        ]),
-        access: AccessType.Protected,
-      });
+
+      if (Array.isArray(defaults?.[storage]?.ctor.params)) {
+        ctor.params.push(...defaults[storage].ctor.params);
+      }
 
       if (Array.isArray(defaults?.[storage]?.inheritance)) {
         inheritance.push(...defaults[storage].inheritance);
       }
 
       if (Array.isArray(defaults?.[storage]?.imports)) {
-        imports.push(...defaults[storage].imports);
+        defaults[storage].imports.forEach((i) => {
+          i.ref_path = componentPath;
+          imports.push(i);
+        });
       }
 
       if (Array.isArray(defaults?.[storage]?.interfaces)) {
@@ -129,6 +136,9 @@ export class RepositoryImplFactory {
       inheritance,
       ctor,
       imports,
+      exp,
+      is_abstract:
+        config.components.repositoryImpl.elementType === "abstract_class",
     };
 
     const element = ClassSchema.create<RepositoryElement>(

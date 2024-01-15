@@ -6,6 +6,7 @@ import {
   ElementWithGenerics,
   ComponentElement,
   Component,
+  ElementWithImports,
 } from "../../../../core";
 import { DefaultCliOptions } from "../api.types";
 import { EntityJson } from "../entity";
@@ -54,7 +55,8 @@ export type NewRepositoryJson = {
   mappers?: MapperJson[];
 };
 
-export type RepositoryElement = ElementWithProps &
+export type RepositoryElement = ElementWithImports &
+  ElementWithProps &
   ElementWithMethods &
   ElementWithGenerics &
   ComponentElement;

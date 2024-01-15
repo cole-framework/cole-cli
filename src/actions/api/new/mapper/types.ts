@@ -4,6 +4,7 @@ import {
   Component,
   ComponentElement,
   ElementWithGenerics,
+  ElementWithImports,
   ElementWithProps,
 } from "../../../../core";
 import { DefaultCliOptions } from "../api.types";
@@ -38,7 +39,8 @@ export type MapperAddons = {
   storage: string;
 };
 
-export type MapperElement = ElementWithProps &
+export type MapperElement = ElementWithImports &
+  ElementWithProps &
   ElementWithGenerics &
   ComponentElement;
 

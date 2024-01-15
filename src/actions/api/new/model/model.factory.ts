@@ -19,6 +19,7 @@ export class ModelFactory {
     const { id, name, type, endpoint, alias } = data;
     const addons = { modelType: type };
     const { defaults } = config.components.model;
+
     const componentName = config.components.model.generateName(name, {
       type,
     });
@@ -31,9 +32,17 @@ export class ModelFactory {
     const imports = [];
     const props = [];
     const generics = [];
+    let exp;
+
+    if (defaults?.common?.exp) {
+      exp = defaults.common.exp;
+    }
 
     if (Array.isArray(defaults?.common?.imports)) {
-      imports.push(...defaults.common.imports);
+      defaults.common.imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.common?.generics)) {
@@ -45,7 +54,10 @@ export class ModelFactory {
     }
 
     if (Array.isArray(defaults?.[type]?.imports)) {
-      imports.push(...defaults[type].imports);
+      defaults[type].imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.[type]?.generics)) {
@@ -72,6 +84,7 @@ export class ModelFactory {
         generics,
         imports,
         alias,
+        exp,
       } as TypeJson,
       config.reservedTypes,
       {

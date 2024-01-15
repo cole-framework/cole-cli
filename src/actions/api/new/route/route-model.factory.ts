@@ -34,9 +34,17 @@ export class RouteModelFactory {
     const imports = [];
     const props = [];
     const generics = [];
+    let exp;
+
+    if (defaults?.common?.exp) {
+      exp = defaults.common.exp;
+    }
 
     if (Array.isArray(defaults?.common?.imports)) {
-      imports.push(...defaults.common.imports);
+      defaults.common.imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.common?.generics)) {
@@ -48,7 +56,10 @@ export class RouteModelFactory {
     }
 
     if (Array.isArray(defaults?.[type]?.imports)) {
-      imports.push(...defaults[type].imports);
+      defaults[type].imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.[type]?.generics)) {
@@ -73,6 +84,7 @@ export class RouteModelFactory {
         type,
         props,
         generics,
+        exp,
       } as TypeJson,
       config.reservedTypes,
       {

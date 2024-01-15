@@ -32,6 +32,11 @@ export class EntityFactory {
     const generics = [];
     const inheritance = [];
     let ctor;
+    let exp;
+
+    if (defaults?.common?.exp) {
+      exp = defaults.common.exp;
+    }
 
     if (defaults?.common.ctor) {
       ctor = defaults.common.ctor;
@@ -58,7 +63,10 @@ export class EntityFactory {
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
-      imports.push(...defaults.common.imports);
+      defaults.common.imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.common?.generics)) {
@@ -74,6 +82,8 @@ export class EntityFactory {
         imports,
         ctor,
         inheritance,
+        exp,
+        is_abstract: config.components.entity.elementType === "abstract_class",
       } as ClassJson,
       config.reservedTypes,
       {

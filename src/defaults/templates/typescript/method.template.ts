@@ -1,25 +1,56 @@
 import { MethodTemplateModel } from "../../../core";
+import { ArgumentTemplate } from "./argument.template";
 import { ParamTemplate } from "./param.template";
 
-export const METHOD_TEMPLATE = `_ACCESS__STATIC__ASYNC__NAME_(_PARAMS_)_RETURN_TYPE_ {
+export const METHOD_TEMPLATE = `_ACCESS_ _STATIC_ _ASYNC_ _NAME_(_PARAMS_)_RETURN_TYPE_ {
   _SUPER_
   _BODY_
 }`;
+export const ABSTRACT_METHOD_TEMPLATE = `_ACCESS_ abstract _ASYNC_ _NAME_(_PARAMS_)_RETURN_TYPE_;`;
+export const INTERFACE_METHOD_TEMPLATE = `_ASYNC_ _NAME_(_PARAMS_)_RETURN_TYPE_;`;
 
 export class MethodTemplate {
-  static parse(model: MethodTemplateModel): string {
-    const _ACCESS_ = model.access;
-    const _ASYNC_ = model.is_async ? "async " : "";
-    const _STATIC_ = model.is_async ? "static " : "";
+  static parse(
+    model: MethodTemplateModel,
+    elementType: string = "class"
+  ): string {
+    const _ACCESS_ = model.access || "";
+    const _ASYNC_ = model.is_async ? "async" : "";
+    const _STATIC_ = model.is_async ? "static" : "";
     const _PARAMS_ = model.params.map((p) => ParamTemplate.parse(p)).join(", ");
-    const _BODY_ = model.body;
+    const _BODY_ = model.body || "";
     const _RETURN_TYPE_ = model.return_type ? `: ${model.return_type}` : "";
     let _SUPER_ = "";
 
+    if (elementType === "abstract_class") {
+      return ABSTRACT_METHOD_TEMPLATE.replace("_ACCESS_", _ACCESS_)
+        .replace("_ASYNC_", _ASYNC_)
+        .replace("_NAME_", model.name)
+        .replace("_PARAMS_", _PARAMS_)
+        .replace("_RETURN_TYPE_", _RETURN_TYPE_)
+        .replace(/[ ]+/g, " ")
+        .replace(/^(\s*\n\s*)+$/gm, "\n");
+    }
+
+    if (elementType === "interface") {
+      return INTERFACE_METHOD_TEMPLATE.replace("_ASYNC_", _ASYNC_)
+        .replace("_NAME_", model.name)
+        .replace("_PARAMS_", _PARAMS_)
+        .replace("_RETURN_TYPE_", _RETURN_TYPE_)
+        .replace(/[ ]+/g, " ")
+        .replace(/^(\s*\n\s*)+$/gm, "\n");
+    }
+
     if (model.supr) {
       if (model.supr.params.length > 0) {
-        _SUPER_ = `super(${model.params
-          .map((p) => ParamTemplate.parse(p))
+        _SUPER_ = `super(${model.supr.params
+          .reduce((acc, p) => {
+            if (p) {
+              acc.push(ArgumentTemplate.parse(p));
+            }
+
+            return acc;
+          }, [])
           .join(", ")});`;
       } else {
         _SUPER_ = "super();";
@@ -33,6 +64,8 @@ export class MethodTemplate {
       .replace("_PARAMS_", _PARAMS_)
       .replace("_RETURN_TYPE_", _RETURN_TYPE_)
       .replace("_SUPER_", _SUPER_)
-      .replace("_BODY_", _BODY_);
+      .replace("_BODY_", _BODY_)
+      .replace(/[ ]+/g, " ")
+      .replace(/^(\s*\n\s*)+$/gm, "\n");
   }
 }

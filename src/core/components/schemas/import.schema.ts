@@ -1,9 +1,11 @@
-import { ConfigAddons } from "../../config";
+import path from "path";
+import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { SchemaTools } from "../schema.tools";
 
 export type ImportData = {
   dflt?: string;
   path?: string;
+  ref_path?: string;
   list?: string[];
   alias?: string;
 };
@@ -20,6 +22,7 @@ export type ImportJson = {
   path?: string;
   list?: string[];
   alias?: string;
+  ref_path?: string;
 };
 
 export type ImportConfig = ImportJson & ConfigAddons;
@@ -53,10 +56,28 @@ export class ImportTools {
       list,
     };
   }
+  static createRelativeImportPath(
+    componentPath: string,
+    dependencyPath: string
+  ) {
+    const relativePath = path.relative(
+      path.dirname(componentPath),
+      dependencyPath
+    );
+
+    if (!relativePath.startsWith(".") && !relativePath.startsWith("..")) {
+      return "./" + relativePath;
+    }
+    return relativePath;
+  }
 }
 
 export class ImportSchema {
-  public static create(data: string | ImportData | ImportJson) {
+  public static create(
+    data: string | ImportData | ImportJson,
+    reserved: ReservedType[],
+    references?: { [key: string]: unknown; dependencies: any[] }
+  ) {
     let dflt;
     let path;
     let alias;
@@ -64,15 +85,88 @@ export class ImportSchema {
 
     if (typeof data === "string") {
       const match = ImportTools.stringToData(data);
-      dflt = match.dflt;
-      alias = match.alias;
-      list = match.list;
-      path = match.path;
+
+      if (ConfigTools.hasInstructions(match.dflt)) {
+        dflt = ConfigTools.executeInstructions(
+          match.dflt,
+          references,
+          reserved
+        );
+      } else {
+        dflt = match.dflt;
+      }
+
+      if (ConfigTools.hasInstructions(match.alias)) {
+        alias = ConfigTools.executeInstructions(
+          match.alias,
+          references,
+          reserved
+        );
+      } else {
+        alias = match.alias;
+      }
+
+      if (ConfigTools.hasInstructions(match.path)) {
+        path = ConfigTools.executeInstructions(
+          match.path,
+          references,
+          reserved
+        );
+      } else {
+        path = match.path;
+      }
+      if (Array.isArray(match.list)) {
+        match.list.forEach((l) => {
+          if (ConfigTools.hasInstructions(l)) {
+            list.push(ConfigTools.executeInstructions(l, references, reserved));
+          } else {
+            list.push(l);
+          }
+        });
+      }
     } else {
-      dflt = data.dflt;
-      alias = data.alias;
-      list = [...data.list];
-      path = data.path;
+      if (ConfigTools.hasInstructions(data.dflt)) {
+        dflt = ConfigTools.executeInstructions(data.dflt, references, reserved);
+      } else {
+        dflt = data.dflt;
+      }
+
+      if (ConfigTools.hasInstructions(data.alias)) {
+        alias = ConfigTools.executeInstructions(
+          data.alias,
+          references,
+          reserved
+        );
+      } else {
+        alias = data.alias;
+      }
+
+      let tempPath: string;
+
+      if (ConfigTools.hasInstructions(data.path)) {
+        tempPath = ConfigTools.executeInstructions(
+          data.path,
+          references,
+          reserved
+        );
+      } else {
+        tempPath = data.path;
+      }
+
+      if (tempPath.includes("@") === false && tempPath.includes("/")) {
+        path = ImportTools.createRelativeImportPath(data.ref_path, tempPath);
+      } else {
+        path = tempPath;
+      }
+      if (Array.isArray(data.list)) {
+        data.list.forEach((l) => {
+          if (ConfigTools.hasInstructions(l)) {
+            list.push(ConfigTools.executeInstructions(l, references, reserved));
+          } else {
+            list.push(l);
+          }
+        });
+      }
     }
 
     return new ImportSchema(dflt, path, list, alias);

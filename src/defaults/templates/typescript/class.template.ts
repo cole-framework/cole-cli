@@ -6,7 +6,7 @@ import { MethodTemplate } from "./method.template";
 
 import { PropTemplate } from "./prop.template";
 
-export const CLASS_TEMPLATE = `_EXPORT_class _NAME__GENERICS__INHERITANCE__INTERFACES_ {
+export const CLASS_TEMPLATE = `_EXPORT_ _ABSTRACT_ class _NAME__GENERICS_ _INHERITANCE_ _INTERFACES_ {
   _STATIC_PROPS_
   _STATIC_METHODS_
   _PROPS_
@@ -16,6 +16,7 @@ export const CLASS_TEMPLATE = `_EXPORT_class _NAME__GENERICS__INHERITANCE__INTER
 
 export class ClassTemplate {
   static parse(model: ClassTemplateModel): string {
+    const _ABSTRACT_ = model.isAbstract ? "abstract" : "";
     const _GENERICS_ =
       model.generics.length > 0
         ? `<${model.generics.map((p) => GenericTemplate.parse(p)).join(", ")}>`
@@ -57,9 +58,13 @@ export class ClassTemplate {
 
     model.methods.forEach((m) => {
       if (m.is_static) {
-        static_methods.push(MethodTemplate.parse(m));
+        static_methods.push(
+          MethodTemplate.parse(m, model.isAbstract ? "abstract_class" : "class")
+        );
       } else {
-        methods.push(MethodTemplate.parse(m));
+        methods.push(
+          MethodTemplate.parse(m, model.isAbstract ? "abstract_class" : "class")
+        );
       }
     });
 
@@ -73,6 +78,7 @@ export class ClassTemplate {
     `);
 
     return CLASS_TEMPLATE.replace("_EXPORT_", _EXPORT_)
+      .replace("_ABSTRACT_", _ABSTRACT_)
       .replace("_NAME_", model.name)
       .replace("_GENERICS_", _GENERICS_)
       .replace("_INHERITANCE_", _INHERITANCE_)
@@ -81,6 +87,8 @@ export class ClassTemplate {
       .replace("_STATIC_METHODS_", _STATIC_METHODS_)
       .replace("_PROPS_", _PROPS_)
       .replace("_CONSTRUCTOR_", _CONSTRUCTOR_)
-      .replace("_METHODS_", _METHODS_);
+      .replace("_METHODS_", _METHODS_)
+      .replace(/[ ]+/g, " ")
+      .replace(/^(\s*\n\s*)+$/gm, "\n");
   }
 }

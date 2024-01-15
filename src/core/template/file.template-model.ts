@@ -9,7 +9,7 @@ import {
   TypeTemplateModel,
 } from "./models";
 
-type FileTemplateContent = {
+export type FileTemplateContent = {
   imports: ImportTemplateModel[];
   types: TypeTemplateModel[];
   functions: FunctionTemplateModel[];
@@ -26,7 +26,8 @@ export class FileTemplateModel {
 
   constructor(
     public readonly path: string,
-    public readonly wite_method: string
+    public readonly wite_method: string,
+    public readonly format: string,
   ) {}
 
   update(data: ComponentData) {
@@ -54,6 +55,14 @@ export class FileTemplateModel {
         } else {
           imports.push(ImportTemplateModel.create(newImport));
         }
+      });
+    }
+
+    if (Array.isArray(data.dependencies)) {
+      data.dependencies.forEach((dependency) => {
+        if (dependency.path !== data.path) {
+         // add import
+       }
       });
     }
 

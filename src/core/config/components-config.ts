@@ -13,13 +13,14 @@ export class ComponentConfig {
     type: string,
     data: ComponentConfigData
   ): ComponentConfig {
-    const { name_pattern, path_pattern, defaults } = data;
+    const { name_pattern, element_type, path_pattern, defaults } = data;
 
     return new ComponentConfig(
       root,
       type,
       name_pattern,
       path_pattern,
+      element_type,
       defaults
     );
   }
@@ -29,6 +30,7 @@ export class ComponentConfig {
     public type: string,
     public namePattern: string,
     public pathPattern: string,
+    public elementType: string,
     public defaults: {
       common?: FrameworkDefaults;
       [key: string]: FrameworkDefaults;
@@ -104,7 +106,8 @@ export class ComponentsConfig {
       ComponentConfig.create(rootPath, "use_case", data.use_case),
       ComponentConfig.create(rootPath, "route", data.route),
       ComponentConfig.create(rootPath, "route_model", data.route_model),
-      ComponentConfig.create(rootPath, "route_io", data.route_io)
+      ComponentConfig.create(rootPath, "route_io", data.route_io),
+      ComponentConfig.create(rootPath, "tool", data.tool)
     );
   }
 
@@ -121,6 +124,7 @@ export class ComponentsConfig {
     public readonly useCase: ComponentConfig,
     public readonly route: ComponentConfig,
     public readonly routeModel: ComponentConfig,
-    public readonly routeIO: ComponentConfig
+    public readonly routeIO: ComponentConfig,
+    public readonly tool: ComponentConfig
   ) {}
 }

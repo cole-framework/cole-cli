@@ -16,6 +16,7 @@ import {
   InheritanceObject,
   ExportObject,
   FunctionObject,
+  ImportSchema,
 } from "./schemas";
 import { ComponentTools } from "./component.tools";
 
@@ -47,6 +48,13 @@ export interface ElementWithInterfaces {
   hasInterface(name: string): boolean;
 }
 
+export interface ElementWithImports {
+  interfaces: ImportSchema[];
+  addImport(intf: ImportSchema);
+  findImport(name: string): ImportSchema;
+  hasImport(name: string): boolean;
+}
+
 export type ElementObject = {
   name: string;
   exp?: ExportObject;
@@ -61,10 +69,11 @@ export type ElementObject = {
   alias?: any;
 };
 
-export interface ComponentElement extends ElementObject {
-  toObject(): ElementObject;
-  listTypes(): TypeInfo[];
-}
+export type ComponentElement = ElementObject &
+  ElementWithImports & {
+    toObject(): ElementObject;
+    listTypes(): TypeInfo[];
+  };
 
 export type Dependency = {
   id: string;
@@ -85,11 +94,11 @@ export type ComponentData<Element = ElementObject, ElementAddons = unknown> = {
 
 export class Component<
   Element extends ComponentElement = ComponentElement,
-  ElementAddons = unknown
+  ElementAddons = unknown,
 > {
   public static create<
     Element extends ComponentElement,
-    ElementAddons = unknown
+    ElementAddons = unknown,
   >(
     id: string,
     type: TypeInfo,
@@ -134,6 +143,17 @@ export class Component<
 
     if (dependency && this.hasDependency(dependency) === false) {
       this.__dependencies.push({ id, path, type, name: element.name });
+
+      if (Array.isArray(this.element.imports) && this.path !== path) {
+        let impt = { path, ref_path: this.path };
+        if (element.exp?.is_default) {
+          impt["dflt"] = element.name;
+        } else {
+          impt["list"] = [element.name];
+        }
+
+        this.element.addImport(ImportSchema.create(impt, []));
+      }
     }
   }
 

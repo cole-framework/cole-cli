@@ -33,6 +33,7 @@ export class RouteFactory {
     const imports = [];
     let inheritance = [];
     let ctor;
+    let exp;
 
     const componentName = config.components.route.generateName(name, {
       type: method,
@@ -45,6 +46,10 @@ export class RouteFactory {
       method,
       endpoint,
     }).path;
+
+    if (defaults?.common?.exp) {
+      exp = defaults.common.exp;
+    }
 
     if (io) {
       dependencies.push(io);
@@ -59,7 +64,10 @@ export class RouteFactory {
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
-      imports.push(...defaults.common.imports);
+      defaults.common.imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.common?.interfaces)) {
@@ -83,7 +91,10 @@ export class RouteFactory {
     }
 
     if (Array.isArray(defaults?.[method]?.imports)) {
-      imports.push(...defaults[method].imports);
+      defaults[method].imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.[method]?.interfaces)) {
@@ -119,6 +130,8 @@ export class RouteFactory {
       generics,
       inheritance,
       ctor,
+      exp,
+      is_abstract: config.components.route.elementType === "abstract_class",
     };
 
     const element = ClassSchema.create<RouteElement>(

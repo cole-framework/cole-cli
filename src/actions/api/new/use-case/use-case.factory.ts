@@ -25,12 +25,17 @@ export class UseCaseFactory {
     const imports = [];
     let inheritance = [];
     let ctor;
+    let exp;
 
     const componentName = config.components.useCase.generateName(name);
     const componentPath = config.components.useCase.generatePath({
       name,
       endpoint,
     }).path;
+
+    if (defaults?.common?.exp) {
+      exp = defaults.common.exp;
+    }
 
     if (defaults?.common?.ctor) {
       ctor = defaults.common.ctor;
@@ -41,7 +46,10 @@ export class UseCaseFactory {
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
-      imports.push(...defaults.common.imports);
+      defaults.common.imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.common?.interfaces)) {
@@ -78,6 +86,8 @@ export class UseCaseFactory {
       inheritance,
       ctor,
       imports,
+      exp,
+      is_abstract: config.components.useCase.elementType === "abstract_class",
     };
 
     const element = ClassSchema.create<UseCaseElement>(

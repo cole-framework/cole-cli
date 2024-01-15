@@ -5,6 +5,7 @@ import {
   ElementWithGenerics,
   ComponentElement,
   Component,
+  ElementWithImports,
 } from "../../../../core";
 import { DefaultCliOptions } from "../api.types";
 
@@ -39,7 +40,8 @@ export type ModelAddons = {
   modelType: string;
 };
 
-export type ModelElement = ElementWithProps &
+export type ModelElement = ElementWithImports &
+  ElementWithProps &
   ElementWithGenerics &
   ComponentElement;
 

@@ -32,7 +32,7 @@ export class MethodTemplateModel {
       return_type &&
       (return_type.isPrimitive ||
         return_type.isDatabaseType ||
-        return_type.isFrameworkDefault)
+        return_type.isFrameworkDefaultType)
     ) {
       t = return_type.name;
     }

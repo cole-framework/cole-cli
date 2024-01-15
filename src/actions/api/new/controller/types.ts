@@ -2,6 +2,7 @@ import {
   ClassJson,
   Component,
   ComponentElement,
+  ElementWithImports,
   ElementWithMethods,
   ElementWithProps,
 } from "../../../../core";
@@ -35,7 +36,8 @@ export type ControllerData = ClassJson & {
   }[];
 };
 
-export type ControllerElement = ElementWithProps &
+export type ControllerElement = ElementWithImports &
+  ElementWithProps &
   ElementWithMethods &
   ComponentElement;
 

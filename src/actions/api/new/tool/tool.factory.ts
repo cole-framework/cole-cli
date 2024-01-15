@@ -7,7 +7,6 @@ import {
   ClassJson,
   ToolType,
 } from "../../../../core";
-import { Model } from "../model";
 import { ToolData, Tool, ToolElement } from "./types";
 
 export class ToolFactory {
@@ -19,9 +18,9 @@ export class ToolFactory {
   ): Tool {
     const { id, name, endpoint } = data;
     const addons = {};
-    const { defaults } = config.components.entity;
-    const componentName = config.components.entity.generateName(name);
-    const componentPath = config.components.entity.generatePath({
+    const { defaults } = config.components.tool;
+    const componentName = config.components.tool.generateName(name);
+    const componentPath = config.components.tool.generatePath({
       name,
       endpoint,
     }).path;
@@ -31,6 +30,11 @@ export class ToolFactory {
     const generics = [];
     const inheritance = [];
     let ctor;
+    let exp;
+
+    if (defaults?.common?.exp) {
+      exp = defaults.common.exp;
+    }
 
     if (defaults?.common.ctor) {
       ctor = defaults.common.ctor;
@@ -57,7 +61,10 @@ export class ToolFactory {
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
-      imports.push(...defaults.common.imports);
+      defaults.common.imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.common?.generics)) {
@@ -73,6 +80,8 @@ export class ToolFactory {
         imports,
         ctor,
         inheritance,
+        exp,
+        is_abstract: config.components.tool.elementType === "abstract_class",
       } as ClassJson,
       config.reservedTypes,
       {

@@ -47,7 +47,7 @@ export class RouteIOFactory {
     const imports = [];
     let inheritance = [];
     let ctor;
-
+    let exp;
     const componentName = config.components.routeIO.generateName(name, {
       type: method,
       method,
@@ -59,6 +59,10 @@ export class RouteIOFactory {
       endpoint,
     }).path;
 
+    if (defaults?.common?.exp) {
+      exp = defaults.common.exp;
+    }
+
     if (defaults?.common?.ctor) {
       ctor = defaults.common.ctor;
     }
@@ -68,7 +72,10 @@ export class RouteIOFactory {
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
-      imports.push(...defaults.common.imports);
+      defaults.common.imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.common?.interfaces)) {
@@ -92,7 +99,10 @@ export class RouteIOFactory {
     }
 
     if (Array.isArray(defaults?.[method]?.imports)) {
-      imports.push(...defaults[method].imports);
+      defaults[method].imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.[method]?.interfaces)) {
@@ -129,6 +139,7 @@ export class RouteIOFactory {
       inheritance,
       ctor,
       imports,
+      exp,
     };
 
     const element = ClassSchema.create<RouteElement>(

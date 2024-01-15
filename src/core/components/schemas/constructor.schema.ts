@@ -6,7 +6,7 @@ import {
   ParamTools,
 } from "./param.schema";
 import { Component } from "../component";
-import { ConfigAddons, ReservedType } from "../../config";
+import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { AccessType } from "../../enums";
 import { SchemaTools } from "../schema.tools";
 
@@ -68,12 +68,13 @@ export class ConstructorSchema {
   public static create(
     data: ConstructorJson | ConstructorData | string,
     reserved: ReservedType[],
-    references?: { [key: string]: unknown; dependencies: any[] }
+    references?: { [key: string]: unknown; dependencies: any[] },
+    isSuper = false
   ) {
     let access: string = AccessType.Public;
     let body: string;
     let supr: ConstructorSchema;
-    const params: ParamSchema[] = [];
+    let params: ParamSchema[] = [];
 
     if (typeof data === "string") {
       const ctor = ConstructorTools.stringToData(data, reserved, references);
@@ -86,15 +87,45 @@ export class ConstructorSchema {
       access = data.access;
 
       if (data.supr) {
-        supr = ConstructorSchema.create(data.supr, reserved, references);
+        supr = ConstructorSchema.create(data.supr, reserved, references, true);
       }
 
+      // if (Array.isArray(data.params)) {
+      //   data.params.forEach((p) => {
+      //     if (SchemaTools.executeMeta(p, references, reserved)) {
+      //       params.push(ParamSchema.create(p, reserved, references));
+      //     }
+      //   });
+      // }
       if (Array.isArray(data.params)) {
-        data.params.forEach((p) => {
-          if (SchemaTools.executeMeta(p, references, reserved)) {
-            params.push(ParamSchema.create(p, reserved, references));
+        data.params.forEach((param) => {
+          if (SchemaTools.executeMeta(param, references, reserved)) {
+            if (ConfigTools.hasInstructions(param)) {
+              const p = ConfigTools.executeInstructions(
+                param,
+                references,
+                reserved
+              );
+              if (p) {
+                params.push(p);
+              }
+            } else {
+              params.push(ParamSchema.create(param, reserved, references));
+            }
           }
         });
+      } else if (typeof data.params === "string") {
+        if (ConfigTools.hasInstructions(data.params)) {
+          params = ConfigTools.executeInstructions(
+            data.params,
+            references,
+            reserved
+          );
+        } else {
+          if (SchemaTools.executeMeta(data.params, references, reserved)) {
+            params.push(ParamSchema.create(data.params, reserved, references));
+          }
+        }
       }
     }
 

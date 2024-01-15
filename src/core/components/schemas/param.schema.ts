@@ -80,7 +80,7 @@ export class ParamTools {
 
       isReadonly = !!match[3];
       isOptional = !!match[5];
-      access = match[2]?.trim() || AccessType.Public;
+      access = match[2]?.trim();
     } else {
       throw new Error(`Param regex match failure`);
     }
@@ -187,7 +187,7 @@ export class ParamSchema {
       name = data.name;
       isOptional = data.is_optional;
       isReadonly = data.is_readonly;
-      access = data.access || AccessType.Public;
+      access = data.access;
 
       if (typeof data.type === "string") {
         let temp = data.type.trim();

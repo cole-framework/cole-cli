@@ -24,7 +24,7 @@ export class ConfigLoader {
     const warnings: ConfigWarnings = {};
 
     const missingSourceDirname =
-      typeof config.general.source_dirname !== "string";
+      typeof config.compilation.source_dirname !== "string";
 
     if (missingSourceDirname) {
       issues.missingSourceDirname = true;

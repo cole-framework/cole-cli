@@ -27,7 +27,7 @@ export class SourceFactory {
     const imports = [];
     let inheritance = [];
     let ctor;
-
+    let exp;
     const componentName = config.components.source.generateName(name, {
       type: storage,
     });
@@ -36,6 +36,10 @@ export class SourceFactory {
       type: storage,
       endpoint,
     }).path;
+
+    if (defaults?.common?.exp) {
+      exp = defaults.common.exp;
+    }
 
     if (defaults?.common?.ctor) {
       ctor = defaults.common.ctor;
@@ -46,7 +50,10 @@ export class SourceFactory {
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
-      imports.push(...defaults.common.imports);
+      defaults.common.imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.common?.interfaces)) {
@@ -74,7 +81,10 @@ export class SourceFactory {
     }
 
     if (Array.isArray(defaults?.[storage]?.imports)) {
-      imports.push(...defaults[storage].imports);
+      defaults[storage].imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.[storage]?.interfaces)) {
@@ -111,6 +121,8 @@ export class SourceFactory {
       inheritance,
       ctor,
       imports,
+      exp,
+      is_abstract: config.components.source.elementType === "abstract_class",
     };
 
     const element = ClassSchema.create<SourceElement>(

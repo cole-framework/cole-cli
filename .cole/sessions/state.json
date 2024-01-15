@@ -1,0 +1,551 @@
+[
+  {
+    "path": "/Users/rad/git/cole/cole-cli/src/endpoints/xxx/domain/entities/baz.ts",
+    "wite_method": "write",
+    "content": {
+      "imports": [],
+      "types": [],
+      "functions": [],
+      "classes": [
+        {
+          "name": "Baz",
+          "ctor": null,
+          "interfaces": [],
+          "inheritance": [],
+          "props": [
+            {
+              "access": "public",
+              "name": "id",
+              "type": "string"
+            },
+            {
+              "access": "public",
+              "name": "rest",
+              "type": "string"
+            }
+          ],
+          "methods": [],
+          "generics": [],
+          "imports": []
+        }
+      ]
+    }
+  },
+  {
+    "path": "/Users/rad/git/cole/cole-cli/src/endpoints/xxx/domain/entities/bar.ts",
+    "wite_method": "write",
+    "content": {
+      "imports": [],
+      "types": [],
+      "functions": [],
+      "classes": [
+        {
+          "name": "Bar",
+          "ctor": null,
+          "interfaces": [],
+          "inheritance": [],
+          "props": [
+            {
+              "access": "public",
+              "name": "id",
+              "type": "string"
+            },
+            {
+              "access": "public",
+              "name": "rest",
+              "type": "string"
+            }
+          ],
+          "methods": [],
+          "generics": [],
+          "imports": []
+        }
+      ]
+    }
+  },
+  {
+    "path": "/Users/rad/git/cole/cole-cli/src/endpoints/xxx/data/mappers/foo.mongo.mapper.ts",
+    "wite_method": "write",
+    "content": {
+      "imports": [],
+      "types": [],
+      "functions": [],
+      "classes": [
+        {
+          "name": "FooMongoMapper",
+          "ctor": null,
+          "interfaces": [],
+          "inheritance": [
+            {
+              "name": "MongoMapper",
+              "generics": [
+                {
+                  "dflt": "Baz",
+                  "inheritance": null
+                },
+                {
+                  "dflt": "SebixMongoModel",
+                  "inheritance": null
+                }
+              ]
+            }
+          ],
+          "props": [],
+          "methods": [
+            {
+              "access": "public",
+              "name": "toEntity",
+              "return_type": "Baz",
+              "params": [
+                {
+                  "access": "public",
+                  "name": "model",
+                  "type": "SebixMongoModel"
+                }
+              ],
+              "supr": null,
+              "generics": []
+            },
+            {
+              "access": "public",
+              "name": "toModel",
+              "return_type": "SebixMongoModel",
+              "params": [
+                {
+                  "access": "public",
+                  "name": "entity",
+                  "type": "Baz"
+                }
+              ],
+              "supr": null,
+              "generics": []
+            }
+          ],
+          "generics": [],
+          "imports": []
+        }
+      ]
+    }
+  },
+  {
+    "path": "/Users/rad/git/cole/cole-cli/src/endpoints/xxx/data/mappers/bar.mongo.mapper.ts",
+    "wite_method": "write",
+    "content": {
+      "imports": [],
+      "types": [],
+      "functions": [],
+      "classes": [
+        {
+          "name": "BarMongoMapper",
+          "ctor": null,
+          "interfaces": [],
+          "inheritance": [
+            {
+              "name": "MongoMapper",
+              "generics": [
+                {
+                  "dflt": "Bar",
+                  "inheritance": null
+                },
+                {
+                  "dflt": "BarMongoModel",
+                  "inheritance": null
+                }
+              ]
+            }
+          ],
+          "props": [],
+          "methods": [
+            {
+              "access": "public",
+              "name": "toEntity",
+              "return_type": "Bar",
+              "params": [
+                {
+                  "access": "public",
+                  "name": "model",
+                  "type": "BarMongoModel"
+                }
+              ],
+              "supr": null,
+              "generics": []
+            },
+            {
+              "access": "public",
+              "name": "toModel",
+              "return_type": "BarMongoModel",
+              "params": [
+                {
+                  "access": "public",
+                  "name": "entity",
+                  "type": "Bar"
+                }
+              ],
+              "supr": null,
+              "generics": []
+            }
+          ],
+          "generics": [],
+          "imports": []
+        }
+      ]
+    }
+  },
+  {
+    "path": "/Users/rad/git/cole/cole-cli/src/endpoints/xxx/data/mappers/bar.sql.mapper.ts",
+    "wite_method": "write",
+    "content": {
+      "imports": [],
+      "types": [],
+      "functions": [],
+      "classes": [
+        {
+          "name": "BarSqlMapper",
+          "ctor": null,
+          "interfaces": [],
+          "inheritance": [],
+          "props": [],
+          "methods": [
+            {
+              "access": "public",
+              "name": "toEntity",
+              "return_type": "Bar",
+              "params": [
+                {
+                  "access": "public",
+                  "name": "model",
+                  "type": "BarSqlModel"
+                }
+              ],
+              "supr": null,
+              "generics": []
+            },
+            {
+              "access": "public",
+              "name": "toModel",
+              "return_type": "BarSqlModel",
+              "params": [
+                {
+                  "access": "public",
+                  "name": "entity",
+                  "type": "Bar"
+                }
+              ],
+              "supr": null,
+              "generics": []
+            }
+          ],
+          "generics": [],
+          "imports": []
+        }
+      ]
+    }
+  },
+  {
+    "path": "/Users/rad/git/cole/cole-cli/src/endpoints/xxx/data/dtos/sebix.dto.ts",
+    "wite_method": "write",
+    "content": {
+      "imports": [],
+      "types": [
+        {
+          "name": "SebixMongoModel",
+          "props": [
+            {
+              "access": "public",
+              "name": "id",
+              "type": "unknown"
+            }
+          ],
+          "generics": [],
+          "imports": []
+        }
+      ],
+      "functions": [],
+      "classes": []
+    }
+  },
+  {
+    "path": "/Users/rad/git/cole/cole-cli/src/endpoints/xxx/data/dtos/bar.dto.ts",
+    "wite_method": "write",
+    "content": {
+      "imports": [],
+      "types": [
+        {
+          "name": "BarMongoModel",
+          "props": [
+            {
+              "access": "public",
+              "name": "id",
+              "type": "unknown"
+            }
+          ],
+          "generics": [],
+          "imports": []
+        },
+        {
+          "name": "BarSqlModel",
+          "props": [],
+          "generics": [],
+          "imports": []
+        }
+      ],
+      "functions": [],
+      "classes": []
+    }
+  },
+  {
+    "path": "/Users/rad/git/cole/cole-cli/src/endpoints/xxx/domain/repositories/qwerty.repository.ts",
+    "wite_method": "write",
+    "content": {
+      "imports": [],
+      "types": [],
+      "functions": [],
+      "classes": [
+        {
+          "name": "QwertyRepository",
+          "ctor": null,
+          "interfaces": [],
+          "inheritance": [
+            {
+              "name": "Respository",
+              "generics": [
+                {
+                  "dflt": "Baz",
+                  "inheritance": null
+                }
+              ]
+            }
+          ],
+          "props": [],
+          "methods": [],
+          "generics": [],
+          "imports": []
+        }
+      ]
+    }
+  },
+  {
+    "path": "/Users/rad/git/cole/cole-cli/src/endpoints/xxx/domain/repositories/bar.repository.ts",
+    "wite_method": "write",
+    "content": {
+      "imports": [],
+      "types": [],
+      "functions": [],
+      "classes": [
+        {
+          "name": "BarRepository",
+          "ctor": null,
+          "interfaces": [],
+          "inheritance": [
+            {
+              "name": "Respository",
+              "generics": [
+                {
+                  "dflt": "Bar",
+                  "inheritance": null
+                }
+              ]
+            }
+          ],
+          "props": [],
+          "methods": [
+            {
+              "access": "public",
+              "name": "addBar",
+              "return_type": "unknown",
+              "params": [],
+              "supr": null,
+              "generics": []
+            }
+          ],
+          "generics": [],
+          "imports": []
+        }
+      ]
+    }
+  },
+  {
+    "path": "/Users/rad/git/cole/cole-cli/src/endpoints/xxx/data/repositories/qwerty.repository-impl.ts",
+    "wite_method": "write",
+    "content": {
+      "imports": [],
+      "types": [],
+      "functions": [],
+      "classes": [
+        {
+          "name": "QwertyRepositoryImpl",
+          "ctor": {
+            "params": [
+              {
+                "access": "protected",
+                "name": "mongo",
+                "type": "unknown"
+              }
+            ],
+            "supr": {
+              "params": [
+                {
+                  "access": "protected",
+                  "name": "context",
+                  "type": "unknown"
+                }
+              ],
+              "supr": null
+            }
+          },
+          "interfaces": [],
+          "inheritance": [
+            {
+              "name": "RepositoryImpl",
+              "generics": [
+                {
+                  "dflt": "Baz",
+                  "inheritance": null
+                },
+                {
+                  "dflt": "SebixMongoModel",
+                  "inheritance": null
+                }
+              ]
+            }
+          ],
+          "props": [],
+          "methods": [],
+          "generics": [],
+          "imports": []
+        }
+      ]
+    }
+  },
+  {
+    "path": "/Users/rad/git/cole/cole-cli/src/endpoints/xxx/data/sources/foo.mongo.source.ts",
+    "wite_method": "write",
+    "content": {
+      "imports": [],
+      "types": [],
+      "functions": [],
+      "classes": [
+        {
+          "name": "FooMongoSource",
+          "ctor": {
+            "params": [
+              {
+                "access": "public",
+                "name": "dbSource",
+                "type": "unknown"
+              }
+            ],
+            "supr": {
+              "params": [
+                {
+                  "access": "public",
+                  "name": "dbSource",
+                  "type": "unknown"
+                },
+                {
+                  "access": "public",
+                  "name": "table",
+                  "type": "string",
+                  "value": "foo"
+                }
+              ],
+              "supr": null
+            }
+          },
+          "interfaces": [],
+          "inheritance": [
+            {
+              "name": "MongoCollectionSource",
+              "generics": [
+                {
+                  "dflt": "SebixMongoModel",
+                  "inheritance": null
+                }
+              ]
+            }
+          ],
+          "props": [],
+          "methods": [],
+          "generics": [],
+          "imports": []
+        }
+      ]
+    }
+  },
+  {
+    "path": "/Users/rad/git/cole/cole-cli/src/endpoints/xxx/data/sources/bar.mongo.source.ts",
+    "wite_method": "write",
+    "content": {
+      "imports": [],
+      "types": [],
+      "functions": [],
+      "classes": [
+        {
+          "name": "BarMongoSource",
+          "ctor": {
+            "params": [
+              {
+                "access": "public",
+                "name": "dbSource",
+                "type": "unknown"
+              }
+            ],
+            "supr": {
+              "params": [
+                {
+                  "access": "public",
+                  "name": "dbSource",
+                  "type": "unknown"
+                },
+                {
+                  "access": "public",
+                  "name": "table",
+                  "type": "string",
+                  "value": "bar"
+                }
+              ],
+              "supr": null
+            }
+          },
+          "interfaces": [],
+          "inheritance": [
+            {
+              "name": "MongoCollectionSource",
+              "generics": [
+                {
+                  "dflt": "BarMongoModel",
+                  "inheritance": null
+                }
+              ]
+            }
+          ],
+          "props": [],
+          "methods": [],
+          "generics": [],
+          "imports": []
+        }
+      ]
+    }
+  },
+  {
+    "path": "/Users/rad/git/cole/cole-cli/src/endpoints/xxx/data/sources/bar.sql.source.ts",
+    "wite_method": "write",
+    "content": {
+      "imports": [],
+      "types": [],
+      "functions": [],
+      "classes": [
+        {
+          "name": "BarSqlSource",
+          "ctor": null,
+          "interfaces": [],
+          "inheritance": [],
+          "props": [],
+          "methods": [],
+          "generics": [],
+          "imports": []
+        }
+      ]
+    }
+  }
+]

@@ -87,7 +87,7 @@ export class PropTools {
       isReadonly = match[3] === "readonly";
       isStatic = match[3] === "static";
       isOptional = !!match[5];
-      access = match[2]?.trim() || AccessType.Public;
+      access = match[2]?.trim();
     } else {
       throw new Error(`Prop regex match failure`);
     }
@@ -192,12 +192,12 @@ export class PropSchema {
       isStatic = prop.is_static;
       type = prop.type;
       value = prop.value;
-      access = prop.access || AccessType.Public;
+      access = prop.access;
     } else {
       isOptional = data.is_optional;
       isReadonly = data.is_readonly;
       isStatic = data.is_static;
-      access = data.access || AccessType.Public;
+      access = data.access;
 
       if (typeof data.type === "string") {
         let temp = data.type.trim();

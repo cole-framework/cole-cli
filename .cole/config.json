@@ -2,9 +2,13 @@
   "general": {
     "headless_mode": false,
     "override": false,
-    "source_dirname": "src",
     "skip_tests": false,
     "with_dependencies": false
+  },
+  "compilation": {
+    "source_dirname": "src",
+    "batch_size": 10,
+    "thread_count": -1
   },
   "databases": [
     {
@@ -97,8 +101,10 @@
     "mapper": {
       "name_pattern": "{{pascal name}}{{pascal type}}Mapper",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/data/mappers/{{kebab name}}.{{kebab type}}.mapper.ts",
+      "element_type": "class",
       "defaults": {
         "common": {
+          "exp": true,
           "methods": [
             {
               "name": "toEntity",
@@ -152,7 +158,11 @@
     "source": {
       "name_pattern": "{{pascal name}}{{pascal type}}Source",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/data/sources/{{kebab name}}.{{kebab type}}.source.ts",
+      "element_type": "class",
       "defaults": {
+        "common": {
+          "exp": true
+        },
         "mongo": {
           "ctor": {
             "params": [
@@ -201,8 +211,10 @@
     "entity": {
       "name_pattern": "{{pascal name}}",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/domain/entities/{{kebab name}}.ts",
+      "element_type": "class",
       "defaults": {
         "common": {
+          "exp": true,
           "generics": [
             {
               "meta": "{{IF addons.hasModel IS true}}",
@@ -247,7 +259,11 @@
     "model": {
       "name_pattern": "{{pascal name}}{{pascal type}}Model",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/data/dtos/{{kebab name}}.dto.ts",
+      "element_type": "type",
       "defaults": {
+        "common": {
+          "exp": true
+        },
         "mongo": {
           "imports": [
             {
@@ -261,7 +277,6 @@
             {
               "name": "_id",
               "type": "MongoDB.ObjectId",
-              "import": "mongo",
               "optional": true
             }
           ]
@@ -281,8 +296,10 @@
     "use_case": {
       "name_pattern": "{{pascal name}}UseCase",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/domain/use-cases/{{kebab name}}.use-case.ts",
+      "element_type": "class",
       "defaults": {
         "common": {
+          "exp": true,
           "imports": [
             {
               "list": [
@@ -309,8 +326,10 @@
     "repository": {
       "name_pattern": "{{pascal name}}Repository",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/domain/repositories/{{kebab name}}.repository.ts",
+      "element_type": "abstract_class",
       "defaults": {
         "common": {
+          "exp": true,
           "imports": [
             {
               "list": [
@@ -318,11 +337,17 @@
                 "injectable"
               ],
               "path": "@cole-framework/api-core"
-            }
+            },
+            {
+              "list": [
+                "{{USE DEPENDENCY(WHERE type.isEntity IS true).element.name}}"
+              ],
+              "path": "{{USE DEPENDENCY(WHERE type.isEntity IS true).path}}"
+            } 
           ],
           "inheritance": [
             {
-              "name": "Respository",
+              "name": "Repository",
               "generics": [
                 {
                   "dflt": "{{USE DEPENDENCY(WHERE type.isEntity IS true).element.name}}"
@@ -336,8 +361,10 @@
     "repository_impl": {
       "name_pattern": "{{pascal name}}RepositoryImpl",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/data/repositories/{{kebab name}}.repository-impl.ts",
+      "element_type": "class",
       "defaults": {
         "common": {
+          "exp": true,
           "imports": [
             {
               "list": [
@@ -360,26 +387,44 @@
                 }
               ]
             }
-          ]
+          ],
+          "interfaces":[
+            {
+              "name": "{{USE DEPENDENCY(WHERE type.isRepository IS true).element.name}}",
+              "generics": [
+                {
+                  "dflt": "{{USE DEPENDENCY(WHERE type.isEntity IS true).element.name}}"
+                }
+              ]
+            }
+          ],
+          "ctor": {
+            "supr": {
+              "params": [{
+                "name": "{{USE DEPENDENCY(WHERE type.isModel IS true).type.type}}",
+                "type": "DataContext<{{USE DEPENDENCY(WHERE type.isEntity IS true).element.name}}, {{USE DEPENDENCY(WHERE type.type IS mongo).element.name}}>"
+              }]
+            }
+          }
         },
         "mongo": {
-          "imports": [
-            {
-              "list": [
-                "MongoQueryBuilders",
-                "MongoSource",
-                "MongoConfig"
-              ],
-              "path": "@cole-framework/storage-mongodb"
-            }
-          ]
+          "ctor": {
+              "params": [{
+                "name": "{{USE DEPENDENCY(WHERE type.isModel IS true).type.type}}",
+                "type": "DataContext<{{USE DEPENDENCY(WHERE type.isEntity IS true).element.name}}, {{USE DEPENDENCY(WHERE type.type IS mongo).element.name}}>"
+              }]
+          }
         }
       }
     },
     "repository_factory": {
       "name_pattern": "{{pascal name}}RepositoryFactory",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/data/repositories/{{kebab name}}.repository-factory.ts",
+      "element_type": "class",
       "defaults": {
+        "common": {
+          "exp": true
+        },
         "mongo": {
           "imports": [
             {
@@ -416,13 +461,20 @@
     "controller": {
       "name_pattern": "{{pascal name}}Controller",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/domain/controllers/{{kebab name}}.controller.ts",
-      "defaults": {}
+      "element_type": "class",
+      "defaults": {
+        "common": {
+          "exp": true
+        }
+      }
     },
     "route": {
       "name_pattern": "{{pascal method}}{{pascal name}}Route",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/routes/{{kebab method}}-{{kebab name}}.route.ts",
+      "element_type": "class",
       "defaults": {
         "common": {
+          "exp": true,
           "methods": [
             {
               "name": "create",
@@ -532,13 +584,20 @@
     "route_model": {
       "name_pattern": "{{pascal name}}{{pascal type}}Model",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/routes/{{kebab name}}.route-model.ts",
-      "defaults": {}
+      "element_type": "type",
+      "defaults": {
+        "common": {
+          "exp": true
+        }
+      }
     },
     "route_io": {
       "name_pattern": "{{pascal method}}{{pascal name}}RouteIO",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/routes/{{kebab method}}-{{kebab name}}.route-io.ts",
+      "element_type": "type",
       "defaults": {
         "common": {
+          "exp": true,
           "interfaces": [
             {
               "name": "RouteIO",
@@ -580,7 +639,12 @@
     "tool": {
       "name_pattern": "{{pascal name}}Tools",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/{{kebab layer}}/tools/{{kebab name}}.tools.ts",
-      "defaults": {}
+      "element_type": "class",
+      "defaults": {
+        "common": {
+          "exp": true
+        }
+      }
     }
   }
 }

@@ -50,7 +50,7 @@ export type MethodJson = {
   return_type?: string;
   is_async?: boolean;
   is_static?: boolean;
-  params?: (ParamJson | string)[];
+  params?: string | (ParamJson | string)[];
   body?: string;
   supr?: MethodJson;
   generics?: (GenericJson | string)[];

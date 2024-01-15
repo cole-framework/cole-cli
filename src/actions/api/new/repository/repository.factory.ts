@@ -27,12 +27,17 @@ export class RepositoryComponentFactory {
     const imports = [];
     let inheritance = [];
     let ctor;
+    let exp;
 
     const componentName = config.components.repository.generateName(name);
     const componentPath = config.components.repository.generatePath({
       name,
       endpoint,
     }).path;
+
+    if (defaults?.common?.exp) {
+      exp = defaults.common.exp;
+    }
 
     if (defaults?.common?.ctor) {
       ctor = defaults.common.ctor;
@@ -43,7 +48,10 @@ export class RepositoryComponentFactory {
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
-      imports.push(...defaults.common.imports);
+      defaults.common.imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.common?.interfaces)) {
@@ -80,6 +88,9 @@ export class RepositoryComponentFactory {
       inheritance,
       imports,
       ctor,
+      exp,
+      is_abstract:
+        config.components.repository.elementType === "abstract_class",
     };
 
     const element = ClassSchema.create<RepositoryElement>(

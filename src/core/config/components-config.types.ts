@@ -1,5 +1,6 @@
 import {
   ConstructorConfig,
+  ExportConfig,
   GenericConfig,
   ImportConfig,
   InheritanceConfig,
@@ -20,6 +21,7 @@ export type FrameworkDefaults = {
   methods?: MethodConfig[];
   generics?: GenericConfig[];
   ctor?: ConstructorConfig;
+  exp?: ExportConfig;
 };
 
 export type ComponentConfigData = {
@@ -27,6 +29,7 @@ export type ComponentConfigData = {
   type?: string;
   name_pattern?: string;
   path_pattern?: string;
+  element_type?: string; // class, abstract_class, interface, type, function
   defaults?: {
     common?: FrameworkDefaults;
     [key: string]: FrameworkDefaults;

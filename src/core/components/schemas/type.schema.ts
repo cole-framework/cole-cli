@@ -119,6 +119,7 @@ export class TypeSchema {
     let name: string;
     let props: PropSchema[] = [];
     let generics: GenericSchema[] = [];
+    let imports = [];
 
     if (typeof data === "string") {
       const tp = TypeTools.stringToData(data, reserved, references);
@@ -166,12 +167,22 @@ export class TypeSchema {
       } else if (TypeInfo.isType(data.alias)) {
         alias = data.alias;
       }
+
+      if (Array.isArray(data.imports)) {
+        imports = [...data.imports];
+      }
     }
 
     const t = new TypeSchema(name, alias, exp);
 
     generics.forEach((g) => t.addGeneric(g));
     props.forEach((p) => t.addProp(p));
+
+    imports.forEach((i) => {
+      if (SchemaTools.executeMeta(i, references, reserved)) {
+        t.addImport(ImportSchema.create(i, reserved, references));
+      }
+    });
 
     return t as T;
   }

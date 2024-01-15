@@ -3,6 +3,7 @@ import {
   Component,
   ComponentElement,
   ElementWithGenerics,
+  ElementWithImports,
   ElementWithProps,
 } from "../../../../core";
 import { ApiJson, DefaultCliOptions } from "../api.types";
@@ -25,7 +26,8 @@ export type EntityAddons = {
   hasModel: boolean;
 };
 
-export type EntityElement = ElementWithProps &
+export type EntityElement = ElementWithImports &
+  ElementWithProps &
   ElementWithGenerics &
   ComponentElement;
 

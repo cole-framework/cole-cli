@@ -29,6 +29,7 @@ export class MapperFactory {
     const imports = [];
     let inheritance = [];
     let ctor;
+    let exp;
 
     const componentName = config.components.mapper.generateName(name, {
       type: storage,
@@ -39,6 +40,9 @@ export class MapperFactory {
       endpoint,
     }).path;
 
+    if (defaults?.common?.exp) {
+      exp = defaults.common.exp;
+    }
     if (defaults?.common?.ctor) {
       ctor = defaults.common.ctor;
     }
@@ -48,7 +52,10 @@ export class MapperFactory {
     }
 
     if (Array.isArray(defaults?.common?.imports)) {
-      imports.push(...defaults.common.imports);
+      defaults.common.imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.common?.interfaces)) {
@@ -72,11 +79,14 @@ export class MapperFactory {
     }
 
     if (Array.isArray(defaults?.[storage]?.imports)) {
-      imports.push(...defaults[storage].imports);
+      defaults[storage].imports.forEach((i) => {
+        i.ref_path = componentPath;
+        imports.push(i);
+      });
     }
 
     if (Array.isArray(defaults?.[storage]?.interfaces)) {
-      imports.push(...defaults[storage].interfaces);
+      interfaces.push(...defaults[storage].interfaces);
     }
 
     if (Array.isArray(defaults?.[storage]?.methods)) {
@@ -108,12 +118,19 @@ export class MapperFactory {
       generics,
       inheritance,
       ctor,
+      exp,
+      imports,
+      is_abstract: config.components.mapper.elementType === "abstract_class",
     };
 
-    const element = ClassSchema.create<MapperElement>(classData, config.reservedTypes, {
-      addons,
-      dependencies
-    });
+    const element = ClassSchema.create<MapperElement>(
+      classData,
+      config.reservedTypes,
+      {
+        addons,
+        dependencies,
+      }
+    );
 
     const component = Component.create<MapperElement, MapperAddons>(
       id,

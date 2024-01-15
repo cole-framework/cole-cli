@@ -1,4 +1,5 @@
 import { CodeConfigData } from "./code-config.types";
+import { CompilationConfigData } from "./compilation-config.types";
 import { ComponentsConfigData } from "./components-config.types";
 import { DatabaseConfigData } from "./database-config.types";
 import { GeneralConfigData } from "./general-config.types";
@@ -15,6 +16,7 @@ export type GeneratedPath = {
 
 export type ConfigData = {
   general: GeneralConfigData;
+  compilation: CompilationConfigData;
   databases: DatabaseConfigData[];
   code: CodeConfigData;
   components: ComponentsConfigData;

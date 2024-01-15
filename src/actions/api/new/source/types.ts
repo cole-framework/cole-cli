@@ -5,6 +5,7 @@ import {
   ElementWithGenerics,
   ComponentElement,
   Component,
+  ElementWithImports,
 } from "../../../../core";
 import { DefaultCliOptions } from "../api.types";
 
@@ -37,7 +38,8 @@ export type SourceAddons = {
   table: string;
 };
 
-export type SourceElement = ElementWithProps &
+export type SourceElement = ElementWithImports &
+  ElementWithProps &
   ElementWithGenerics &
   ComponentElement;
 

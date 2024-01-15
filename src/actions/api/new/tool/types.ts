@@ -3,6 +3,7 @@ import {
   Component,
   ComponentElement,
   ElementWithGenerics,
+  ElementWithImports,
   ElementWithMethods,
   ElementWithProps,
 } from "../../../../core";
@@ -19,7 +20,8 @@ export type ToolJson = ClassJson & {
 
 export type ToolData = ToolJson;
 
-export type ToolElement = ElementWithProps &
+export type ToolElement = ElementWithImports &
+  ElementWithProps &
   ElementWithMethods &
   ElementWithGenerics &
   ComponentElement;

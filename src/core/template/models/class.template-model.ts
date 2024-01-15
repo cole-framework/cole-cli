@@ -1,10 +1,5 @@
 import { Dependency } from "../../components/component";
-import {
-  ClassObject,
-  ExportObject,
-  GenericObject,
-  InheritanceObject,
-} from "../../components/schemas";
+import { ClassObject, ExportObject } from "../../components/schemas";
 import { ConstructorTemplateModel } from "./constructor.template-model";
 import { GenericTemplateModel } from "./generic.template-model";
 import { ImportTemplateModel } from "./import.template-model";
@@ -25,9 +20,11 @@ export class ClassTemplateModel {
       generics,
       imports,
       name,
+      is_abstract,
     } = schema;
 
     return new ClassTemplateModel(
+      is_abstract,
       name,
       exp,
       ctor ? ConstructorTemplateModel.create(ctor, dependencies) : null,
@@ -53,6 +50,7 @@ export class ClassTemplateModel {
   }
 
   constructor(
+    public isAbstract: boolean,
     public name: string,
     public exp: ExportObject,
     public ctor: ConstructorTemplateModel,

@@ -101,6 +101,7 @@ export class RepositoryJsonParser {
   buildImpl(
     data: RepositoryJson,
     entity: Entity,
+    repository: Repository,
     contexts: DataContext[],
     entitiesRef: Entity[],
     modelsRef: Model[]
@@ -134,6 +135,7 @@ export class RepositoryJsonParser {
         }),
       },
       entity,
+      repository,
       contexts,
       writeMethod.component,
       config
@@ -221,8 +223,10 @@ export class RepositoryJsonParser {
       const use_default_impl =
         typeof data.use_default_impl === "boolean"
           ? data.use_default_impl
-          : (Array.isArray(data.methods) && data.methods.length > 0) ||
-            (Array.isArray(data.contexts) && data.contexts.length > 1);
+          : Array.isArray(data.methods) &&
+            data.methods.length === 0 &&
+            Array.isArray(data.contexts) &&
+            data.contexts.length === 1;
       const build_factory = false;
 
       const entityName = data.entity || data.name;
@@ -327,6 +331,7 @@ export class RepositoryJsonParser {
           const impl_result = this.buildImpl(
             data,
             entity,
+            repository,
             ctxs,
             entitiesRef,
             modelsRef

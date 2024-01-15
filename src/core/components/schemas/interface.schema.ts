@@ -100,9 +100,16 @@ export class InterfaceSchema {
       });
     }
 
+    let name;
+    if (ConfigTools.hasInstructions(data.name)) {
+      name = ConfigTools.executeInstructions(data.name, references, reserved);
+    } else {
+      name = data.name;
+    }
+
     const intf = new InterfaceSchema(
       data.id || nanoid(),
-      data.name,
+      name,
       exp,
       inheritance
     );
@@ -127,6 +134,14 @@ export class InterfaceSchema {
       data.generics.forEach((g) => {
         if (SchemaTools.executeMeta(g, references, reserved)) {
           intf.addGeneric(GenericSchema.create(g, reserved, references));
+        }
+      });
+    }
+
+    if (Array.isArray(data.imports)) {
+      data.imports.forEach((i) => {
+        if (SchemaTools.executeMeta(i, references, reserved)) {
+          intf.addImport(ImportSchema.create(i, reserved, references));
         }
       });
     }
