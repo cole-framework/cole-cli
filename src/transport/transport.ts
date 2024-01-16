@@ -1,8 +1,10 @@
+export type TransportStatus = "skipped" | "created" | "error";
+
 export declare abstract class Transport {
   abstract writeOutput(
     data: string,
     options?: TransportOptions
-  ): Promise<boolean> | boolean | void;
+  ): Promise<TransportStatus> | TransportStatus | void;
 }
 
 export type TransportOptions = {

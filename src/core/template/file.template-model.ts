@@ -26,8 +26,7 @@ export class FileTemplateModel {
 
   constructor(
     public readonly path: string,
-    public readonly wite_method: string,
-    public readonly format: string,
+    public readonly wite_method: string
   ) {}
 
   update(data: ComponentData) {
@@ -61,8 +60,8 @@ export class FileTemplateModel {
     if (Array.isArray(data.dependencies)) {
       data.dependencies.forEach((dependency) => {
         if (dependency.path !== data.path) {
-         // add import
-       }
+          // add import
+        }
       });
     }
 

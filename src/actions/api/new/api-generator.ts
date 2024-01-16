@@ -1,87 +1,35 @@
-import { Transport } from "../../../transport/transport";
 import {
-  ComponentData,
   Config,
-  FileOutput,
+  FileTemplateModel,
   Result,
+  Strategy,
   WorkerPool,
 } from "../../../core";
-import { ApiObject } from "./api.types";
-import { FileTemplateModel } from "../../../core/template/file.template-model";
 import { ApiSchema } from "./api.schema";
-import { COMPILER_WORKER_PATH } from "./worker";
+import { COMPILER_WORKER_PATH } from "../../../core/worker";
+import { TypeScriptTemplateModelStrategy } from "../../../defaults/typescript.strategy";
+import Logger from "../../../core/tools/logger";
 
-export const updateTemplateModel = (
-  files: Map<string, FileTemplateModel>,
-  data: ComponentData,
-  code: string
-) => {
-  let file = files.get(data.path);
-
-  if (!file) {
-    file = new FileTemplateModel(data.path, data.write_method, code);
-    files.set(data.path, file);
-  }
-  file.update(data);
-};
-
+const logger = Logger.getLogger();
 export class ApiGenerator {
-  constructor(
-    protected config: Config
-  ) {}
-
-  protected createTemplateModels(api: ApiObject) {
-    const {
-      config: { code },
-    } = this;
-    const templateModels = new Map<string, FileTemplateModel>();
-
-    api.controllers.forEach((item) =>
-      updateTemplateModel(templateModels, item, code.alias)
-    );
-    api.entities.forEach((item) =>
-      updateTemplateModel(templateModels, item, code.alias)
-    );
-    api.mappers.forEach((item) =>
-      updateTemplateModel(templateModels, item, code.alias)
-    );
-    api.models.forEach((item) =>
-      updateTemplateModel(templateModels, item, code.alias)
-    );
-    api.repositories.forEach((item) =>
-      updateTemplateModel(templateModels, item, code.alias)
-    );
-    api.repository_factories.forEach((item) =>
-      updateTemplateModel(templateModels, item, code.alias)
-    );
-    api.repository_impls.forEach((item) =>
-      updateTemplateModel(templateModels, item, code.alias)
-    );
-    api.route_ios.forEach((item) =>
-      updateTemplateModel(templateModels, item, code.alias)
-    );
-    api.routes.forEach((item) =>
-      updateTemplateModel(templateModels, item, code.alias)
-    );
-    api.sources.forEach((item) =>
-      updateTemplateModel(templateModels, item, code.alias)
-    );
-    api.tools.forEach((item) =>
-      updateTemplateModel(templateModels, item, code.alias)
-    );
-    api.use_cases.forEach((item) =>
-      updateTemplateModel(templateModels, item, code.alias)
-    );
-
-    return Array.from(templateModels, ([, value]) => value);
-  }
+  private modelsStrategy: Strategy<FileTemplateModel[]>;
+  private templatesStrategy: Strategy;
+  constructor(protected config: Config) {}
 
   public async generate(api: ApiSchema): Promise<Result> {
+    const { config, modelsStrategy, templatesStrategy } = this;
     const obj = api.toObject();
-    const models = this.createTemplateModels(obj);
+    // const codeModule = require(config.code.module);
+    const { content: models, failure } = new TypeScriptTemplateModelStrategy(
+      config
+    ).apply(obj);
 
-    // console.log("OBJ:", JSON.stringify(obj, null, 2));
-    console.log('MODELS:', JSON.stringify(models, null, 2));
+    if (failure) {
+      console.log("MODELS create FAILURE");
+      return Result.withFailure(failure);
+    }
+
+    // console.log("MODELS:", JSON.stringify(models, null, 2));
 
     const promises = [];
     const {
@@ -92,23 +40,35 @@ export class ApiGenerator {
       operationsCount < threadCount ? operationsCount : threadCount;
     const workerPool = new WorkerPool(COMPILER_WORKER_PATH, usefulThreadCount);
 
-    // workerPool.setTaskCompleteCallback(() => { });
-    // workerPool.setTaskErrorCallback(() => { });
+    workerPool.setTaskCompleteCallback((data) => {
+      if (Array.isArray(data?.state)) {
+        data.state.forEach((s) => {
+          logger.info(
+            `${s.status} ${s.path}`,
+            s.status === "skipped" ? `🔵` : s.status === "created" ? `🟢` : `🔴`
+          );
+        });
+      }
+    });
 
     for (let i = 0; i < models.length; i += batchSize) {
       const batch = models.slice(i, i + batchSize);
-      promises.push(workerPool.executeTask(batch));
+      promises.push(
+        workerPool.executeTask({
+          code_module: config.code.module,
+          transport: config.compilation.transport,
+          models: batch,
+        })
+      );
     }
 
     try {
       await Promise.all(promises);
-      console.log("Done");
-    } catch (error) {
-      console.error(error);
-    } finally {
       workerPool.shutdown();
+      return Result.withoutContent();
+    } catch (error) {
+      workerPool.shutdown();
+      return Result.withFailure(error);
     }
-
-    return Result.withoutContent();
   }
 }

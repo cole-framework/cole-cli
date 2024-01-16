@@ -22,17 +22,9 @@ export class WorkerPool {
 
   executeTask(data: any) {
     return new Promise((resolve, reject) => {
-      if (this.availableWorkers.length === 0) {
-        reject(new Error("No available workers"));
-        return;
-      }
-
-      const worker = this.availableWorkers.pop();
-      worker.once("message", (result) => {
-        this.availableWorkers.push(worker);
-        resolve(result);
-      });
-      worker.postMessage(data);
+      const task = { data, resolve, reject };
+      this.taskQueue.push(task);
+      this.checkQueue();
     });
   }
 
@@ -52,15 +44,21 @@ export class WorkerPool {
 
   private checkQueue() {
     if (this.taskQueue.length > 0 && this.availableWorkers.length > 0) {
-      const { taskData, resolve, reject } = this.taskQueue.shift();
+      const { data, resolve, reject } = this.taskQueue.shift();
       const worker = this.availableWorkers.pop();
-      worker.once("message", (result) => {
-        this.availableWorkers.push(worker);
-        if (this.onTaskComplete) {
-          this.onTaskComplete(result, worker);
+
+      worker.on("message", (message) => {
+        if (message?.status === "complete") {
+          this.availableWorkers.push(worker);
+
+          if (this.onTaskComplete) {
+            this.onTaskComplete(message, worker);
+          }
+
+          resolve(message);
+          worker.removeAllListeners();
+          this.checkQueue();
         }
-        resolve(result);
-        this.checkQueue();
       });
       worker.once("error", (error) => {
         if (this.onTaskError) {
@@ -69,7 +67,7 @@ export class WorkerPool {
         reject(error);
         this.checkQueue();
       });
-      worker.postMessage(taskData);
+      worker.postMessage(data);
     }
   }
 

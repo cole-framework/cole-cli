@@ -8,7 +8,8 @@
   "compilation": {
     "source_dirname": "src",
     "batch_size": 10,
-    "thread_count": -1
+    "thread_count": -1,
+    "transport": "file"
   },
   "databases": [
     {
@@ -78,6 +79,7 @@
     }
   ],
   "code": {
+    "module": "@cole-framework/code-cli-typescript",
     "name": "TypeScript",
     "alias": "typescript",
     "types": [

@@ -40,8 +40,8 @@ export const fromJson = async (options: DefaultCliOptions) => {
     const data = readFileSync(options.json, "utf-8");
     const json = JSON.parse(data);
     const schema = new ApiJsonParser(apiConfig, config, texts).build(json);
-
-    const result = new ApiGenerator(config).generate(schema);
+    const apiGenerator = new ApiGenerator(config);
+    const result = await apiGenerator.generate(schema);
 
     // console.log("->", JSON.stringify(schema, null, 2));
   } catch (error) {

@@ -1,5 +1,5 @@
 import { WriteMethod, LangLoader } from "../../../../../core";
-import { ApiDataCreationStrategy } from "../../api-data.strategy";
+import { Strategy } from "../../../../../core/strategy";
 import { ApiData } from "../../api.types";
 import { Controller } from "../types";
 import { NewControllerStoryboard } from "../storyboards/new-controler.storyboard";
@@ -12,7 +12,7 @@ export type NewControllerStoryboardResult = {
   [key: string]: any;
 };
 
-export class NewControllerInteractiveStrategy extends ApiDataCreationStrategy {
+export class NewControllerInteractiveStrategy extends Strategy {
   public readonly name = "new_controller";
   public async apply(apiSchema: ApiData, ...args: unknown[]) {
     const { config } = this;

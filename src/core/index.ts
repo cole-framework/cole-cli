@@ -12,3 +12,4 @@ export * from "./result";
 export * from "./type.info";
 export * from "./state-manager";
 export * from "./worker-pool";
+export * from "./strategy";

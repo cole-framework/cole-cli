@@ -1,28 +1,23 @@
-import { Transport, TransportOptions } from "./transport";
-import Logger from "../core/tools/logger";
+import { Transport, TransportOptions, TransportStatus } from "./transport";
 import fs from "fs";
 import { ensurePathExists, fileOrDirExists } from "../core/tools/files.tools";
 
-const logger = Logger.getLogger();
-
 export class FileTransport implements Transport {
-  writeOutput(data: string, options: FileTransportOptions): boolean {
+  writeOutput(data: string, options: FileTransportOptions): TransportStatus {
     const { outputPath, overwrite = false } = options;
     try {
       if (!overwrite && fileOrDirExists(outputPath)) {
-        logger.info(`skipped ${outputPath}`, `🔵`);
-        return true;
+        return "skipped";
       }
 
       ensurePathExists(outputPath);
       fs.writeFileSync(outputPath, data);
-      logger.info(`created ${outputPath}`, `🟢`);
     } catch (ex) {
-      logger.error(ex);
-      return false;
+      console.log(ex);
+      return "error";
     }
 
-    return true;
+    return "created";
   }
 }
 

@@ -1,5 +1,5 @@
 import { CodeConfig } from "./code-config";
-import { CompilationConfig } from "./CompilationConfig";
+import { CompilationConfig } from "./compilation-config";
 import { ComponentsConfig } from "./components-config";
 import { ComponentsConfigTools } from "./components-config.tools";
 import { ConfigData, ReservedType } from "./config.types";

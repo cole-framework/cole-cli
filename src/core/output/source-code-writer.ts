@@ -1,6 +1,8 @@
 import { Transport } from "../../transport/transport";
 import { FileOutput } from "./file.output";
 
+export type SourceCodeWriterState = { path: string; status: string }[];
+
 export class SourceCodeWriter {
   protected outputs = new Set<FileOutput>();
   constructor(protected transport: Transport) {}
@@ -14,18 +16,19 @@ export class SourceCodeWriter {
     return this;
   }
 
-  public write(): { error?: Error } {
+  public write(): { error?: Error; state: SourceCodeWriterState } {
     try {
       const { transport, outputs } = this;
-
+      const state = [];
       outputs.forEach((out) => {
-        transport.writeOutput(out.content, {
+        const status = transport.writeOutput(out.content, {
           outputPath: out.path,
         });
+        state.push({ status, path: out.path });
       });
-      return {};
+      return { state };
     } catch (error) {
-      return { error };
+      return { error, state: [] };
     }
   }
 }

@@ -1,5 +1,5 @@
 import { LangLoader, WriteMethod } from "../../../../../core";
-import { ApiDataCreationStrategy } from "../../api-data.strategy";
+import { Strategy } from "../../../../../core/strategy";
 import { ApiData } from "../../api.types";
 
 export type NewSourceStoryboardResult = {
@@ -9,7 +9,7 @@ export type NewSourceStoryboardResult = {
   [key: string]: any;
 };
 
-export class NewSourceInteractiveStrategy extends ApiDataCreationStrategy {
+export class NewSourceInteractiveStrategy extends Strategy {
   public readonly name = "new_source";
   public async apply(apiSchema: ApiData, ...args: unknown[]) {
     const { config } = this;

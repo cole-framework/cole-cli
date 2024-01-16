@@ -1,12 +1,12 @@
 import chalk from "chalk";
 import { LangLoader, ModelType } from "../../../../../core";
-import { ApiDataCreationStrategy } from "../../api-data.strategy";
+import { Strategy } from "../../../../../core/strategy";
 import { ModelJson, NewModelOptions } from "../types";
 import { CliOptionsTools } from "../../../../../core/tools";
 import { ApiJsonParser } from "../../api-json.parser";
 import { ApiData } from "../../api.types";
 
-export class NewModelOptionsStrategy extends ApiDataCreationStrategy {
+export class NewModelOptionsStrategy extends Strategy {
   public async apply(apiSchema: ApiData, options: NewModelOptions) {
     const { config } = this;
     const { content: texts } = await LangLoader.load();

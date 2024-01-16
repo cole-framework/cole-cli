@@ -5,7 +5,6 @@ export const ensurePathExists = (path: string) => {
   const targetDirPath = dirname(path);
   if (!existsSync(targetDirPath)) {
     mkdirSync(targetDirPath, { recursive: true });
-    console.info(`Created dir ${targetDirPath}`);
   }
 };
 

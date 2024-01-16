@@ -12,13 +12,15 @@ export class CompilationConfig {
     return new CompilationConfig(
       data.source_dirname || "src",
       data.batch_size || 10,
-      thread_count
+      thread_count,
+      data.transport || "file"
     );
   }
 
   constructor(
     public readonly sourceDirname: string,
     public readonly batchSize: number,
-    public readonly threadCount: number
+    public readonly threadCount: number,
+    public readonly transport: string
   ) {}
 }

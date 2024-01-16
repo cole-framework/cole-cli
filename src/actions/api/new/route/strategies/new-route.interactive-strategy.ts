@@ -1,5 +1,5 @@
 import { LangLoader, WriteMethod } from "../../../../../core";
-import { ApiDataCreationStrategy } from "../../api-data.strategy";
+import { Strategy } from "../../../../../core/strategy";
 import { ApiData } from "../../api.types";
 import { NewRouteStoryboard } from "../storyboards";
 import { Route } from "../types";
@@ -12,7 +12,7 @@ export type NewRouteStoryboardResult = {
   [key: string]: any;
 };
 
-export class NewRouteInteractiveStrategy extends ApiDataCreationStrategy {
+export class NewRouteInteractiveStrategy extends Strategy {
   public readonly name = "new_route";
   public async apply(apiSchema: ApiData, ...args: unknown[]) {
     const { config } = this;

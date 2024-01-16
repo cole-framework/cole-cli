@@ -1,11 +1,11 @@
 import chalk from "chalk";
-import { ApiDataCreationStrategy } from "../../api-data.strategy";
+import { Strategy } from "../../../../../core/strategy";
 import { UseCaseJson, NewUseCaseOptions } from "../types";
 import { ApiJsonParser } from "../../api-json.parser";
 import { LangLoader } from "../../../../../core";
 import { ApiData } from "../../api.types";
 
-export class NewUseCaseOptionsStrategy extends ApiDataCreationStrategy {
+export class NewUseCaseOptionsStrategy extends Strategy {
   public async apply(apiSchema: ApiData, options: NewUseCaseOptions) {
     const { config } = this;
     const { content: texts } = await LangLoader.load();

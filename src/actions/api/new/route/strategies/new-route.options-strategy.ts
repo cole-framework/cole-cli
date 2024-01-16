@@ -1,11 +1,11 @@
 import chalk from "chalk";
-import { ApiDataCreationStrategy } from "../../api-data.strategy";
+import { Strategy } from "../../../../../core/strategy";
 import { NewRouteOptions, RouteJson } from "../types";
 import { LangLoader, RouteMethodType } from "../../../../../core";
 import { ApiJsonParser } from "../../api-json.parser";
 import { ApiData } from "../../api.types";
 
-export class NewRouteOptionsStrategy extends ApiDataCreationStrategy {
+export class NewRouteOptionsStrategy extends Strategy {
   public async apply(apiSchema: ApiData, options: NewRouteOptions) {
     const { config } = this;
     const { content: texts } = await LangLoader.load();
