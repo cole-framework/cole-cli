@@ -25,7 +25,6 @@ export class ApiGenerator {
     ).apply(obj);
 
     if (failure) {
-      console.log("MODELS create FAILURE");
       return Result.withFailure(failure);
     }
 
@@ -45,7 +44,13 @@ export class ApiGenerator {
         data.state.forEach((s) => {
           logger.info(
             `${s.status} ${s.path}`,
-            s.status === "skipped" ? `🔵` : s.status === "created" ? `🟢` : `🔴`
+            s.status === "skipped"
+              ? `🔵`
+              : s.status === "created"
+                ? `🟢`
+                : s.status === "updated"
+                  ? `🟠`
+                  : `🔴`
           );
         });
       }

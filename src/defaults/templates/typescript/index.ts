@@ -1,5 +1,6 @@
 export * from "./class.template";
 export * from "./constructor.template";
+export * from "./export.template";
 export * from "./function.template";
 export * from "./generic.template";
 export * from "./import.template";

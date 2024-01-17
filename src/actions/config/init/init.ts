@@ -5,13 +5,13 @@ import {
   localConfigPath,
   localMapPath,
   localTemplatesPath,
-} from "../../core/consts";
-import DefaultConfig from "../../defaults/default.config.json";
-import { fetchData } from "../../core/tools/files.tools";
+} from "../../../core/consts";
+import DefaultConfig from "../../../defaults/default.config.json";
+import { fetchData } from "../../../core/tools/files.tools";
 import { dirname, join } from "path";
 import { InitOptions } from "./types";
 
-import { ConfigData, ConfigLoader, InteractionPrompts } from "../../core";
+import { ConfigData, ConfigLoader, InteractionPrompts } from "../../../core";
 
 export const init = async (options: InitOptions) => {
   const { global } = options;

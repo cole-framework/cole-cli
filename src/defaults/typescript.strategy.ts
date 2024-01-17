@@ -1,10 +1,13 @@
+import { basename, dirname, extname, join, relative } from "path";
 import { ApiObject } from "../actions/api/new/api.types";
 import {
   ComponentData,
+  ExportTemplateModel,
   FileOutput,
   FileTemplateModel,
   Result,
   Strategy,
+  WriteMethod,
   fileOrDirExists,
 } from "../core";
 import { TypeScriptFileTemplate } from "./typescript.file-template";
@@ -20,7 +23,11 @@ export class TypeScriptFileOutputStrategy extends Strategy {
           // update file
         } else {
           const content = await TypeScriptFileTemplate.parse(model.content);
-          const output = new FileOutput(model.path, model.wite_method, content);
+          const output = new FileOutput(
+            model.path,
+            model.write_method,
+            content
+          );
           outputs.push(output);
         }
       }
@@ -86,9 +93,68 @@ export class TypeScriptTemplateModelStrategy extends Strategy {
         this.updateTemplateModel(templateModels, item)
       );
 
-      return Result.withContent(
-        Array.from(templateModels, ([, value]) => value)
+      const models = Array.from(templateModels, ([, value]) => value);
+
+      // create index.ts files
+      const indexModelsByPath = new Map<string, ExportTemplateModel[]>();
+      models.forEach((model) => {
+        const dir = dirname(model.path);
+        const indexPath = join(dir, "index.ts");
+        let temp = join(
+          relative(dirname(indexPath), dirname(model.path)),
+          basename(model.path).replace(extname(model.path), "")
+        );
+
+        const path = temp.startsWith(".") ? temp : `./${temp}`;
+
+        let exports = indexModelsByPath.get(indexPath);
+
+        if (!exports) {
+          exports = [];
+          indexModelsByPath.set(indexPath, exports);
+        }
+
+        model.content.classes.forEach((cls) => {
+          if (cls.exp) {
+            exports.push(
+              ExportTemplateModel.create({
+                ...cls.exp,
+                path,
+              })
+            );
+          }
+        });
+
+        model.content.types.forEach((item) => {
+          if (item.exp) {
+            exports.push(
+              ExportTemplateModel.create({
+                ...item.exp,
+                path,
+              })
+            );
+          }
+        });
+
+        model.content.functions.forEach((item) => {
+          if (item.exp) {
+            exports.push(
+              ExportTemplateModel.create({
+                ...item.exp,
+                path,
+              })
+            );
+          }
+        });
+      });
+
+      const indexes = Array.from(
+        indexModelsByPath,
+        ([path, exports]) =>
+          new FileTemplateModel(path, WriteMethod.Write, { exports })
       );
+
+      return Result.withContent([...indexes, ...models]);
     } catch (error) {
       return Result.withFailure(error);
     }

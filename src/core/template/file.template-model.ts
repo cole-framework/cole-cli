@@ -1,6 +1,7 @@
 import { ComponentData } from "../components";
 import {
   ClassTemplateModel,
+  ExportTemplateModel,
   FunctionTemplateModel,
   ImportTemplateModel,
   MethodTemplateModel,
@@ -10,6 +11,7 @@ import {
 } from "./models";
 
 export type FileTemplateContent = {
+  exports: ExportTemplateModel[];
   imports: ImportTemplateModel[];
   types: TypeTemplateModel[];
   functions: FunctionTemplateModel[];
@@ -18,6 +20,7 @@ export type FileTemplateContent = {
 
 export class FileTemplateModel {
   public readonly content: FileTemplateContent = {
+    exports: [],
     imports: [],
     types: [],
     functions: [],
@@ -26,8 +29,23 @@ export class FileTemplateModel {
 
   constructor(
     public readonly path: string,
-    public readonly wite_method: string
-  ) {}
+    public readonly write_method: string,
+    content?: {
+      exports?: ExportTemplateModel[];
+      imports?: ImportTemplateModel[];
+      types?: TypeTemplateModel[];
+      functions?: FunctionTemplateModel[];
+      classes?: ClassTemplateModel[];
+    }
+  ) {
+    if (content) {
+      this.content.classes = content.classes || [];
+      this.content.functions = content.functions || [];
+      this.content.types = content.types || [];
+      this.content.imports = content.imports || [];
+      this.content.exports = content.exports || [];
+    }
+  }
 
   update(data: ComponentData) {
     const {
