@@ -48,7 +48,7 @@ export class ApiGenerator {
               ? `🔵`
               : s.status === "created"
                 ? `🟢`
-                : s.status === "updated"
+                : s.status === "modified"
                   ? `🟠`
                   : `🔴`
           );

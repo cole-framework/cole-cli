@@ -1,4 +1,5 @@
 import { Transport } from "../../transport/transport";
+import { WriteMethod } from "../enums";
 import { FileOutput } from "./file.output";
 
 export type SourceCodeWriterState = { path: string; status: string }[];
@@ -23,6 +24,9 @@ export class SourceCodeWriter {
       outputs.forEach((out) => {
         const status = transport.writeOutput(out.content, {
           outputPath: out.path,
+          overwrite:
+            out.wite_method === WriteMethod.Write ||
+            out.wite_method === WriteMethod.Overwrite,
         });
         state.push({ status, path: out.path });
       });

@@ -35,14 +35,13 @@ import {
 } from "./inheritance.schema";
 
 export type InterfaceObject = {
-  exp: ExportObject;
-  inheritance: InheritanceObject[];
-  props: PropObject[];
-  methods: MethodObject[];
-  generics: GenericObject[];
-  imports: ImportObject[];
+  exp?: ExportObject;
+  inheritance?: InheritanceObject[];
+  props?: PropObject[];
+  methods?: MethodObject[];
+  generics?: GenericObject[];
+  imports?: ImportObject[];
   name: string;
-  id: string;
 };
 
 export type InterfaceData = {
@@ -272,7 +271,6 @@ export class InterfaceSchema {
       exp,
     } = this;
     const intf: InterfaceObject = {
-      id,
       name,
       inheritance: __inheritance?.map((i) => i.toObject()),
       exp: exp?.toObject(),

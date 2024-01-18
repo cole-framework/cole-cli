@@ -5,6 +5,7 @@ export * from "./function.template";
 export * from "./generic.template";
 export * from "./import.template";
 export * from "./inheritance.template";
+export * from "./interface.template";
 export * from "./method.template";
 export * from "./param.template";
 export * from "./prop.template";

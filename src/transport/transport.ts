@@ -1,4 +1,4 @@
-export type TransportStatus = "skipped" | "created" | "error";
+export type TransportStatus = "skipped" | "created" | "error" | "modified";
 
 export declare abstract class Transport {
   abstract writeOutput(

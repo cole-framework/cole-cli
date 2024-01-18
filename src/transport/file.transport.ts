@@ -4,20 +4,21 @@ import { ensurePathExists, fileOrDirExists } from "../core/tools/files.tools";
 
 export class FileTransport implements Transport {
   writeOutput(data: string, options: FileTransportOptions): TransportStatus {
-    const { outputPath, overwrite = false } = options;
+    const { outputPath, overwrite } = options;
     try {
-      if (!overwrite && fileOrDirExists(outputPath)) {
+      const exists = fileOrDirExists(outputPath);
+      if (!overwrite && exists) {
         return "skipped";
       }
 
       ensurePathExists(outputPath);
       fs.writeFileSync(outputPath, data);
+
+      return exists ? "modified" : "created";
     } catch (ex) {
       console.log(ex);
       return "error";
     }
-
-    return "created";
   }
 }
 

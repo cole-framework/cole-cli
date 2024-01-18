@@ -247,6 +247,8 @@ export abstract class TypeInfo {
     public readonly isFrameworkDefaultType?: boolean,
     public readonly isMultiType?: boolean,
     public readonly isComponentType?: boolean,
+    public readonly isInterface?: boolean,
+    public readonly isClass?: boolean,
     public readonly isEntity?: boolean,
     public readonly isTool?: boolean,
     public readonly isModel?: boolean,

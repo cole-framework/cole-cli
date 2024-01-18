@@ -12,7 +12,7 @@ export const INTERFACE_METHOD_TEMPLATE = `_ASYNC_ _NAME_(_PARAMS_)_RETURN_TYPE_;
 export class MethodTemplate {
   static parse(
     model: MethodTemplateModel,
-    elementType: string = "class"
+    elementType: "class" | "abstract_class" | "interface"
   ): string {
     const _ACCESS_ = model.access || "";
     const _ASYNC_ = model.is_async ? "async" : "";

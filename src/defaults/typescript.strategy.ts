@@ -11,6 +11,8 @@ import {
   fileOrDirExists,
 } from "../core";
 import { TypeScriptFileTemplate } from "./typescript.file-template";
+import { TypeScriptFileReader } from "./typescript.file-reader";
+import { TypeScriptFileModifier } from "./typescript.file-modifier";
 
 export class TypeScriptFileOutputStrategy extends Strategy {
   public async apply(
@@ -20,7 +22,12 @@ export class TypeScriptFileOutputStrategy extends Strategy {
     try {
       for (const model of models) {
         if (fileOrDirExists(model.path)) {
-          // update file
+          const file = TypeScriptFileReader.readFile(model.path);
+          const modifier = new TypeScriptFileModifier(file);
+          const output = modifier.modify(model);
+          if (output) {
+            outputs.push(output);
+          }
         } else {
           const content = await TypeScriptFileTemplate.parse(model.content);
           const output = new FileOutput(

@@ -21,6 +21,10 @@ import { Controller, ControllerJson } from "./controller/types";
 import { Entity, EntityJson } from "./entity/types";
 import { ToolJson, ToolJsonParser } from "./tool";
 
+export default class Fooooooo {
+  
+}
+
 export class ApiJsonParser {
   private apiSchema = new ApiSchema();
   private writeMethod: { component: WriteMethod; dependency: WriteMethod };

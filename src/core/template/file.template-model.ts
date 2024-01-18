@@ -4,6 +4,7 @@ import {
   ExportTemplateModel,
   FunctionTemplateModel,
   ImportTemplateModel,
+  InterfaceTemplateModel,
   MethodTemplateModel,
   ParamTemplateModel,
   PropTemplateModel,
@@ -16,6 +17,7 @@ export type FileTemplateContent = {
   types: TypeTemplateModel[];
   functions: FunctionTemplateModel[];
   classes: ClassTemplateModel[];
+  interfaces: InterfaceTemplateModel[];
 };
 
 export class FileTemplateModel {
@@ -25,6 +27,7 @@ export class FileTemplateModel {
     types: [],
     functions: [],
     classes: [],
+    interfaces: [],
   };
 
   constructor(
@@ -36,6 +39,7 @@ export class FileTemplateModel {
       types?: TypeTemplateModel[];
       functions?: FunctionTemplateModel[];
       classes?: ClassTemplateModel[];
+      interfaces?: InterfaceTemplateModel[];
     }
   ) {
     if (content) {
@@ -43,13 +47,14 @@ export class FileTemplateModel {
       this.content.functions = content.functions || [];
       this.content.types = content.types || [];
       this.content.imports = content.imports || [];
+      this.content.interfaces = content.interfaces || [];
       this.content.exports = content.exports || [];
     }
   }
 
   update(data: ComponentData) {
     const {
-      content: { imports, types, functions, classes },
+      content: { imports, types, functions, classes, interfaces },
     } = this;
 
     if (Array.isArray(data.element.imports)) {
@@ -117,6 +122,31 @@ export class FileTemplateModel {
       } else {
         types.push(TypeTemplateModel.create(data.element, data.dependencies));
       }
+    }
+
+    if (data.type.isInterface) {
+      const intf = interfaces.find((i) => i.name === data.element.name);
+
+      if (intf) {
+        data.element.props.forEach((item) => {
+          if (intf.props.findIndex((prop) => prop.name === item.name) === -1) {
+            intf.props.push(PropTemplateModel.create(item, data.dependencies));
+          }
+        });
+        data.element.methods.forEach((item) => {
+          if (intf.methods.findIndex((mth) => mth.name === item.name) === -1) {
+            intf.methods.push(
+              MethodTemplateModel.create(item, data.dependencies)
+            );
+          }
+        });
+      } else {
+        interfaces.push(
+          InterfaceTemplateModel.create(data.element, data.dependencies)
+        );
+      }
+      //TODO: temp sol --- before adding isClass  
+      return;
     }
 
     if (
