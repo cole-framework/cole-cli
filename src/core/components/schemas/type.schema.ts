@@ -85,12 +85,11 @@ export class TypeTools {
         });
         type = new ObjectType();
       } catch (e) {
-        const temp = match[5].trim();
+        let temp = match[5].trim();
         if (ConfigTools.hasInstructions(temp)) {
-          type = ConfigTools.executeInstructions(temp, references, reserved);
-        } else {
-          type = TypeInfo.create(temp, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, reserved);
         }
+        type = TypeInfo.create(temp, reserved);
       }
     }
 
@@ -136,10 +135,9 @@ export class TypeSchema {
         let temp = data.type.trim();
 
         if (ConfigTools.hasInstructions(temp)) {
-          type = ConfigTools.executeInstructions(temp, references, reserved);
-        } else {
-          type = TypeInfo.create(temp, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, reserved);
         }
+        type = TypeInfo.create(temp, reserved);
       } else if (TypeInfo.isType(data.type)) {
         type = data.type;
       } else {

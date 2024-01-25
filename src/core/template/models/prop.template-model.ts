@@ -1,33 +1,21 @@
 import { Dependency } from "../../components/component";
 import { PropObject } from "../../components/schemas";
+import { Config } from "../../config";
+import { TemplateModelTools } from "../template-model.tools";
 
 export class PropTemplateModel {
-  static create(schema: PropObject, dependencies: Dependency[]) {
+  static create(
+    schema: PropObject,
+    dependencies: Dependency[],
+    config: Config
+  ) {
     const { access, name, type, is_optional, is_readonly, is_static, value } =
       schema;
-    let t = "any";
-
-    if (type && type.isComponentType) {
-      const dependency = dependencies.find(
-        (d) =>
-          d.type.name === type.name &&
-          d.type.type === type.type &&
-          d.type.component === type.component
-      );
-      if (dependency) {
-        t = dependency.name;
-      }
-    } else if (
-      type &&
-      (type.isPrimitive || type.isDatabaseType || type.isFrameworkDefaultType)
-    ) {
-      t = type.name;
-    }
 
     return new PropTemplateModel(
       access,
       name,
-      t,
+      TemplateModelTools.generateNameFromType(type, dependencies, config),
       is_optional,
       is_readonly,
       is_static,

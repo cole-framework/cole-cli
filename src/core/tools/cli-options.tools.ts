@@ -1,10 +1,12 @@
+import { SchemaTools } from "../components/schema.tools";
+
 export class CliOptionsTools {
-  public static splitArrayOption(value: string[]): Set<string> {
+  public static splitArrayOption(value: string[]): string[] {
     const parts = new Set<string>();
 
     if (Array.isArray(value)) {
       value.forEach((str) => {
-        const list = str.split(/,/);
+        const list = SchemaTools.splitIgnoringBrackets(str, ",");
         list.forEach((item) => {
           if (item) {
             parts.add(item.trim());
@@ -13,6 +15,6 @@ export class CliOptionsTools {
       });
     }
 
-    return parts;
+    return [...parts];
   }
 }

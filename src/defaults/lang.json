@@ -1,31 +1,4 @@
 {
-  "session": {
-    "CONTINUE_PREV_SESSION": "Previous session found. Continue from where you left off?"
-  },
-  "questions": {
-    "ADD_MORE": "#type# (#name#) has been added. Do you want to add more?",
-    "WHAT_IS_THE_ROUTE_RESPONSE": "What should the route response contain?",
-    
-    "WHAT_IS_THE_ARRAY_TYPE": "",
-    "DO_YOU_WANT_TO_ADD_METHOD_PARAMS": "Do you want to add method parameters?",
-    "DO_YOU_WANT_TO_ADD_PROPERTIES": "Do you want to add properties?",
-    "SHOULD_CREATE_OUTPUT_MODEL": "Do you want to create a controller output?"
-  },
-  "forms": {
-    "TITLE": "Please provide the following #type# information:"
-  },
-  "select": {
-    
-    "BLANK_CONTROLLER_OUTPUT": "As a blank model"
-  },
-  "file_exists": {
-    "TITLE": "A file with the same name was detected, what do you want to do?",
-    "options": {
-      "OVERWRITE": "Overwrite it",
-      "PATCH": "Patch it",
-      "SKIP": "Skip it"
-    }
-  },
   "INFO_FILE_XXX_NOT_FOUND": "File not found: ###",
   "INFO_FILE_NOT_FOUND": "File not found.",
   "INFO_MODEL_XXX_SKIPPED_ERROR": "Model (###) creation was skipped due to an error...",

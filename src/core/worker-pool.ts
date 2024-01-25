@@ -56,10 +56,16 @@ export class WorkerPool {
           }
 
           resolve(message);
-          worker.removeAllListeners();
+          this.checkQueue();
+        } else if (message?.status === "error") {
+          if (this.onTaskError) {
+            this.onTaskError(message.error, worker);
+          }
+          reject(message);
           this.checkQueue();
         }
       });
+
       worker.once("error", (error) => {
         if (this.onTaskError) {
           this.onTaskError(error, worker);
@@ -67,6 +73,7 @@ export class WorkerPool {
         reject(error);
         this.checkQueue();
       });
+
       worker.postMessage(data);
     }
   }

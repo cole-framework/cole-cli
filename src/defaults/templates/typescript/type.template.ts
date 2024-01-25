@@ -30,7 +30,7 @@ export class TypeTemplate {
         .replace(/^(\s*\n\s*)+$/gm, "\n");
     }
 
-    const _PROPS_ = model.props.map((p) => PropTemplate.parse(p)).join(`,
+    const _PROPS_ = model.props.map((p) => PropTemplate.parse(p, "type")).join(`
     `);
 
     return TYPE_TEMPLATE.replace("_EXPORT_", _EXPORT_)

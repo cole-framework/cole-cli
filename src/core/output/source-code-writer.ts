@@ -1,4 +1,4 @@
-import { Transport } from "../../transport/transport";
+import { Transport } from "../transport/transport";
 import { WriteMethod } from "../enums";
 import { FileOutput } from "./file.output";
 
@@ -10,7 +10,9 @@ export class SourceCodeWriter {
 
   public add(value: FileOutput | FileOutput[]) {
     if (Array.isArray(value)) {
-      value.forEach((v) => this.outputs.add(v));
+      value.forEach((v) => {
+        this.outputs.add(v);
+      });
     } else {
       this.outputs.add(value);
     }
@@ -24,9 +26,7 @@ export class SourceCodeWriter {
       outputs.forEach((out) => {
         const status = transport.writeOutput(out.content, {
           outputPath: out.path,
-          overwrite:
-            out.wite_method === WriteMethod.Write ||
-            out.wite_method === WriteMethod.Overwrite,
+          write_method: out.write_method,
         });
         state.push({ status, path: out.path });
       });

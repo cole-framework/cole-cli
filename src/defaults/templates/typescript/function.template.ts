@@ -11,7 +11,11 @@ export class FunctionTemplate {
     const _NAME_ = model.name;
     const _ASYNC_ = model.is_async ? "async " : "";
     const _PARAMS_ = model.params.map((p) => ParamTemplate.parse(p)).join(", ");
-    const _RETURN_TYPE_ = model.return_type ? `: ${model.return_type}` : "";
+    const _RETURN_TYPE_ = model.return_type
+      ? model.is_async
+        ? `: Promise<${model.return_type}>`
+        : `: ${model.return_type}`
+      : "";
     const _BODY_ = model.body || "";
     const _EXPORT_ = model.exp
       ? model.exp.is_default

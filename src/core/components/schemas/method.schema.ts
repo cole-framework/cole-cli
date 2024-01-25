@@ -106,14 +106,11 @@ export class MethodTools {
       if (match[10]) {
         let temp = match[10].trim();
         if (ConfigTools.hasInstructions(temp)) {
-          returnType = ConfigTools.executeInstructions(
-            temp,
-            references,
-            reserved
-          );
-        } else {
-          returnType = TypeInfo.create(temp, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, reserved);
         }
+        returnType = TypeInfo.isType(temp)
+          ? temp
+          : TypeInfo.create(temp, reserved);
       } else {
         returnType = new UnknownType();
       }
@@ -157,16 +154,13 @@ export class MethodTools {
         let return_type;
 
         if (typeof item.return_type === "string") {
-          const temp = item.return_type.trim();
+          let temp = item.return_type.trim();
           if (ConfigTools.hasInstructions(temp)) {
-            return_type = ConfigTools.executeInstructions(
-              temp,
-              references,
-              reserved
-            );
-          } else {
-            return_type = TypeInfo.create(temp, reserved);
+            temp = ConfigTools.executeInstructions(temp, references, reserved);
           }
+          return_type = TypeInfo.isType(temp)
+            ? temp
+            : TypeInfo.create(temp, reserved);
         }
 
         const tempName = item.name.trim();
@@ -246,21 +240,18 @@ export class MethodSchema {
       if (TypeInfo.isType(data.return_type)) {
         returnType = data.return_type;
       } else if (typeof data.return_type === "string") {
-        const temp = data.return_type.trim();
+        let temp = data.return_type.trim();
         if (ConfigTools.hasInstructions(temp)) {
-          returnType = ConfigTools.executeInstructions(
-            temp,
-            references,
-            reserved
-          );
-        } else {
-          returnType = TypeInfo.create(temp, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, reserved);
         }
+        returnType = TypeInfo.isType(temp)
+          ? temp
+          : TypeInfo.create(temp, reserved);
       }
 
       if (Array.isArray(data.params)) {
         data.params.forEach((param) => {
-          if (SchemaTools.executeMeta(param, references, reserved)) {
+          if (typeof param === "string") {
             if (ConfigTools.hasInstructions(param)) {
               const p = ConfigTools.executeInstructions(
                 param,
@@ -271,6 +262,10 @@ export class MethodSchema {
                 params.push(p);
               }
             } else {
+              params.push(ParamSchema.create(param, reserved, references));
+            }
+          } else {
+            if (SchemaTools.executeMeta(param, references, reserved)) {
               params.push(ParamSchema.create(param, reserved, references));
             }
           }

@@ -19,8 +19,12 @@ export class MethodTemplate {
     const _STATIC_ = model.is_async ? "static" : "";
     const _PARAMS_ = model.params.map((p) => ParamTemplate.parse(p)).join(", ");
     const _BODY_ = model.body || "";
-    const _RETURN_TYPE_ = model.return_type ? `: ${model.return_type}` : "";
     let _SUPER_ = "";
+    const _RETURN_TYPE_ = model.return_type
+      ? model.is_async
+        ? `: Promise<${model.return_type}>`
+        : `: ${model.return_type}`
+      : "";
 
     if (elementType === "abstract_class") {
       return ABSTRACT_METHOD_TEMPLATE.replace("_ACCESS_", _ACCESS_)

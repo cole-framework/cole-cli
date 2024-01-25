@@ -6,6 +6,7 @@ import {
   ComponentsConfigData,
   FrameworkDefaults,
 } from "./components-config.types";
+import { TypeInfo } from "../type.info";
 
 export class ComponentConfig {
   public static create(
@@ -107,7 +108,7 @@ export class ComponentsConfig {
       ComponentConfig.create(rootPath, "route", data.route),
       ComponentConfig.create(rootPath, "route_model", data.route_model),
       ComponentConfig.create(rootPath, "route_io", data.route_io),
-      ComponentConfig.create(rootPath, "tool", data.tool)
+      ComponentConfig.create(rootPath, "toolset", data.toolset)
     );
   }
 
@@ -125,6 +126,117 @@ export class ComponentsConfig {
     public readonly route: ComponentConfig,
     public readonly routeModel: ComponentConfig,
     public readonly routeIO: ComponentConfig,
-    public readonly tool: ComponentConfig
+    public readonly toolset: ComponentConfig
   ) {}
+
+  public generateName(type: TypeInfo): string {
+    if (type.isModel) {
+      return this.model.generateName(type.name, { type: type.type });
+    }
+    if (type.isEntity) {
+      return this.entity.generateName(type.name);
+    }
+    if (type.isSource) {
+      return this.source.generateName(type.name, { type: type.type });
+    }
+    if (type.isUseCase) {
+      return this.useCase.generateName(type.name);
+    }
+    if (type.isRepository) {
+      return this.repository.generateName(type.name);
+    }
+    if (type.isRepositoryFactory) {
+      return this.repositoryFactory.generateName(type.name);
+    }
+    if (type.isRepositoryImpl) {
+      return this.repositoryImpl.generateName(type.name);
+    }
+    if (type.isController) {
+      return this.controller.generateName(type.name);
+    }
+    if (type.isMapper) {
+      return this.mapper.generateName(type.name, { type: type.type });
+    }
+    if (type.isRoute) {
+      return this.route.generateName(type.name, {
+        type: type.type,
+        method: type.type,
+      });
+    }
+    if (type.isRouteModel) {
+      return this.routeModel.generateName(type.name, {
+        type: type.type,
+        method: type.type,
+      });
+    }
+    if (type.isRouteIO) {
+      return this.routeIO.generateName(type.name, {
+        type: type.type,
+        method: type.type,
+      });
+    }
+    if (type.isToolset) {
+      return this.toolset.generateName(type.name);
+    }
+
+    return type.name;
+  }
+
+  public generatePath(type: TypeInfo): string {
+    if (type.isModel) {
+      return this.model.generatePath({ name: type.name, type: type.type }).path;
+    }
+    if (type.isEntity) {
+      return this.entity.generatePath({ name: type.name }).path;
+    }
+    if (type.isSource) {
+      return this.source.generatePath({ name: type.name, type: type.type })
+        .path;
+    }
+    if (type.isUseCase) {
+      return this.useCase.generatePath({ name: type.name }).path;
+    }
+    if (type.isRepository) {
+      return this.repository.generatePath({ name: type.name }).path;
+    }
+    if (type.isRepositoryFactory) {
+      return this.repositoryFactory.generatePath({ name: type.name }).path;
+    }
+    if (type.isRepositoryImpl) {
+      return this.repositoryImpl.generatePath({ name: type.name }).path;
+    }
+    if (type.isController) {
+      return this.controller.generatePath({ name: type.name }).path;
+    }
+    if (type.isMapper) {
+      return this.mapper.generatePath({ name: type.name, type: type.type })
+        .path;
+    }
+    if (type.isRoute) {
+      return this.route.generatePath({
+        name: type.name,
+        type: type.type,
+        method: type.type,
+      }).path;
+    }
+    if (type.isRouteModel) {
+      return this.routeModel.generatePath({
+        name: type.name,
+        type: type.type,
+        method: type.type,
+      }).path;
+    }
+    if (type.isRouteIO) {
+      return this.routeIO.generatePath({
+        name: type.name,
+        type: type.type,
+        method: type.type,
+      }).path;
+    }
+    if (type.isToolset) {
+      return this.toolset.generatePath({ name: type.name }).path;
+    }
+
+    return type.name;
+  }
 }

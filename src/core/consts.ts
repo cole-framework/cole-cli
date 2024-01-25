@@ -69,30 +69,3 @@ export const localStatePath = path.join(
   sessionDirname,
   stateFilename
 );
-
-export const standardTypes = [
-  "string",
-  "number",
-  "boolean",
-  "unknown",
-  "any",
-  "object",
-  "map",
-  "set",
-  "undefined",
-  "bigint",
-];
-
-export const TypeScriptPrimitives = [
-  "string",
-  "number",
-  "boolean",
-  "unknown",
-  "any",
-  "object",
-  "map",
-  "set",
-  "undefined",
-  "bigint",
-  "void",
-];

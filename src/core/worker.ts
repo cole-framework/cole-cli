@@ -5,8 +5,8 @@ import {
   SourceCodeWriter,
   fileOrDirExists,
 } from "./";
-import { FileTransport } from "../transport/file.transport";
-import { ConsoleTransport } from "../transport/console.transport";
+import { FileTransport } from "./transport/file.transport";
+import { ConsoleTransport } from "./transport/console.transport";
 import { TypeScriptFileTemplate } from "../defaults/typescript.file-template";
 import { TypeScriptFileOutputStrategy } from "../defaults/typescript.strategy";
 
@@ -22,6 +22,7 @@ const writeFiles = async (payload: Payload) => {
   const { models, code_module } = payload;
   const transport =
     payload.transport === "file" ? new FileTransport() : new ConsoleTransport();
+
   const codeWriter = new SourceCodeWriter(transport);
   // const codeModule = require(code_module);
   const strategy = new TypeScriptFileOutputStrategy(null);

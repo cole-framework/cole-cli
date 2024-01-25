@@ -1,7 +1,7 @@
 import { basename, dirname, extname, join, relative } from "path";
-import { ApiObject } from "../actions/api/new/api.types";
 import {
   ComponentData,
+  ExportData,
   ExportTemplateModel,
   FileOutput,
   FileTemplateModel,
@@ -13,6 +13,7 @@ import {
 import { TypeScriptFileTemplate } from "./typescript.file-template";
 import { TypeScriptFileReader } from "./typescript.file-reader";
 import { TypeScriptFileModifier } from "./typescript.file-modifier";
+import { ApiObject } from "../commands/api";
 
 export class TypeScriptFileOutputStrategy extends Strategy {
   public async apply(
@@ -57,8 +58,23 @@ export class TypeScriptTemplateModelStrategy extends Strategy {
       file = new FileTemplateModel(data.path, data.write_method);
       files.set(data.path, file);
     }
-    file.update(data);
+    file.update(data, this.config);
   }
+
+  private addExport(exports: ExportData[], path: string, exp: ExportData) {
+    if (exp) {
+      const cExp = exports.find((e) => e.path === path);
+      if (!cExp) {
+        exports.push(
+          ExportTemplateModel.create({
+            ...exp,
+            path,
+          })
+        );
+      }
+    }
+  }
+
   public apply(api: ApiObject): Result<FileTemplateModel[]> {
     try {
       const templateModels = new Map<string, FileTemplateModel>();
@@ -93,7 +109,7 @@ export class TypeScriptTemplateModelStrategy extends Strategy {
       api.sources.forEach((item) =>
         this.updateTemplateModel(templateModels, item)
       );
-      api.tools.forEach((item) =>
+      api.toolsets.forEach((item) =>
         this.updateTemplateModel(templateModels, item)
       );
       api.use_cases.forEach((item) =>
@@ -105,6 +121,10 @@ export class TypeScriptTemplateModelStrategy extends Strategy {
       // create index.ts files
       const indexModelsByPath = new Map<string, ExportTemplateModel[]>();
       models.forEach((model) => {
+        if (model.write_method === WriteMethod.Skip) {
+          return;
+        }
+
         const dir = dirname(model.path);
         const indexPath = join(dir, "index.ts");
         let temp = join(
@@ -121,37 +141,16 @@ export class TypeScriptTemplateModelStrategy extends Strategy {
           indexModelsByPath.set(indexPath, exports);
         }
 
-        model.content.classes.forEach((cls) => {
-          if (cls.exp) {
-            exports.push(
-              ExportTemplateModel.create({
-                ...cls.exp,
-                path,
-              })
-            );
-          }
+        model.content.classes.forEach((item) => {
+          this.addExport(exports, path, item.exp);
         });
 
         model.content.types.forEach((item) => {
-          if (item.exp) {
-            exports.push(
-              ExportTemplateModel.create({
-                ...item.exp,
-                path,
-              })
-            );
-          }
+          this.addExport(exports, path, item.exp);
         });
 
         model.content.functions.forEach((item) => {
-          if (item.exp) {
-            exports.push(
-              ExportTemplateModel.create({
-                ...item.exp,
-                path,
-              })
-            );
-          }
+          this.addExport(exports, path, item.exp);
         });
       });
 

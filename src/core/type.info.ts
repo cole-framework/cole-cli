@@ -5,7 +5,7 @@ import { ReservedType } from "./config";
 
 export type ComponentLabel =
   | "model"
-  | "tool"
+  | "toolset"
   | "entity"
   | "use_case"
   | "controller"
@@ -47,8 +47,6 @@ export abstract class TypeInfo {
       return new UnknownType();
     }
 
-    const typeLC = data.toLowerCase();
-
     if (data.type?.name) {
       switch (data.type.name) {
         case "model": {
@@ -60,8 +58,8 @@ export abstract class TypeInfo {
         case "entity": {
           return new EntityType(data.name);
         }
-        case "tool": {
-          return new ToolType(data.name);
+        case "toolset": {
+          return new ToolsetType(data.name);
         }
         default: {
           return new UnknownType();
@@ -69,19 +67,28 @@ export abstract class TypeInfo {
       }
     }
 
-    const entityMatch = typeLC.match(/^entity\s*<\s*(\w+)\s*>/i);
+    const typeLC = data.toLowerCase();
+
+    const entityMatch = data.match(/^Entity\s*<\s*(\w+)\s*>/i);
     if (entityMatch) {
       return new EntityType(entityMatch[1]);
     }
 
-    const toolMatch = typeLC.match(/^tool\s*<\s*(\w+)\s*>/i);
-    if (toolMatch) {
-      return new EntityType(toolMatch[1]);
+    const toolsetMatch = data.match(/^Toolset\s*<\s*(\w+)\s*>/i);
+    if (toolsetMatch) {
+      return new EntityType(toolsetMatch[1]);
     }
 
-    const modelMatch = typeLC.match(/^model\s*<\s*(\w+)\s*,?\s*(\w+)?\s*>/i);
+    const modelMatch = data.match(/^Model\s*<\s*(\w+)\s*,?\s*(\w+)?\s*>/i);
     if (modelMatch) {
       return new ModelType(modelMatch[1], modelMatch[2]?.toLowerCase());
+    }
+
+    const dataContextMatch = data.match(
+      /^DataContext\s*<\s*(\w+)\s*,?\s*(\w+)?\s*>/i
+    );
+    if (dataContextMatch) {
+      return new DataContextType(dataContextMatch[1], dataContextMatch[2]);
     }
 
     if (data.includes("|") || data.includes("&")) {
@@ -109,8 +116,8 @@ export abstract class TypeInfo {
     }
 
     if (typeLC.includes(BasicType.Array) || typeLC.includes("[]")) {
-      const t = /^array\s*<\s*([a-zA-Z0-9<>_ ]+)\s*>/.test(typeLC)
-        ? data.match(/<([a-zA-Z0-9<>_ ]+)>/)[1]
+      const t = /^array\s*<\s*([a-zA-Z0-9<>_, ]+)\s*>/i.test(data)
+        ? data.match(/<([a-zA-Z0-9<>_, ]+)>/)[1]
         : data.replace("[]", "");
 
       const itemType = TypeInfo.create(t, reserved);
@@ -119,7 +126,7 @@ export abstract class TypeInfo {
     }
 
     if (typeLC.includes(BasicType.Set)) {
-      const t = data.match(/<([a-zA-Z0-9<>_ ]+)>/)[1];
+      const t = data.match(/<([a-zA-Z0-9<>_, ]+)>/)[1];
       const itemType = TypeInfo.create(t, reserved);
 
       return new SetType(`Set<${itemType.name}>`, itemType);
@@ -127,7 +134,7 @@ export abstract class TypeInfo {
 
     if (typeLC.includes(BasicType.Map)) {
       const match = data.match(
-        /<\s*([a-zA-Z0-9<>_ ]+)\s*,\s*([a-zA-Z0-9<>_ ]+)\s*>/
+        /<\s*([a-zA-Z0-9<>_ ]+)\s*,\s*([a-zA-Z0-9<>_, ]+)\s*>/
       );
       const map = {
         keyType: TypeInfo.create(match[1], reserved),
@@ -206,29 +213,14 @@ export abstract class TypeInfo {
     return type.isConfigInstructionType;
   }
 
-  public static isType(type: unknown): type is TypeInfo {
+  public static isType(type: any): type is TypeInfo {
     return (
-      type instanceof DatabaseType ||
-      type instanceof FrameworkDefaultType ||
-      type instanceof UnknownType ||
-      type instanceof ModelType ||
-      type instanceof EntityType ||
-      type instanceof ToolType ||
-      type instanceof ControllerType ||
-      type instanceof SourceType ||
-      type instanceof MapperType ||
-      type instanceof UseCaseType ||
-      type instanceof RepositoryType ||
-      type instanceof RepositoryImplType ||
-      type instanceof RepositoryFactoryType ||
-      type instanceof RouteType ||
-      type instanceof RouteIOType ||
-      type instanceof ArrayType ||
-      type instanceof SetType ||
-      type instanceof MapType ||
-      type instanceof MultiType ||
-      type instanceof ConfigInstructionType ||
-      type instanceof PrimitiveType
+      type &&
+      (type.isDatabaseType ||
+        type.isFrameworkDefaultType ||
+        type.isConfigInstructionType ||
+        type.isComponentType ||
+        type.isPrimitive)
     );
   }
 
@@ -250,7 +242,8 @@ export abstract class TypeInfo {
     public readonly isInterface?: boolean,
     public readonly isClass?: boolean,
     public readonly isEntity?: boolean,
-    public readonly isTool?: boolean,
+    public readonly isToolset?: boolean,
+    public readonly isDataContext?: boolean,
     public readonly isModel?: boolean,
     public readonly isSource?: boolean,
     public readonly isRepository?: boolean,
@@ -345,6 +338,25 @@ export class UnknownType {
   }
 }
 
+export class DataContextType {
+  public readonly isDataContext = true;
+  public readonly isComponentType = true;
+  public readonly component = "data_context";
+
+  constructor(
+    public readonly entity: string,
+    public readonly model: string
+  ) {}
+
+  get ref() {
+    return `DataContext<${this.entity},${this.model}>`;
+  }
+
+  get name() {
+    return `DataContext<${this.entity},${this.model}>`;
+  }
+}
+
 export class ModelType {
   public readonly isModel = true;
   public readonly isComponentType = true;
@@ -359,14 +371,14 @@ export class ModelType {
   }
 }
 
-export class ToolType {
-  public readonly isTool = true;
+export class ToolsetType {
+  public readonly isToolset = true;
   public readonly isComponentType = true;
-  public readonly component = "tool";
+  public readonly component = "toolset";
   constructor(public readonly name: string) {}
 
   get ref() {
-    return `Tool<${this.name}>`;
+    return `Toolset<${this.name}>`;
   }
 }
 

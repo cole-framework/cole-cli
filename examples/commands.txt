@@ -1,2 +1,2 @@
-node build/cole.js new controller --name Foo --endpoint xxx -h "getFoo(Entity<Bla>):Baz, getBar" --with-deps
-node build/cole.js new route -e xxx -n foo -m get -p "foo/:bar/qwerty?baz&baf" -h "blex.getFoo(Qwe):Entity<Far>"
+node build/cole.js new --json "./examples/new-repository.json" --with-deps
+node build/cole.js new toolset --name fooo -e xxx -l domain -m "splitFoo(p1:string, p2:Model<baz>):Array<number>" -w -f

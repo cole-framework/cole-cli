@@ -17,6 +17,8 @@ import {
   ExportObject,
   FunctionObject,
   ImportSchema,
+  ImportTools,
+  ImportData,
 } from "./schemas";
 import { ComponentTools } from "./component.tools";
 
@@ -51,7 +53,7 @@ export interface ElementWithInterfaces {
 export interface ElementWithImports {
   interfaces: ImportSchema[];
   addImport(intf: ImportSchema);
-  findImport(name: string): ImportSchema;
+  findImport(data: ImportData): ImportSchema;
   hasImport(name: string): boolean;
 }
 
@@ -120,7 +122,9 @@ export class Component<
     );
 
     if (Array.isArray(dependencies)) {
-      dependencies.forEach((d) => component.addDependency(d));
+      dependencies.forEach((d) => {
+        component.addDependency(d);
+      });
     }
 
     return component;
@@ -145,14 +149,28 @@ export class Component<
       this.__dependencies.push({ id, path, type, name: element.name });
 
       if (Array.isArray(this.element.imports) && this.path !== path) {
-        let impt = { path, ref_path: this.path };
-        if (element.exp?.is_default) {
-          impt["dflt"] = element.name;
-        } else {
-          impt["list"] = [element.name];
-        }
+        const relativePath = ImportTools.createRelativeImportPath(
+          this.path,
+          path
+        );
+        const impt = this.element.findImport({ path: relativePath });
 
-        this.element.addImport(ImportSchema.create(impt, []));
+        if (impt) {
+          if (element.exp?.is_default && !impt.dflt) {
+            impt.dflt["dflt"] = element.name;
+          } else {
+            impt.list.push(element.name);
+          }
+        } else {
+          let impt = { path, ref_path: this.path };
+          if (element.exp?.is_default) {
+            impt["dflt"] = element.name;
+          } else {
+            impt["list"] = [element.name];
+          }
+
+          this.element.addImport(ImportSchema.create(impt, []));
+        }
       }
     }
   }

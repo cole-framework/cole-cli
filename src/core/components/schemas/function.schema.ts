@@ -16,7 +16,12 @@ import {
 } from "./generic.schema";
 import { ConfigTools, ReservedType } from "../../config";
 import { SchemaTools } from "../schema.tools";
-import { ExportData, ExportJson, ExportObject, ExportSchema } from "./export.schema";
+import {
+  ExportData,
+  ExportJson,
+  ExportObject,
+  ExportSchema,
+} from "./export.schema";
 
 export const foo = <T extends string | number>(foo: T) => {
   foo;
@@ -87,14 +92,11 @@ export class FunctionTools {
       if (match[8]) {
         let temp = match[8].trim();
         if (ConfigTools.hasInstructions(temp)) {
-          returnType = ConfigTools.executeInstructions(
-            temp,
-            references,
-            reserved
-          );
-        } else {
-          returnType = TypeInfo.create(temp, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, reserved);
         }
+        returnType = TypeInfo.isType(temp)
+          ? temp
+          : TypeInfo.create(temp, reserved);
       } else {
         returnType = new UnknownType();
       }
@@ -170,21 +172,18 @@ export class FunctionSchema {
       if (TypeInfo.isType(data.return_type)) {
         returnType = data.return_type;
       } else if (typeof data.return_type === "string") {
-        const temp = data.return_type.trim();
+        let temp = data.return_type.trim();
         if (ConfigTools.hasInstructions(temp)) {
-          returnType = ConfigTools.executeInstructions(
-            temp,
-            references,
-            reserved
-          );
-        } else {
-          returnType = TypeInfo.create(temp, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, reserved);
         }
+        returnType = TypeInfo.isType(temp)
+          ? temp
+          : TypeInfo.create(temp, reserved);
       }
 
       if (Array.isArray(data.params)) {
         data.params.forEach((param) => {
-          if (SchemaTools.executeMeta(param, references, reserved)) {
+          if (typeof param === "string") {
             if (ConfigTools.hasInstructions(param)) {
               const p = ConfigTools.executeInstructions(
                 param,
@@ -195,6 +194,10 @@ export class FunctionSchema {
                 params.push(p);
               }
             } else {
+              params.push(ParamSchema.create(param, reserved, references));
+            }
+          } else {
+            if (SchemaTools.executeMeta(param, references, reserved)) {
               params.push(ParamSchema.create(param, reserved, references));
             }
           }

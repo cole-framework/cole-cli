@@ -1,10 +1,16 @@
 import { Dependency } from "../../components/component";
 import { MethodObject } from "../../components/schemas";
+import { Config } from "../../config";
+import { TemplateModelTools } from "../template-model.tools";
 import { GenericTemplateModel } from "./generic.template-model";
 import { ParamTemplateModel } from "./param.template-model";
 
 export class MethodTemplateModel {
-  static create(schema: MethodObject, dependencies: Dependency[]) {
+  static create(
+    schema: MethodObject,
+    dependencies: Dependency[],
+    config: Config
+  ) {
     const {
       access,
       name,
@@ -16,36 +22,20 @@ export class MethodTemplateModel {
       body,
       supr,
     } = schema;
-    let t = "unknown";
-
-    if (return_type && return_type.isComponentType) {
-      const dependency = dependencies.find(
-        (d) =>
-          d.type.name === return_type.name &&
-          d.type.type === return_type.type &&
-          d.type.component === return_type.component
-      );
-      if (dependency) {
-        t = dependency.name;
-      }
-    } else if (
-      return_type &&
-      (return_type.isPrimitive ||
-        return_type.isDatabaseType ||
-        return_type.isFrameworkDefaultType)
-    ) {
-      t = return_type.name;
-    }
 
     return new MethodTemplateModel(
       access,
       name,
-      t,
+      TemplateModelTools.generateNameFromType(
+        return_type,
+        dependencies,
+        config
+      ),
       is_async,
       is_static,
-      params.map((p) => ParamTemplateModel.create(p, dependencies)),
+      params.map((p) => ParamTemplateModel.create(p, dependencies, config)),
       body,
-      supr ? MethodTemplateModel.create(supr, dependencies) : null,
+      supr ? MethodTemplateModel.create(supr, dependencies, config) : null,
       Array.isArray(generics)
         ? generics.map((g) => GenericTemplateModel.create(g))
         : []

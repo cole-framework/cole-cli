@@ -204,16 +204,24 @@ export class ClassSchema {
     }
   }
 
-  findImport(impt: ImportData) {
-    const { dflt, path, alias, list } = impt;
+  findImport(data: ImportData) {
+    const { list, ...rest } = data;
+    const restKeys = Object.keys(rest);
 
-    return this.__imports.find(
-      (p) =>
-        p.path === path &&
-        p.alias === alias &&
-        p.dflt === dflt &&
-        impt.list.every((i) => list.includes(i))
-    );
+    return this.__imports.find((impt) => {
+      const found =
+        Array.isArray(list) && list.length > 0
+          ? impt.list.some((i) => list.includes(i))
+          : true;
+
+      for (const key of restKeys) {
+        const k = impt[key];
+        if (k && k !== rest[key]) {
+          return false;
+        }
+      }
+      return found;
+    });
   }
 
   hasImport(impt: ImportData) {

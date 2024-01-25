@@ -1,4 +1,5 @@
 import { ComponentData } from "../components";
+import { Config } from "../config";
 import {
   ClassTemplateModel,
   ExportTemplateModel,
@@ -52,11 +53,11 @@ export class FileTemplateModel {
     }
   }
 
-  update(data: ComponentData) {
+  update(data: ComponentData, config: Config) {
     const {
       content: { imports, types, functions, classes, interfaces },
     } = this;
-
+    
     if (Array.isArray(data.element.imports)) {
       data.element.imports.forEach((newImport) => {
         const impt = imports.find((imp) => imp.path === newImport.path);
@@ -98,13 +99,13 @@ export class FileTemplateModel {
               fn.params.findIndex((param) => param.name === item.name) === -1
             ) {
               fn.params.push(
-                ParamTemplateModel.create(item, data.dependencies)
+                ParamTemplateModel.create(item, data.dependencies, config)
               );
             }
           });
         } else {
           functions.push(
-            FunctionTemplateModel.create(newFn, data.dependencies)
+            FunctionTemplateModel.create(newFn, data.dependencies, config)
           );
         }
       });
@@ -116,11 +117,11 @@ export class FileTemplateModel {
       if (type) {
         data.element.props.forEach((item) => {
           if (type.props.findIndex((prop) => prop.name === item.name) === -1) {
-            type.props.push(PropTemplateModel.create(item, data.dependencies));
+            type.props.push(PropTemplateModel.create(item, data.dependencies, config));
           }
         });
       } else {
-        types.push(TypeTemplateModel.create(data.element, data.dependencies));
+        types.push(TypeTemplateModel.create(data.element, data.dependencies, config));
       }
     }
 
@@ -130,19 +131,19 @@ export class FileTemplateModel {
       if (intf) {
         data.element.props.forEach((item) => {
           if (intf.props.findIndex((prop) => prop.name === item.name) === -1) {
-            intf.props.push(PropTemplateModel.create(item, data.dependencies));
+            intf.props.push(PropTemplateModel.create(item, data.dependencies, config));
           }
         });
         data.element.methods.forEach((item) => {
           if (intf.methods.findIndex((mth) => mth.name === item.name) === -1) {
             intf.methods.push(
-              MethodTemplateModel.create(item, data.dependencies)
+              MethodTemplateModel.create(item, data.dependencies, config)
             );
           }
         });
       } else {
         interfaces.push(
-          InterfaceTemplateModel.create(data.element, data.dependencies)
+          InterfaceTemplateModel.create(data.element, data.dependencies, config)
         );
       }
       //TODO: temp sol --- before adding isClass  
@@ -159,19 +160,19 @@ export class FileTemplateModel {
       if (cls) {
         data.element.props.forEach((item) => {
           if (cls.props.findIndex((prop) => prop.name === item.name) === -1) {
-            cls.props.push(PropTemplateModel.create(item, data.dependencies));
+            cls.props.push(PropTemplateModel.create(item, data.dependencies, config));
           }
         });
         data.element.methods.forEach((item) => {
           if (cls.methods.findIndex((mth) => mth.name === item.name) === -1) {
             cls.methods.push(
-              MethodTemplateModel.create(item, data.dependencies)
+              MethodTemplateModel.create(item, data.dependencies, config)
             );
           }
         });
       } else {
         classes.push(
-          ClassTemplateModel.create(data.element, data.dependencies)
+          ClassTemplateModel.create(data.element, data.dependencies, config)
         );
       }
     }

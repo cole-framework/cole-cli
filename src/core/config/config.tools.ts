@@ -38,7 +38,12 @@ export class ConfigTools {
 
     if (Array.isArray(instruction_match)) {
       if (instruction_match.length === 1) {
-        return this.parseInstruction(instruction_match[0], data, reserved);
+        const parsed = this.parseInstruction(
+          instruction_match[0],
+          data,
+          reserved
+        );
+        return value.replace(instruction_match[0], parsed);
       }
 
       let result = value;
@@ -69,7 +74,7 @@ export class ConfigTools {
     ] = str.match(instruction_regex);
 
     if (dependency_instruction && data.dependencies.length === 0) {
-      return "PARSE_ERROR # MISSING DEPENDENCIES";
+      return "PARSE_ERROR_ # _MISSING_DEPENDENCIES";
     }
 
     let o;
@@ -141,15 +146,15 @@ export class ConfigTools {
           (expected.toLowerCase() === "true"
             ? true
             : expected.toLowerCase() === "false"
-            ? false
-            : expected)) ||
+              ? false
+              : expected)) ||
       ((op === "!==" || op === "!=" || op === "is not" || op === "not") &&
         value ===
           (expected.toLowerCase() === "true"
             ? true
             : expected.toLowerCase() === "false"
-            ? false
-            : expected)) ||
+              ? false
+              : expected)) ||
       ((op === ">" || op === "gt") && value > expected) ||
       ((op === "<" || op === "lt") && value < expected) ||
       ((op === ">=" || op === "gte") && value >= expected) ||

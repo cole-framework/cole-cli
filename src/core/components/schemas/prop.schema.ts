@@ -65,9 +65,12 @@ export class PropTools {
       }
 
       if (match[7]) {
-        const temp = match[7].trim();
+        let temp = match[7].trim();
         if (ConfigTools.hasInstructions(temp)) {
-          type = ConfigTools.executeInstructions(temp, references, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, reserved);
+        }
+        if (TypeInfo.isType(temp)) {
+          type = temp;
         } else {
           type = TypeInfo.create(temp, reserved);
         }
@@ -132,9 +135,12 @@ export class PropTools {
         }
 
         if (typeof item.type === "string") {
-          const temp = item.type.trim();
+          let temp = item.type.trim();
           if (ConfigTools.hasInstructions(temp)) {
-            type = ConfigTools.executeInstructions(temp, references, reserved);
+            temp = ConfigTools.executeInstructions(temp, references, reserved);
+          }
+          if (TypeInfo.isType(temp)) {
+            type = temp;
           } else {
             type = TypeInfo.create(temp, reserved);
           }
@@ -202,7 +208,10 @@ export class PropSchema {
       if (typeof data.type === "string") {
         let temp = data.type.trim();
         if (ConfigTools.hasInstructions(temp)) {
-          type = ConfigTools.executeInstructions(temp, references, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, reserved);
+        }
+        if (TypeInfo.isType(temp)) {
+          type = temp;
         } else {
           type = TypeInfo.create(temp, reserved);
         }

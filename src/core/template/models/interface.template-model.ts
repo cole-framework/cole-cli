@@ -5,12 +5,17 @@ import {
   InheritanceObject,
   InterfaceObject,
 } from "../../components/schemas";
+import { Config } from "../../config";
 import { ImportTemplateModel } from "./import.template-model";
 import { MethodTemplateModel } from "./method.template-model";
 import { PropTemplateModel } from "./prop.template-model";
 
 export class InterfaceTemplateModel {
-  static create(schema: InterfaceObject, dependencies: Dependency[]) {
+  static create(
+    schema: InterfaceObject,
+    dependencies: Dependency[],
+    config: Config
+  ) {
     const { exp, inheritance, props, methods, generics, name, imports } =
       schema;
 
@@ -19,10 +24,10 @@ export class InterfaceTemplateModel {
       exp,
       inheritance,
       Array.isArray(props)
-        ? props.map((i) => PropTemplateModel.create(i, dependencies))
+        ? props.map((i) => PropTemplateModel.create(i, dependencies, config))
         : [],
       Array.isArray(methods)
-        ? methods.map((i) => MethodTemplateModel.create(i, dependencies))
+        ? methods.map((i) => MethodTemplateModel.create(i, dependencies, config))
         : [],
       generics,
       Array.isArray(imports)

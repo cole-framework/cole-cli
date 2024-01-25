@@ -5,7 +5,6 @@ import {
   ParamSchema,
   ParamTools,
 } from "./param.schema";
-import { Component } from "../component";
 import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { AccessType } from "../../enums";
 import { SchemaTools } from "../schema.tools";
@@ -90,16 +89,9 @@ export class ConstructorSchema {
         supr = ConstructorSchema.create(data.supr, reserved, references, true);
       }
 
-      // if (Array.isArray(data.params)) {
-      //   data.params.forEach((p) => {
-      //     if (SchemaTools.executeMeta(p, references, reserved)) {
-      //       params.push(ParamSchema.create(p, reserved, references));
-      //     }
-      //   });
-      // }
       if (Array.isArray(data.params)) {
         data.params.forEach((param) => {
-          if (SchemaTools.executeMeta(param, references, reserved)) {
+          if (typeof param === "string") {
             if (ConfigTools.hasInstructions(param)) {
               const p = ConfigTools.executeInstructions(
                 param,
@@ -110,6 +102,10 @@ export class ConstructorSchema {
                 params.push(p);
               }
             } else {
+              params.push(ParamSchema.create(param, reserved, references));
+            }
+          } else {
+            if (SchemaTools.executeMeta(param, references, reserved)) {
               params.push(ParamSchema.create(param, reserved, references));
             }
           }

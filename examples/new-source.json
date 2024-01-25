@@ -1,7 +1,6 @@
 {
   "sources": [
     {
-      "id": "Foo",
       "name": "Foo",
       "endpoint": "xxx",
       "storages": [

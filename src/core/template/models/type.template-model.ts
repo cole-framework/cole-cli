@@ -1,11 +1,16 @@
 import { Dependency } from "../../components/component";
 import { TypeObject, ExportObject } from "../../components/schemas";
+import { Config } from "../../config";
 import { GenericTemplateModel } from "./generic.template-model";
 import { ImportTemplateModel } from "./import.template-model";
 import { PropTemplateModel } from "./prop.template-model";
 
 export class TypeTemplateModel {
-  static create(schema: TypeObject, dependencies: Dependency[]) {
+  static create(
+    schema: TypeObject,
+    dependencies: Dependency[],
+    config: Config
+  ) {
     const { exp, props, generics, imports, name, alias } = schema;
 
     return new TypeTemplateModel(
@@ -13,7 +18,7 @@ export class TypeTemplateModel {
       alias,
       exp,
       Array.isArray(props)
-        ? props.map((i) => PropTemplateModel.create(i, dependencies))
+        ? props.map((i) => PropTemplateModel.create(i, dependencies, config))
         : [],
       Array.isArray(generics)
         ? generics.map((g) => GenericTemplateModel.create(g))

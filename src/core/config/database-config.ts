@@ -10,12 +10,13 @@ export class DatabaseConfig {
       });
     }
 
-    return new DatabaseConfig(data.name, data.alias, mappings);
+    return new DatabaseConfig(data.name, data.alias, data.case_style, mappings);
   }
 
   constructor(
     public readonly name: string,
     public readonly alias: string,
+    public readonly caseStyle: string,
     public readonly mappings: DatabaseMapping[]
   ) {}
 }

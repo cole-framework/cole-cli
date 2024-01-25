@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
-import * as Actions from "./actions";
-import { GetConfigOptions, SetConfigOptions } from "./actions/config";
-
+import * as Commands from "./commands";
 import Logger, { LogLevel } from "./core/tools/logger";
 
 import commander from "commander";
@@ -26,7 +24,7 @@ newComponent
   .option("-j, --json <value>", "path to the json")
   .option("--skip-tests", "Determines if tests should be included")
   .option("-w, --with-deps", "Include component dependencies")
-  .action((options) => Actions.Api.fromJson(options));
+  .action((options) => Commands.Api.Actions.fromJson(options));
 
 newComponent
   .command("model")
@@ -38,7 +36,7 @@ newComponent
   .option("--skip-tests", "Determines if tests should be included")
   .option("-w, --with-deps", "Include component dependencies")
   .description("Creates new model file based on provided data.")
-  .action((options) => Actions.Api.newModel(options));
+  .action((options) => Commands.Api.Actions.newModel(options));
 
 newComponent
   .command("entity")
@@ -46,10 +44,26 @@ newComponent
   .option("-n, --name <value>", "Name of the entity")
   .option("-e, --endpoint <value>", "Name of the endpoint")
   .option("-p, --props [values...]", "prop1:string prop2:number")
+  .option("-m, --model", "Include JSON model")
   .option("--skip-tests", "Determines if tests should be included")
   .option("-w, --with-deps", "Include component dependencies")
   .description("Creates new entity file based on provided data.")
-  .action((options) => Actions.Api.newEntity(options));
+  .action((options) => Commands.Api.Actions.newEntity(options));
+
+newComponent
+  .command("toolset")
+  .option("-f, --force", "Determines whether to overwrite existing files")
+  .option("-e, --endpoint <value>", "Name of the endpoint")
+  .option("-n, --name <value>", "Name of the toolset")
+  .option("-l, --layer <value>", "Domain, Data, Infra")
+  .option(
+    "-m, --methods [values...]",
+    "method1(Array<string>):Output, handlerName2"
+  )
+  .option("--skip-tests", "Determines if tests should be included")
+  .option("-w, --with-deps", "Include component dependencies")
+  .description("Creates new controller file based on provided data.")
+  .action((options) => Commands.Api.Actions.newToolset(options));
 
 newComponent
   .command("mapper")
@@ -62,7 +76,7 @@ newComponent
   .option("--skip-tests", "Determines if tests should be included")
   .option("-w, --with-deps", "Include component dependencies")
   .description("Creates new mapper file based on provided data.")
-  .action((options) => Actions.Api.newMapper(options));
+  .action((options) => Commands.Api.Actions.newMapper(options));
 
 newComponent
   .command("use-case")
@@ -74,20 +88,20 @@ newComponent
   .option("--skip-tests", "Determines if tests should be included")
   .option("-w, --with-deps", "Include component dependencies")
   .description("Creates new use case file based on provided data.")
-  .action((options) => Actions.Api.newUseCase(options));
+  .action((options) => Commands.Api.Actions.newUseCase(options));
 
 newComponent
   .command("source")
   .option("-f, --force", "Determines whether to overwrite existing files")
   .option("-n, --name <value>", "Name of the data source")
   .option("-e, --endpoint <value>", "Name of the endpoint")
-  .option("-t, --type [values...]", "mongo")
+  .option("-s, --storage [values...]", "mongo")
   .option("-b, --table <value>", "table name")
   .option("-m, --model <value>", "model name")
   .option("--skip-tests", "Determines if tests should be included")
   .option("-w, --with-deps", "Include component dependencies")
   .description("Creates new data source file based on provided data.")
-  .action((options) => Actions.Api.newSource(options));
+  .action((options) => Commands.Api.Actions.newSource(options));
 
 newComponent
   .command("repository")
@@ -104,7 +118,7 @@ newComponent
   .option("-c, --factory", "Include factory")
   .option("--skip-tests", "Determines if tests should be included")
   .description("Creates new repository file based on provided data.")
-  .action((options) => Actions.Api.newRepository(options));
+  .action((options) => Commands.Api.Actions.newRepository(options));
 
 newComponent
   .command("route")
@@ -121,7 +135,7 @@ newComponent
   .option("--skip-tests", "Determines if tests should be included")
   .option("-w, --with-deps", "Include component dependencies")
   .description("Creates new route file based on provided data.")
-  .action((options) => Actions.Api.newRoute(options));
+  .action((options) => Commands.Api.Actions.newRoute(options));
 
 newComponent
   .command("controller")
@@ -138,7 +152,7 @@ newComponent
   .option("--skip-tests", "Determines if tests should be included")
   .option("-w, --with-deps", "Include component dependencies")
   .description("Creates new controller file based on provided data.")
-  .action((options) => Actions.Api.newController(options));
+  .action((options) => Commands.Api.Actions.newController(options));
 
 /**
  * Config
@@ -157,7 +171,9 @@ config
   .description(
     "This command is used to set individual option values or the entire configuration."
   )
-  .action((options: SetConfigOptions) => Actions.Config.setConfig(options));
+  .action((options: Commands.Config.Actions.SetConfigOptions) =>
+    Commands.Config.Actions.setConfig(options)
+  );
 
 config
   .command("get")
@@ -165,7 +181,9 @@ config
   .description(
     "This command is used to display a specific option or the entire configuration."
   )
-  .action((options: GetConfigOptions) => Actions.Config.printConfig(options));
+  .action((options: Commands.Config.Actions.PrintConfigOptions) =>
+    Commands.Config.Actions.printConfig(options)
+  );
 
 /**
  *
