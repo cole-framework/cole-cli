@@ -2,6 +2,7 @@ import { Dependency } from "../../components/component";
 import { MethodObject } from "../../components/schemas";
 import { Config } from "../../config";
 import { TemplateModelTools } from "../template-model.tools";
+import { BodyTemplateModel } from "./body.template-model";
 import { GenericTemplateModel } from "./generic.template-model";
 import { ParamTemplateModel } from "./param.template-model";
 
@@ -34,7 +35,7 @@ export class MethodTemplateModel {
       is_async,
       is_static,
       params.map((p) => ParamTemplateModel.create(p, dependencies, config)),
-      body,
+      BodyTemplateModel.create(body),
       supr ? MethodTemplateModel.create(supr, dependencies, config) : null,
       Array.isArray(generics)
         ? generics.map((g) => GenericTemplateModel.create(g))
@@ -49,7 +50,7 @@ export class MethodTemplateModel {
     public is_async: boolean,
     public is_static: boolean,
     public params: ParamTemplateModel[],
-    public body: any,
+    public body: BodyTemplateModel,
     public supr: MethodTemplateModel,
     public generics: GenericTemplateModel[]
   ) {}

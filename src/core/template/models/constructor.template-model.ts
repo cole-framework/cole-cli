@@ -1,6 +1,7 @@
 import { Dependency } from "../../components/component";
 import { ConstructorObject } from "../../components/schemas";
 import { Config } from "../../config";
+import { BodyTemplateModel } from "./body.template-model";
 import { ParamTemplateModel } from "./param.template-model";
 
 export class ConstructorTemplateModel {
@@ -16,7 +17,7 @@ export class ConstructorTemplateModel {
       Array.isArray(params)
         ? params.map((p) => ParamTemplateModel.create(p, dependencies, config))
         : [],
-      body,
+      BodyTemplateModel.create(body),
       supr ? ConstructorTemplateModel.create(supr, dependencies, config) : null
     );
   }
@@ -24,7 +25,7 @@ export class ConstructorTemplateModel {
   constructor(
     public access: string,
     public params: ParamTemplateModel[],
-    public body: any,
+    public body: BodyTemplateModel,
     public supr: ConstructorTemplateModel
   ) {}
 }

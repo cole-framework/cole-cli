@@ -16,9 +16,9 @@ export class MethodTemplate {
   ): string {
     const _ACCESS_ = model.access || "";
     const _ASYNC_ = model.is_async ? "async" : "";
-    const _STATIC_ = model.is_async ? "static" : "";
+    const _STATIC_ = model.is_static ? "static" : "";
     const _PARAMS_ = model.params.map((p) => ParamTemplate.parse(p)).join(", ");
-    const _BODY_ = model.body || "";
+
     let _SUPER_ = "";
     const _RETURN_TYPE_ = model.return_type
       ? model.is_async
@@ -59,6 +59,14 @@ export class MethodTemplate {
       } else {
         _SUPER_ = "super();";
       }
+    }
+
+    let _BODY_ = "";
+
+    if (model.body.templateName) {
+      _BODY_ = `// ${model.body.instruction}`;
+    } else if (model.body.content) {
+      _BODY_ = model.body.content;
     }
 
     return METHOD_TEMPLATE.replace("_ACCESS_", _ACCESS_)

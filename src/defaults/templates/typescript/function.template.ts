@@ -16,7 +16,7 @@ export class FunctionTemplate {
         ? `: Promise<${model.return_type}>`
         : `: ${model.return_type}`
       : "";
-    const _BODY_ = model.body || "";
+
     const _EXPORT_ = model.exp
       ? model.exp.is_default
         ? "export default "
@@ -26,6 +26,14 @@ export class FunctionTemplate {
       model.generics.length > 0
         ? `<${model.generics.map((p) => GenericTemplate.parse(p)).join(", ")}>`
         : "";
+
+    let _BODY_ = "";
+
+    if (model.body.templateName) {
+      _BODY_ = `// ${model.body.instruction}`;
+    } else if (model.body.content) {
+      _BODY_ = model.body.content;
+    }
 
     return FUNCTION_TEMPLATE.replace("_EXPORT_", _EXPORT_)
       .replace("_ASYNC_", _ASYNC_)

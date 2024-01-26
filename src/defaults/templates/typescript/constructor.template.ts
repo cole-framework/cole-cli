@@ -11,7 +11,6 @@ export class ConstructorTemplate {
   static parse(model: ConstructorTemplateModel): string {
     const _ACCESS_ = model.access || "";
     const _PARAMS_ = model.params.map((p) => ParamTemplate.parse(p)).join(", ");
-    const _BODY_ = model.body || "";
     let _SUPER_ = "";
 
     if (model.supr) {
@@ -28,6 +27,14 @@ export class ConstructorTemplate {
       } else {
         _SUPER_ = "super();";
       }
+    }
+
+    let _BODY_ = "";
+
+    if (model.body.templateName) {
+      _BODY_ = `// ${model.body.instruction}`;
+    } else if (model.body.content) {
+      _BODY_ = model.body.content;
     }
 
     return CONSTRUCTOR_TEMPLATE.replace("_ACCESS_", _ACCESS_)

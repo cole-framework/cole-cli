@@ -6,6 +6,7 @@ import {
 } from "../../components/schemas";
 import { Config } from "../../config";
 import { TemplateModelTools } from "../template-model.tools";
+import { BodyTemplateModel } from "./body.template-model";
 import { GenericTemplateModel } from "./generic.template-model";
 import { ParamTemplateModel } from "./param.template-model";
 
@@ -29,7 +30,7 @@ export class FunctionTemplateModel {
       Array.isArray(params)
         ? params.map((p) => ParamTemplateModel.create(p, dependencies, config))
         : [],
-      body,
+      BodyTemplateModel.create(body),
       Array.isArray(generics)
         ? generics.map((g) => GenericTemplateModel.create(g))
         : []
@@ -42,7 +43,7 @@ export class FunctionTemplateModel {
     public return_type: string,
     public is_async: boolean,
     public params: ParamTemplateModel[],
-    public body: any,
+    public body: BodyTemplateModel,
     public generics: GenericTemplateModel[]
   ) {}
 }

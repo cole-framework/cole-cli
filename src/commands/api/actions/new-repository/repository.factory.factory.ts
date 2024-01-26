@@ -3,11 +3,11 @@ import {
   Repository,
   RepositoryData,
   RepositoryElement,
+  RepositoryImpl,
 } from "./types";
 import { Entity } from "../new-entity";
-import { RepositoryImplType, TypeInfo } from "../../../../core/type.info";
+import { RepositoryFactoryType } from "../../../../core/type.info";
 import {
-  AccessType,
   ClassData,
   ClassSchema,
   Component,
@@ -15,18 +15,19 @@ import {
   WriteMethod,
 } from "../../../../core";
 
-export class RepositoryImplFactory {
+export class RepositoryFactoryFactory {
   static create(
     data: RepositoryData,
     entity: Entity,
     repository: Repository,
+    impl: RepositoryImpl,
     contexts: DataContext[],
     writeMethod: WriteMethod,
     config: Config
   ): Component<RepositoryElement> {
-    const dependencies: Component[] = [entity, repository];
+    const dependencies: Component[] = [];
     const { id, name, endpoint } = data;
-    const { defaults } = config.components.repositoryImpl;
+    const { defaults } = config.components.repositoryFactory;
     const addons = {};
     const interfaces = [];
     const methods = [];
@@ -37,8 +38,9 @@ export class RepositoryImplFactory {
     let ctor: any = { params: [], supr: null };
     let exp;
 
-    const componentName = config.components.repositoryImpl.generateName(name);
-    const componentPath = config.components.repositoryImpl.generatePath({
+    const componentName =
+      config.components.repositoryFactory.generateName(name);
+    const componentPath = config.components.repositoryFactory.generatePath({
       name,
       endpoint,
     }).path;
@@ -138,8 +140,6 @@ export class RepositoryImplFactory {
       ctor,
       imports,
       exp,
-      is_abstract:
-        config.components.repositoryImpl.elementType === "abstract_class",
     };
 
     const element = ClassSchema.create<RepositoryElement>(
@@ -153,14 +153,28 @@ export class RepositoryImplFactory {
 
     const component = Component.create<RepositoryElement>(
       id,
-      new RepositoryImplType(name),
+      new RepositoryFactoryType(name),
       endpoint,
       componentPath,
       writeMethod,
-      null,
+      addons,
       element,
-      dependencies
+      []
     );
+
+    component.addDependency(entity);
+    component.addDependency(repository);
+    component.addDependency(impl);
+
+    contexts.forEach((ctx) => {
+      if (ctx.mapper) {
+        component.addDependency(ctx.mapper);
+      }
+      if (ctx.source) {
+        component.addDependency(ctx.source);
+      }
+      component.addDependency(ctx.model);
+    });
 
     return component;
   }

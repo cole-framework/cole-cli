@@ -332,7 +332,7 @@
               "name": "execute",
               "params": "{{USE addons.input TO BUILD Array<Param>}}",
               "return_type": "{{USE addons.output}}",
-              "async": true
+              "is_async": true
             }
           ]
         }
@@ -447,7 +447,28 @@
       "element_type": "class",
       "defaults": {
         "common": {
-          "exp": true
+          "exp": true,
+          "methods": [
+            {
+              "name": "create",
+              "params": [],
+              "return": null,
+              "is_async": true,
+              "access": "public",
+              "is_static": true,
+              "body": "{{USE TEMPLATE(repository_factory_method)}}"
+            }
+          ],
+          "imports": [
+            {
+              "list": [
+                "RepositoryImpl",
+                "Repository",
+                "Container"
+              ],
+              "path": "@cole-framework/api-core"
+            }
+          ]
         },
         "mongo": {
           "imports": [
@@ -459,24 +480,19 @@
                 "MongoSource"
               ],
               "path": "@cole-framework/storage-mongodb"
-            },
+            }
+          ]
+        },
+        "mysql": {
+          "imports": [
             {
               "list": [
-                "RepositoryImpl",
-                "Container"
+                "MySqlCollectionSource",
+                "MySqlConfig",
+                "MySqlQueryBuilders",
+                "MySqlSource"
               ],
-              "path": "@cole-framework/api-core"
-            }
-          ],
-          "props": [],
-          "methods": [
-            {
-              "name": "create",
-              "params": [],
-              "return": null,
-              "async": true,
-              "access": "public",
-              "static": true
+              "path": "@cole-framework/storage-mysql"
             }
           ]
         }
@@ -502,7 +518,7 @@
           "methods": [
             {
               "name": "create",
-              "static": true,
+              "is_static": true,
               "params": [
                 {
                   "name": "handler",

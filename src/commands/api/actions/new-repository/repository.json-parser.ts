@@ -20,6 +20,7 @@ import {
   RepositoryImpl,
   RepositoryFactory,
 } from "./types";
+import { RepositoryFactoryFactory } from "./repository.factory.factory";
 
 export class RepositoryJsonParser {
   constructor(
@@ -182,11 +183,35 @@ export class RepositoryJsonParser {
 
   buildFactory(
     data: RepositoryJson,
+    entity: Entity,
     repository: Repository,
     impl: RepositoryImpl,
     contexts: DataContext[]
   ): RepositoryFactory {
-    return null;
+    const { config, writeMethod, texts } = this;
+    const { name, endpoint } = data;
+
+    if (!endpoint && config.components.repositoryImpl.isEndpointRequired()) {
+      console.log(chalk.red(texts.get("missing_endpoint")));
+      console.log(
+        chalk.yellow(texts.get("component_###_skipped").replace("###", name))
+      );
+      return;
+    }
+    const factory = RepositoryFactoryFactory.create(
+      {
+        name,
+        endpoint,
+      },
+      entity,
+      repository,
+      impl,
+      contexts,
+      writeMethod.component,
+      config
+    );
+
+    return factory;
   }
 
   build(
@@ -221,7 +246,7 @@ export class RepositoryJsonParser {
       const { endpoint, contexts } = data;
 
       const build_interface =
-        typeof data.build_factory === "boolean" ? data.build_interface : true;
+        typeof data.build_interface === "boolean" ? data.build_interface : true;
       const use_default_impl =
         typeof data.use_default_impl === "boolean"
           ? data.use_default_impl
@@ -229,7 +254,8 @@ export class RepositoryJsonParser {
             data.methods.length === 0 &&
             Array.isArray(data.contexts) &&
             data.contexts.length === 1;
-      const build_factory = false;
+      const build_factory =
+        typeof data.build_factory === "boolean" ? data.build_factory : false;
 
       const entityName = data.entity || data.name;
       let entity = entitiesRef.find((e) => e.type.name === entityName);
@@ -346,7 +372,7 @@ export class RepositoryJsonParser {
       }
 
       if (build_factory) {
-        const factory = this.buildFactory(data, repository, impl, ctxs);
+        const factory = this.buildFactory(data, entity, repository, impl, ctxs);
         repository_factories.push(factory);
       }
     }

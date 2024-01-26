@@ -39,9 +39,12 @@ export class ClassTemplate {
             .join(", ")}`
         : "";
 
-    const _CONSTRUCTOR_ = model.ctor
-      ? ConstructorTemplate.parse(model.ctor)
-      : "";
+    const _CONSTRUCTOR_ =
+      model.ctor?.params.length > 0 ||
+      model.ctor?.body?.content ||
+      model.ctor?.body?.instruction
+        ? ConstructorTemplate.parse(model.ctor)
+        : "";
 
     const props = [];
     const static_props = [];
