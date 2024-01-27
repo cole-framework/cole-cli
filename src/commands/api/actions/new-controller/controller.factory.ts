@@ -91,6 +91,7 @@ export class ControllerFactory {
             name: handler.name,
             params,
             return_type: handler.output,
+            is_async: true,
           });
         }
       });

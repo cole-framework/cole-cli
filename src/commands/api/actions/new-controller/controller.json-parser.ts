@@ -28,11 +28,9 @@ export class ControllerJsonParser {
       const { name, endpoint, handlers } = data;
 
       if (!endpoint && config.components.controller.isEndpointRequired()) {
-        console.log(chalk.red(texts.get("MISSING_ENDPOINT")));
+        console.log(chalk.red(texts.get("missing_endpoint")));
         console.log(
-          chalk.yellow(
-            texts.get("INFO_CONTROLLER_XXX_SKIPPED_ERROR").replace("###", name)
-          )
+          chalk.yellow(texts.get("component_###_skipped").replace("###", name))
         );
         continue;
       }

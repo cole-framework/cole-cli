@@ -1,11 +1,9 @@
 import chalk from "chalk";
 import { ConfigLoader } from "../../../../core";
-import {
-  NewControllerInteractiveStrategy,
-  NewControllerOptionsStrategy,
-} from "./strategies";
 import { NewControllerOptions } from "./types";
 import { ApiConfig } from "../../common";
+import { NewControllerOptionsStrategy } from "./new-controller.options-strategy";
+import { NewControllerInteractiveStrategy } from "./new-controller.interactive-strategy";
 
 export const newController = async (options: NewControllerOptions) => {
   const { content: config, failure } = ConfigLoader.load("controller");

@@ -10,7 +10,7 @@ export class NewRepositoryOptionsStrategy extends Strategy {
     const texts = await Texts.load();
 
     if (!options.endpoint && config.components.model.isEndpointRequired()) {
-      console.log(chalk.red(texts.get("MISSING_ENDPOINT")));
+      console.log(chalk.red(texts.get("missing_endpoint")));
       process.exit(1);
     }
 

@@ -29,8 +29,8 @@ export class NewModelOptionsStrategy extends Strategy {
     const schema = new ApiJsonParser(apiConfig, config, texts).build({
       models: [model],
     });
-    const apiGenerator = new ApiGenerator(config);
-    const result = await apiGenerator.generate(schema);
+
+    const result = await new ApiGenerator(config).generate(schema);
 
     if (result.isFailure) {
       console.log(result.failure.error);

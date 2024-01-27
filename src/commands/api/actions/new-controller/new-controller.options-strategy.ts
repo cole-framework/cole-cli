@@ -1,9 +1,9 @@
 import chalk from "chalk";
-import { Strategy } from "../../../../../core/strategy";
-import { NewControllerOptions, ControllerJson, HandlerJson } from "../types";
-import { ApiJsonParser } from "../../../common/api-json.parser";
-import { CliOptionsTools, Texts } from "../../../../../core";
-import { ApiConfig } from "../../../common";
+import { Strategy } from "../../../../core/strategy";
+import { NewControllerOptions, ControllerJson, HandlerJson } from "./types";
+import { ApiJsonParser } from "../../common/api-json.parser";
+import { CliOptionsTools, Texts } from "../../../../core";
+import { ApiConfig, ApiGenerator } from "../../common";
 
 export class NewControllerOptionsStrategy extends Strategy {
   public async apply(apiConfig: ApiConfig, options: NewControllerOptions) {
@@ -14,7 +14,7 @@ export class NewControllerOptionsStrategy extends Strategy {
       !options.endpoint &&
       config.components.controller.isEndpointRequired()
     ) {
-      console.log(chalk.red(texts.get("MISSING_ENDPOINT")));
+      console.log(chalk.red(texts.get("missing_endpoint")));
       process.exit(1);
     }
 
@@ -35,12 +35,16 @@ export class NewControllerOptionsStrategy extends Strategy {
       handlers,
     };
 
-    const result = new ApiJsonParser(apiConfig, config, texts).build({
+    const schema = new ApiJsonParser(apiConfig, config, texts).build({
       controllers: [controller],
     });
+    const result = await new ApiGenerator(config).generate(schema);
 
-    console.log("->", JSON.stringify(result, null, 2));
-
-    return result;
+    if (result.isFailure) {
+      console.log(result.failure.error);
+      process.exit(1);
+    } else {
+      process.exit(0);
+    }
   }
 }
