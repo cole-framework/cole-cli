@@ -33,9 +33,11 @@ export class ComponentsConfigTools {
       path = path.replace(rootMatch[0], replacements.root);
     }
 
+    let generated = Pattern.replace(path, replacements);
+
     return {
       marker,
-      path: Pattern.replace(path, replacements),
+      path: generated,
       hasDynamicFilename,
     };
   }

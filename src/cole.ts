@@ -123,7 +123,7 @@ newComponent
 newComponent
   .command("route")
   .option("-f, --force", "Determines whether to overwrite existing files")
-  .option("-n, --name <value>", "Name of the repository")
+  .option("-n, --name <value>", "Name of the route")
   .option("-m, --method <value>", "Request method")
   .option("-p, --path <value>", "/qwerty/:foo?bar=1&baz=true")
   .option("-h, --handler <value>", "handler_name.method_name")

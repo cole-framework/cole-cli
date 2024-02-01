@@ -1,4 +1,5 @@
 import { ClassTemplateModel } from "../../../core";
+import { ComponentTemplates } from "../components";
 import { ConstructorTemplate } from "./constructor.template";
 import { GenericTemplate } from "./generic.template";
 import { InheritanceTemplate } from "./inheritance.template";
@@ -16,6 +17,10 @@ export const CLASS_TEMPLATE = `_EXPORT_ _ABSTRACT_ class _NAME__GENERICS_ _INHER
 
 export class ClassTemplate {
   static parse(model: ClassTemplateModel): string {
+    if (model.template) {
+      return ComponentTemplates.get(model.template)(model);
+    }
+
     const _ABSTRACT_ = model.isAbstract ? "abstract" : "";
     const _GENERICS_ =
       model.generics.length > 0

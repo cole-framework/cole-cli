@@ -1,5 +1,5 @@
-export * from "./create-param-data.interaction";
-export * from "./create-prop-data.interaction";
+export * from "./create-param.interaction";
+export * from "./create-prop.interaction";
 export * from "./create-props.interaction";
 export * from "./input-name-and-endpoint.interaction";
 export * from "./input-name-and-endpoint.predefined-interaction";

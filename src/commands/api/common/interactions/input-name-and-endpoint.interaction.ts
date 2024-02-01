@@ -23,10 +23,10 @@ export class InputNameAndEndpointInteraction extends Interaction<InputAndName> {
     const {
       texts: { nameMessage, nameHint, endpointMessage, endpointHint },
     } = this;
-    let name;
+    let name = "";
     let endpoint;
 
-    while (typeof name !== "string") {
+    while (name.length === 0) {
       name = await InteractionPrompts.input(
         nameMessage,
         context?.name,
@@ -35,7 +35,8 @@ export class InputNameAndEndpointInteraction extends Interaction<InputAndName> {
     }
 
     if (context?.isEndpointRequired) {
-      while (typeof endpoint !== "string") {
+      endpoint = "";
+      while (endpoint.length === 0) {
         endpoint = await InteractionPrompts.input(
           endpointMessage,
           context?.endpoint,

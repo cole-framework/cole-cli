@@ -1,5 +1,6 @@
 import { ParamSchema, PropSchema } from "../components";
 import { TypeInfo } from "../type.info";
+import { Config } from "./config";
 import { ReservedType } from "./config.types";
 
 export type InstructionData = { [key: string]: any; dependencies: any[] };
@@ -8,21 +9,22 @@ export type InstructionData = { [key: string]: any; dependencies: any[] };
 {{USE DEPENDENCY(WHERE type.type IS input).element.name}}
 {{USE DEPENDENCY(WHERE type.type IS input).element.name}}
 {{USE DEPENDENCY(WHERE type.type IS input).element.name TO BUILD Array<Param>}}
-{{USE addons.path TO BUILD Foo}}
-{{USE addons.table}}
+{{USE ADDONS().table}}
 
 0: "{{USE DEPENDENCY(WHERE type.type IS input).element.name TO BUILD Array<Param>}}"
 1: "USE"
-2: "DEPENDENCY(WHERE type.type IS input)."
-3: "type.type"
-4: " IS "
-5: "input"
-6: "element.name"
-7: " TO BUILD "
-8: "Array<Param>"
+2: "DEPENDENCY"
+3: "WHERE"
+4: "type.type"
+5: " IS "
+6: "input"
+7: "element.name"
+8: " TO BUILD "
+9: "Array<Param>"
 */
 const instruction_regex =
-  /{{\s*(USE|IF)\s+(DEPENDENCY\([A-Z ]+([a-zA-Z.0-9_]+)(\s+[A-Z=\>\<\! ]+\s+)?([a-zA-Z0-9\"\'\_\- ]+)?\).?)?([a-z.A-Z0-9\[\]-_\(\)]+)(\s+[A-Z_ ]+\s+)?([^}]+)?\s*}}/;
+  // /{{\s*(USE|IF)\s+((DEPENDENCY|ADDONS)\s*\([A-Z ]+([a-zA-Z.0-9_]+)(\s+[A-Z=\>\<\! ]+\s+)?([a-zA-Z0-9\"\'\_\- ]+)?\).?)?([a-z.A-Z0-9\[\]-_\(\)]+)(\s+[A-Z_ ]+\s+)?([^}]+)?\s*}}/;
+  /{{\s*(USE|IF)\s+(DEPENDENCY|ADDONS)\(([A-Z]+)?\s*([a-zA-Z.0-9_]+)?(\s+[A-Z=\>\<\! ]+\s+)?([a-zA-Z0-9\"\'\_\- ]+)?\).?([a-z.A-Z0-9\[\]-_\(\)]+)?(\s+[A-Z_ ]+\s+)?([^}]+)?\s*}}/;
 
 export class ConfigTools {
   static hasInstructions(value: string) {
@@ -32,7 +34,7 @@ export class ConfigTools {
   static executeInstructions(
     value: string,
     data: InstructionData,
-    reserved: ReservedType[]
+    config: Config
   ): any {
     const instruction_match = value.match(new RegExp(instruction_regex, "g"));
 
@@ -41,14 +43,19 @@ export class ConfigTools {
         const parsed = this.parseInstruction(
           instruction_match[0],
           data,
-          reserved
+          config
         );
+
+        if (value.length === instruction_match[0].length) {
+          return parsed;
+        }
+
         return value.replace(instruction_match[0], parsed);
       }
 
       let result = value;
       instruction_match.forEach((match) => {
-        const parsed = this.parseInstruction(match, data, reserved);
+        const parsed = this.parseInstruction(match, data, config);
         result = result.replace(match, parsed);
       });
 
@@ -59,41 +66,36 @@ export class ConfigTools {
   private static parseInstruction(
     str: string,
     data: InstructionData,
-    reserved: ReservedType[]
+    config: Config
   ): any {
     const [
       ref,
       instruction,
-      dependency_instruction,
-      dependency_path,
-      dependency_operator,
-      dependency_value,
+      source_type,
+      where,
+      source_path,
+      source_operator,
+      source_value,
       path,
       command,
       target,
     ] = str.match(instruction_regex);
-
-    if (dependency_instruction && data.dependencies.length === 0) {
-      return "PARSE_ERROR_ # _MISSING_DEPENDENCIES";
-    }
-
     let o;
+    const source =
+      source_type.toLowerCase() === "dependency"
+        ? data.dependencies
+        : data.addons;
 
-    if (dependency_instruction) {
-      o = this.getDependencyByCondition(
-        data.dependencies,
-        dependency_path,
-        dependency_operator,
-        dependency_value
-      );
-    } else {
-      o = data;
+    if (source_type && source?.length === 0) {
+      return "PARSE_ERROR_ # _MISSING_SOURCE";
     }
 
-    const value = this.getValueFromPath(o, path.trim());
+    o = this.getSource(source, source_path, source_operator, source_value);
+
+    const value = path ? this.getValueFromPath(o, path.trim()) : o;
 
     if (instruction === "USE" && command?.trim() === "TO BUILD") {
-      return this.parseBuild(value, target, data, reserved);
+      return this.parseBuild(value, target, data, config);
     }
 
     if (instruction === "IF" && command) {
@@ -107,7 +109,7 @@ export class ConfigTools {
     ref: any,
     element: string,
     data: InstructionData,
-    reserved: ReservedType[]
+    config: Config
   ): any[] | any {
     const refs = Array.isArray(ref) ? ref : [ref];
     const array_match = element.toLowerCase().match(/array<(.+)>/);
@@ -122,11 +124,11 @@ export class ConfigTools {
 
     refs.forEach((r) => {
       if (target === "param") {
-        result.push(ParamSchema.create(r, reserved, data));
+        result.push(ParamSchema.create(r, config, data));
       } else if (target === "prop") {
-        result.push(PropSchema.create(r, reserved, data));
+        result.push(PropSchema.create(r, config, data));
       } else if (target === "typeinfo" || target === "type") {
-        result.push(TypeInfo.create(r, reserved));
+        result.push(TypeInfo.create(r, config));
       }
     });
 
@@ -166,20 +168,30 @@ export class ConfigTools {
     return false;
   }
 
-  private static getDependencyByCondition(
-    dependencies: any[],
+  private static getSource(
+    source: any,
     path: string,
     operator: string,
     value: string
   ): any {
-    for (const d of dependencies) {
-      if (typeof d === "object") {
-        const v = this.getValueFromPath(d, path);
+    if (path && operator && value) {
+      if (Array.isArray(source)) {
+        for (const d of source) {
+          if (typeof d === "object") {
+            const v = this.getValueFromPath(d, path);
 
-        if (this.metCondition(operator, v, value)) {
-          return d;
+            if (this.metCondition(operator, v, value)) {
+              return d;
+            }
+          } else {
+            return d;
+          }
         }
+      } else if (typeof source === "object") {
+        return this.getValueFromPath(source, path);
       }
+    } else {
+      return source;
     }
   }
 }

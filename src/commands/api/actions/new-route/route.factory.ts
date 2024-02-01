@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import {
   WriteMethod,
   Config,
@@ -22,6 +23,8 @@ export class RouteFactory {
       request: { method },
       endpoint,
     } = data;
+
+    const methodLC = method.toLowerCase();
     const { defaults } = config.components.route;
     const addons: { path: string } = {
       path: data.request.path,
@@ -86,27 +89,27 @@ export class RouteFactory {
       generics.push(...defaults.common.generics);
     }
 
-    if (Array.isArray(defaults?.[method]?.inheritance)) {
-      inheritance.push(...defaults[method].inheritance);
+    if (Array.isArray(defaults?.[methodLC]?.inheritance)) {
+      inheritance.push(...defaults[methodLC].inheritance);
     }
 
-    if (Array.isArray(defaults?.[method]?.imports)) {
-      defaults[method].imports.forEach((i) => {
+    if (Array.isArray(defaults?.[methodLC]?.imports)) {
+      defaults[methodLC].imports.forEach((i) => {
         i.ref_path = componentPath;
         imports.push(i);
       });
     }
 
-    if (Array.isArray(defaults?.[method]?.interfaces)) {
-      imports.push(...defaults[method].interfaces);
+    if (Array.isArray(defaults?.[methodLC]?.interfaces)) {
+      imports.push(...defaults[methodLC].interfaces);
     }
 
-    if (Array.isArray(defaults?.[method]?.methods)) {
-      methods.push(...defaults[method].methods);
+    if (Array.isArray(defaults?.[methodLC]?.methods)) {
+      methods.push(...defaults[methodLC].methods);
     }
 
-    if (Array.isArray(defaults?.[method]?.props)) {
-      props.push(...defaults[method].props);
+    if (Array.isArray(defaults?.[methodLC]?.props)) {
+      props.push(...defaults[methodLC].props);
     }
 
     if (Array.isArray(data.props)) {
@@ -117,8 +120,8 @@ export class RouteFactory {
       methods.push(...data.methods);
     }
 
-    if (Array.isArray(defaults?.[method]?.generics)) {
-      generics.push(...defaults[method].generics);
+    if (Array.isArray(defaults?.[methodLC]?.generics)) {
+      generics.push(...defaults[methodLC].generics);
     }
 
     const classData: ClassData = {
@@ -129,30 +132,27 @@ export class RouteFactory {
       interfaces,
       generics,
       inheritance,
+      imports,
       ctor,
       exp,
       is_abstract: config.components.route.elementType === "abstract_class",
     };
 
-    const element = ClassSchema.create<RouteElement>(
-      classData,
-      config.reservedTypes,
-      {
-        addons,
-        dependencies,
-      }
-    );
+    const element = ClassSchema.create<RouteElement>(classData, config, {
+      addons,
+      dependencies,
+    });
 
-    const component = Component.create<RouteElement>(
-      id,
-      new RouteType(name, method),
+    const component = Component.create<RouteElement>(config, {
+      id: id || nanoid(),
+      type: RouteType.create(componentName, name, method),
       endpoint,
-      componentPath,
+      path: componentPath,
       writeMethod,
       addons,
       element,
-      dependencies
-    );
+      dependencies,
+    });
 
     return component;
   }

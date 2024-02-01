@@ -1,4 +1,5 @@
 import { FunctionTemplateModel } from "../../../core";
+import { ComponentTemplates } from "../components";
 import { GenericTemplate } from "./generic.template";
 import { ParamTemplate } from "./param.template";
 
@@ -8,6 +9,10 @@ export const FUNCTION_TEMPLATE = `_EXPORT_ _ASYNC_ function _NAME__GENERICS_(_PA
 
 export class FunctionTemplate {
   static parse(model: FunctionTemplateModel): string {
+    if (model.template) {
+      return ComponentTemplates.get(model.template)(model);
+    }
+
     const _NAME_ = model.name;
     const _ASYNC_ = model.is_async ? "async " : "";
     const _PARAMS_ = model.params.map((p) => ParamTemplate.parse(p)).join(", ");

@@ -1,7 +1,5 @@
-import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
+import { Config, ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { TypeInfo } from "../../type.info";
-import { Component } from "../component";
-import { SchemaTools } from "../schema.tools";
 import {
   InheritanceData,
   InheritanceObject,
@@ -31,7 +29,7 @@ export type GenericConfig = GenericJson & ConfigAddons;
 export class GenericTools {
   static stringToData(
     str: string,
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ): GenericData {
     let inheritance;
@@ -44,7 +42,7 @@ export class GenericTools {
     if (match[1]) {
       let temp = match[1].trim();
       if (ConfigTools.hasInstructions(temp)) {
-        name = ConfigTools.executeInstructions(temp, references, reserved);
+        name = ConfigTools.executeInstructions(temp, references, config);
       } else {
         name = temp;
       }
@@ -54,13 +52,9 @@ export class GenericTools {
       let temp = match[3].trim();
 
       if (ConfigTools.hasInstructions(temp)) {
-        inheritance = ConfigTools.executeInstructions(
-          temp,
-          references,
-          reserved
-        );
+        inheritance = ConfigTools.executeInstructions(temp, references, config);
       } else {
-        inheritance = TypeInfo.create(temp, reserved);
+        inheritance = TypeInfo.create(temp, config);
       }
     }
 
@@ -68,9 +62,9 @@ export class GenericTools {
       let temp = match[5].trim();
 
       if (ConfigTools.hasInstructions(temp)) {
-        dflt = ConfigTools.executeInstructions(temp, references, reserved);
+        dflt = ConfigTools.executeInstructions(temp, references, config);
       } else {
-        dflt = TypeInfo.create(temp, reserved);
+        dflt = TypeInfo.create(temp, config);
       }
     }
 
@@ -85,7 +79,7 @@ export class GenericTools {
 export class GenericSchema {
   public static create(
     data: string | GenericJson | GenericData,
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ) {
     let inheritance;
@@ -93,7 +87,7 @@ export class GenericSchema {
     let dflt;
 
     if (typeof data === "string") {
-      const generic = GenericTools.stringToData(data, reserved, references);
+      const generic = GenericTools.stringToData(data, config, references);
       inheritance = generic.inheritance;
       name = generic.name;
       dflt = generic.dflt;
@@ -103,7 +97,7 @@ export class GenericSchema {
       if (typeof data.name === "string") {
         let temp = data.name.trim();
         if (ConfigTools.hasInstructions(temp)) {
-          name = ConfigTools.executeInstructions(temp, references, reserved);
+          name = ConfigTools.executeInstructions(temp, references, config);
         } else {
           name = temp;
         }
@@ -113,7 +107,7 @@ export class GenericSchema {
         let temp = data.dflt.trim();
 
         if (ConfigTools.hasInstructions(temp)) {
-          dflt = ConfigTools.executeInstructions(temp, references, reserved);
+          dflt = ConfigTools.executeInstructions(temp, references, config);
         } else {
           dflt = temp;
         }
@@ -128,15 +122,15 @@ export class GenericSchema {
           inheritance = ConfigTools.executeInstructions(
             temp,
             references,
-            reserved
+            config
           );
         } else {
-          inheritance = InheritanceSchema.create(temp, reserved, references);
+          inheritance = InheritanceSchema.create(temp, config, references);
         }
       } else {
         inheritance = InheritanceSchema.create(
           data.inheritance,
-          reserved,
+          config,
           references
         );
       }

@@ -52,11 +52,11 @@ export class RepositoryJsonParser {
       {
         name,
         endpoint,
-        props: PropTools.arrayToData(props, config.reservedTypes, {
+        props: PropTools.arrayToData(props, config, {
           dependencies: [],
           addons: {},
         }),
-        methods: MethodTools.arrayToData(methods, config.reservedTypes, {
+        methods: MethodTools.arrayToData(methods, config, {
           dependencies: [],
           addons: {},
         }),
@@ -70,25 +70,25 @@ export class RepositoryJsonParser {
       if (type.isModel) {
         let model;
         model = modelsRef.find((m) => {
-          return m.type.name === type.name && m.type.type === type.type;
+          return m.type.ref === type.ref && m.type.type === type.type;
         });
 
         if (!model) {
           model = ModelFactory.create(
-            { name: type.name, endpoint: repository.endpoint, type: type.type },
+            { name: type.ref, endpoint: repository.endpoint, type: type.type },
             writeMethod.dependency,
             config,
             []
           );
           models.push(model);
         }
-        repository.addDependency(model);
-      } else if (type.isEntity && type.name !== entity.type.name) {
+        repository.addDependency(model, config);
+      } else if (type.isEntity && type.ref !== entity.type.ref) {
         let e;
-        e = entitiesRef.find((m) => m.type.name === type.name);
+        e = entitiesRef.find((m) => m.type.ref === type.ref);
         if (!e) {
           e = EntityFactory.create(
-            { name: type.name, endpoint: repository.endpoint },
+            { name: type.ref, endpoint: repository.endpoint },
             null,
             writeMethod.dependency,
             config,
@@ -96,7 +96,7 @@ export class RepositoryJsonParser {
           );
           entities.push(e);
         }
-        repository.addDependency(e);
+        repository.addDependency(e, config);
       }
     });
 
@@ -128,11 +128,11 @@ export class RepositoryJsonParser {
       {
         name,
         endpoint,
-        props: PropTools.arrayToData(props, config.reservedTypes, {
+        props: PropTools.arrayToData(props, config, {
           dependencies: [],
           addons: {},
         }),
-        methods: MethodTools.arrayToData(methods, config.reservedTypes, {
+        methods: MethodTools.arrayToData(methods, config, {
           dependencies: [],
           addons: {},
         }),
@@ -148,25 +148,25 @@ export class RepositoryJsonParser {
       if (type.isModel) {
         let model;
         model = modelsRef.find(
-          (m) => m.type.name === type.name && m.type.type === type.type
+          (m) => m.type.ref === type.ref && m.type.type === type.type
         );
 
         if (!model) {
           model = ModelFactory.create(
-            { name: type.name, endpoint: impl.endpoint, type: type.type },
+            { name: type.ref, endpoint: impl.endpoint, type: type.type },
             writeMethod.dependency,
             config,
             []
           );
           models.push(model);
         }
-        impl.addDependency(model);
-      } else if (type.isEntity && type.name !== entity.type.name) {
+        impl.addDependency(model, config);
+      } else if (type.isEntity && type.ref !== entity.type.ref) {
         let e;
-        e = entitiesRef.find((m) => m.type.name === type.name);
+        e = entitiesRef.find((m) => m.type.ref === type.ref);
         if (!e) {
           e = EntityFactory.create(
-            { name: type.name, endpoint: impl.endpoint },
+            { name: type.ref, endpoint: impl.endpoint },
             null,
             writeMethod.dependency,
             config,
@@ -174,7 +174,7 @@ export class RepositoryJsonParser {
           );
           entities.push(e);
         }
-        impl.addDependency(e);
+        impl.addDependency(e, config);
       }
     });
 
@@ -258,7 +258,7 @@ export class RepositoryJsonParser {
         typeof data.build_factory === "boolean" ? data.build_factory : false;
 
       const entityName = data.entity || data.name;
-      let entity = entitiesRef.find((e) => e.type.name === entityName);
+      let entity = entitiesRef.find((e) => e.type.ref === entityName);
 
       if (!entity) {
         entity = EntityFactory.create(
@@ -312,7 +312,7 @@ export class RepositoryJsonParser {
           }
 
           model = modelsRef.find((s) => {
-            return s.type.name === modelName;
+            return s.type.ref === modelName;
           });
           if (!model) {
             model = ModelFactory.create(
@@ -324,7 +324,7 @@ export class RepositoryJsonParser {
             models.push(model);
           }
 
-          source = sourcesRef.find((s) => s.type.name === sourceName);
+          source = sourcesRef.find((s) => s.type.ref === sourceName);
           if (!source) {
             source = SourceFactory.create(
               {
@@ -340,7 +340,7 @@ export class RepositoryJsonParser {
             sources.push(source);
           }
 
-          mapper = mappersRef.find((s) => s.type.name === mapperName);
+          mapper = mappersRef.find((s) => s.type.ref === mapperName);
           if (!mapper) {
             mapper = MapperFactory.create(
               { name: mapperName, endpoint, storage: type },

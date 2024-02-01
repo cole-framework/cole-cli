@@ -36,7 +36,7 @@ export class MapperJsonParser {
       }
 
       entity = entitiesRef.find(
-        (e) => e.type.name === data.entity || e.type.name === name
+        (e) => e.type.ref === data.entity || e.type.ref === name
       );
 
       if (!entity) {
@@ -57,7 +57,7 @@ export class MapperJsonParser {
         let model;
         if (
           mappers.find(
-            (m) => m.type.name === data.name && m.type.type === storage
+            (m) => m.type.ref === data.name && m.type.type === storage
           )
         ) {
           continue;
@@ -65,7 +65,7 @@ export class MapperJsonParser {
 
         model = modelsRef.find(
           (m) =>
-            (m.type.name === data.model || m.type.name === name) &&
+            (m.type.ref === data.model || m.type.ref === name) &&
             m.type.type === storage
         );
 
@@ -88,11 +88,11 @@ export class MapperJsonParser {
             name,
             storage,
             endpoint,
-            props: PropTools.arrayToData(props, config.reservedTypes, {
+            props: PropTools.arrayToData(props, config, {
               dependencies: [],
               addons: {},
             }),
-            methods: MethodTools.arrayToData(methods, config.reservedTypes, {
+            methods: MethodTools.arrayToData(methods, config, {
               dependencies: [],
               addons: {},
             }),
@@ -108,25 +108,25 @@ export class MapperJsonParser {
           if (type.isModel) {
             let model;
             model = modelsRef.find(
-              (m) => m.type.name === type.name && m.type.type === type.type
+              (m) => m.type.ref === type.ref && m.type.type === type.type
             );
 
             if (!model) {
               model = ModelFactory.create(
-                { name: type.name, endpoint: mapper.endpoint, type: type.type },
+                { name: type.ref, endpoint: mapper.endpoint, type: type.type },
                 writeMethod.dependency,
                 config,
                 []
               );
               models.push(model);
             }
-            mapper.addDependency(model);
+            mapper.addDependency(model, config);
           } else if (type.isEntity) {
             let e;
-            e = entities.find((m) => m.type.name === type.name);
+            e = entities.find((m) => m.type.ref === type.ref);
             if (!e) {
               e = EntityFactory.create(
-                { name: type.name, endpoint: mapper.endpoint },
+                { name: type.ref, endpoint: mapper.endpoint },
                 null,
                 writeMethod.dependency,
                 config,
@@ -134,7 +134,7 @@ export class MapperJsonParser {
               );
               entities.push(e);
             }
-            mapper.addDependency(e);
+            mapper.addDependency(e, config);
           }
         });
 

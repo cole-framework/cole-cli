@@ -14,7 +14,7 @@ import {
   GenericSchema,
   GenericTools,
 } from "./generic.schema";
-import { ConfigTools, ReservedType } from "../../config";
+import { Config, ConfigTools, ReservedType } from "../../config";
 import { SchemaTools } from "../schema.tools";
 import {
   ExportData,
@@ -37,6 +37,7 @@ export type FunctionObject = {
   is_async: boolean;
   params: ParamObject[];
   body: string;
+  template: string;
   generics: GenericObject[];
 };
 
@@ -47,6 +48,7 @@ export type FunctionData = {
   is_async?: boolean;
   params?: ParamData[];
   body?: string;
+  template?: string;
   generics?: GenericData[];
 };
 
@@ -63,7 +65,7 @@ export type FunctionJson = {
 export class FunctionTools {
   static stringToData(
     str: string,
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ): FunctionData {
     let name: string;
@@ -81,7 +83,7 @@ export class FunctionTools {
       if (match[2]) {
         let temp = match[2].trim();
         if (ConfigTools.hasInstructions(temp)) {
-          name = ConfigTools.executeInstructions(temp, references, reserved);
+          name = ConfigTools.executeInstructions(temp, references, config);
         } else {
           name = temp;
         }
@@ -92,20 +94,20 @@ export class FunctionTools {
       if (match[8]) {
         let temp = match[8].trim();
         if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, config);
         }
         returnType = TypeInfo.isType(temp)
           ? temp
-          : TypeInfo.create(temp, reserved);
+          : TypeInfo.create(temp, config);
       } else {
-        returnType = new UnknownType();
+        returnType = UnknownType.create();
       }
 
       SchemaTools.splitIgnoringBrackets(match[4], ",").forEach((str) => {
-        generics.push(GenericTools.stringToData(str, reserved, references));
+        generics.push(GenericTools.stringToData(str, config, references));
       });
       SchemaTools.splitIgnoringBrackets(match[6], ",").forEach((str) => {
-        params.push(ParamTools.stringToData(str, reserved, references));
+        params.push(ParamTools.stringToData(str, config, references));
       });
     } else {
       throw new Error(`Function regex match failure`);
@@ -125,7 +127,7 @@ export class FunctionTools {
 export class FunctionSchema {
   public static create(
     data: FunctionData | FunctionJson | string,
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ): FunctionSchema {
     if (!data) {
@@ -138,25 +140,25 @@ export class FunctionSchema {
     let returnType: TypeInfo;
     let isAsync: boolean;
     let body: string;
+    let template: string;
     let generics: GenericSchema[] = [];
 
     if (typeof data === "string") {
-      const fn = FunctionTools.stringToData(data, reserved, references);
+      const fn = FunctionTools.stringToData(data, config, references);
 
       name = fn.name;
-      params = fn.params.map((p) =>
-        ParamSchema.create(p, reserved, references)
-      );
+      params = fn.params.map((p) => ParamSchema.create(p, config, references));
       returnType = fn.return_type;
       isAsync = fn.is_async;
       body = fn.body;
       generics = fn.generics.map((g) =>
-        GenericSchema.create(g, reserved, references)
+        GenericSchema.create(g, config, references)
       );
     } else {
       name = data.name;
       isAsync = data.is_async;
       body = data.body;
+      template = (<FunctionData>data).template;
 
       if (data.exp) {
         exp = ExportSchema.create(data.exp);
@@ -164,7 +166,7 @@ export class FunctionSchema {
 
       const tempName = data.name.trim();
       if (ConfigTools.hasInstructions(tempName)) {
-        name = ConfigTools.executeInstructions(tempName, references, reserved);
+        name = ConfigTools.executeInstructions(tempName, references, config);
       } else {
         name = tempName;
       }
@@ -174,11 +176,11 @@ export class FunctionSchema {
       } else if (typeof data.return_type === "string") {
         let temp = data.return_type.trim();
         if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, config);
         }
         returnType = TypeInfo.isType(temp)
           ? temp
-          : TypeInfo.create(temp, reserved);
+          : TypeInfo.create(temp, config);
       }
 
       if (Array.isArray(data.params)) {
@@ -188,17 +190,17 @@ export class FunctionSchema {
               const p = ConfigTools.executeInstructions(
                 param,
                 references,
-                reserved
+                config
               );
               if (p) {
                 params.push(p);
               }
             } else {
-              params.push(ParamSchema.create(param, reserved, references));
+              params.push(ParamSchema.create(param, config, references));
             }
           } else {
-            if (SchemaTools.executeMeta(param, references, reserved)) {
-              params.push(ParamSchema.create(param, reserved, references));
+            if (SchemaTools.executeMeta(param, references, config)) {
+              params.push(ParamSchema.create(param, config, references));
             }
           }
         });
@@ -207,25 +209,32 @@ export class FunctionSchema {
           params = ConfigTools.executeInstructions(
             data.params,
             references,
-            reserved
+            config
           );
         } else {
-          if (SchemaTools.executeMeta(data.params, references, reserved)) {
-            params.push(ParamSchema.create(data.params, reserved, references));
+          if (SchemaTools.executeMeta(data.params, references, config)) {
+            params.push(ParamSchema.create(data.params, config, references));
           }
         }
       }
 
       if (Array.isArray(data.generics)) {
         data.generics.forEach((g) => {
-          if (SchemaTools.executeMeta(g, references, reserved)) {
-            generics.push(GenericSchema.create(g, reserved, references));
+          if (SchemaTools.executeMeta(g, references, config)) {
+            generics.push(GenericSchema.create(g, config, references));
           }
         });
       }
     }
 
-    const fn = new FunctionSchema(exp, name, returnType, isAsync, body);
+    const fn = new FunctionSchema(
+      exp,
+      name,
+      returnType,
+      isAsync,
+      body,
+      template
+    );
 
     params.forEach((param) => {
       fn.addParam(param);
@@ -246,7 +255,8 @@ export class FunctionSchema {
     public readonly name: string,
     public readonly returnType: TypeInfo,
     public readonly isAsync: boolean,
-    public readonly body: string
+    public readonly body: string,
+    public readonly template: string
   ) {}
 
   addParam(param: ParamSchema) {
@@ -286,7 +296,16 @@ export class FunctionSchema {
   }
 
   toObject(): FunctionObject {
-    const { __params, __generics, body, name, isAsync, returnType, exp } = this;
+    const {
+      __params,
+      __generics,
+      body,
+      name,
+      isAsync,
+      returnType,
+      exp,
+      template,
+    } = this;
     const fn: FunctionObject = {
       exp: exp?.toObject(),
       params: __params.map((p) => p.toObject()),
@@ -295,6 +314,7 @@ export class FunctionSchema {
       name,
       is_async: isAsync,
       return_type: returnType,
+      template,
     };
 
     return fn;

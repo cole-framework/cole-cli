@@ -1,4 +1,4 @@
-import { ConfigTools, InstructionData, ReservedType } from "../config";
+import { Config, ConfigTools, InstructionData, ReservedType } from "../config";
 import { AccessType } from "../enums";
 
 export class SchemaTools {
@@ -132,13 +132,9 @@ export class SchemaTools {
     return data;
   }
 
-  static executeMeta(
-    item: any,
-    data: InstructionData,
-    reserved: ReservedType[]
-  ) {
+  static executeMeta(item: any, data: InstructionData, config: Config) {
     if (item["meta"]) {
-      return ConfigTools.executeInstructions(item["meta"], data, reserved);
+      return ConfigTools.executeInstructions(item["meta"], data, config);
     }
 
     return true;

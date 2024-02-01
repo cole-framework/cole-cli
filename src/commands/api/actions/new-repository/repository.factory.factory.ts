@@ -14,6 +14,7 @@ import {
   Config,
   WriteMethod,
 } from "../../../../core";
+import { nanoid } from "nanoid";
 
 export class RepositoryFactoryFactory {
   static create(
@@ -142,38 +143,34 @@ export class RepositoryFactoryFactory {
       exp,
     };
 
-    const element = ClassSchema.create<RepositoryElement>(
-      classData,
-      config.reservedTypes,
-      {
-        addons,
-        dependencies,
-      }
-    );
+    const element = ClassSchema.create<RepositoryElement>(classData, config, {
+      addons,
+      dependencies,
+    });
 
-    const component = Component.create<RepositoryElement>(
-      id,
-      new RepositoryFactoryType(name),
+    const component = Component.create<RepositoryElement>(config, {
+      id: id || nanoid(),
+      type: RepositoryFactoryType.create(componentName, name),
       endpoint,
-      componentPath,
+      path: componentPath,
       writeMethod,
       addons,
       element,
-      []
-    );
+      dependencies: [],
+    });
 
-    component.addDependency(entity);
-    component.addDependency(repository);
-    component.addDependency(impl);
+    component.addDependency(entity, config);
+    component.addDependency(repository, config);
+    component.addDependency(impl, config);
 
     contexts.forEach((ctx) => {
       if (ctx.mapper) {
-        component.addDependency(ctx.mapper);
+        component.addDependency(ctx.mapper, config);
       }
       if (ctx.source) {
-        component.addDependency(ctx.source);
+        component.addDependency(ctx.source, config);
       }
-      component.addDependency(ctx.model);
+      component.addDependency(ctx.model, config);
     });
 
     return component;

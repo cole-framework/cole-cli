@@ -1,4 +1,5 @@
 import { ParamTemplateModel } from "../../../core";
+import { ComponentTemplates } from "../components";
 
 export const PARAM_TEMPLATE = `_ACCESS_ _READONLY_ _NAME__OPTIONAL__TYPE_ _VALUE_`;
 
@@ -7,6 +8,10 @@ export class ParamTemplate {
     model: ParamTemplateModel,
     options?: { skipAccess?: boolean; skipType?: boolean }
   ): string {
+    if (model.template) {
+      return ComponentTemplates.get(model.template)(model, options);
+    }
+
     const _ACCESS_ = model.access && !options?.skipAccess ? model.access : "";
     const _READONLY_ = model.is_readonly ? "readonly" : "";
     const _OPTIONAL_ = model.is_optional ? "?" : "";

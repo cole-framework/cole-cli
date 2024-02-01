@@ -112,25 +112,21 @@ export class ControllerFactory {
         config.components.controller.elementType === "abstract_class",
     };
 
-    const element = ClassSchema.create<ControllerElement>(
-      classData,
-      config.reservedTypes,
-      {
-        addons: {},
-        dependencies,
-      }
-    );
+    const element = ClassSchema.create<ControllerElement>(classData, config, {
+      addons: {},
+      dependencies,
+    });
 
-    const component = Component.create<ControllerElement>(
+    const component = Component.create<ControllerElement>(config, {
       id,
-      new ControllerType(name),
+      type: ControllerType.create(componentName, name),
       endpoint,
-      componentPath,
+      path: componentPath,
       writeMethod,
-      null,
+      addons: null,
       element,
-      dependencies
-    );
+      dependencies,
+    });
 
     return component;
   }

@@ -93,25 +93,21 @@ export class RepositoryComponentFactory {
         config.components.repository.elementType === "abstract_class",
     };
 
-    const element = ClassSchema.create<RepositoryElement>(
-      classData,
-      config.reservedTypes,
-      {
-        addons,
-        dependencies,
-      }
-    );
+    const element = ClassSchema.create<RepositoryElement>(classData, config, {
+      addons,
+      dependencies,
+    });
 
-    const component = Component.create<RepositoryElement>(
+    const component = Component.create<RepositoryElement>(config, {
       id,
-      new RepositoryType(name),
+      type: RepositoryType.create(componentName, name),
       endpoint,
-      componentPath,
+      path: componentPath,
       writeMethod,
       addons,
       element,
-      dependencies
-    );
+      dependencies,
+    });
 
     return component;
   }

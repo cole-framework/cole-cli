@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import {
   ClassData,
   ClassSchema,
@@ -7,14 +8,15 @@ import {
 } from "../../../../core";
 
 import { RouteIOType, TypeInfo } from "../../../../core/type.info";
+import { Entity } from "../new-entity";
 import { Model } from "../new-model";
 import { RouteData, RouteModel, RouteElement } from "./types";
 
 export class RouteIOFactory {
   public static create(
     data: RouteData,
-    input: Model,
-    output: Model,
+    input: Model | Entity,
+    output: Model | Entity,
     pathParams: RouteModel,
     queryParams: RouteModel,
     requestBody: RouteModel,
@@ -39,7 +41,34 @@ export class RouteIOFactory {
       endpoint,
     } = data;
     const { defaults } = config.components.routeIO;
-    const addons = {};
+    //temporary
+    const request = {
+      element: {
+        name: `Request<${queryParams?.element?.name}, ${pathParams?.element?.name}, ${requestBody?.element?.name}>`,
+      },
+      type: {
+        name: `Request<${queryParams?.element?.name}, ${pathParams?.element?.name}, ${requestBody?.element?.name}>`,
+        ref: "Request",
+        tag: "Request",
+        isFrameworkDefaultType: true,
+      },
+    };
+    const response = {
+      element: { name: "Response" },
+      type: {
+        name: "Response",
+        ref: "Response",
+        tag: "Response",
+        isFrameworkDefaultType: true,
+      },
+    };
+
+    const addons = {
+      input,
+      output,
+      response,
+      request,
+    };
     const interfaces = [];
     const methods = [];
     const props = [];
@@ -79,7 +108,7 @@ export class RouteIOFactory {
     }
 
     if (Array.isArray(defaults?.common?.interfaces)) {
-      imports.push(...defaults.common.interfaces);
+      interfaces.push(...defaults.common.interfaces);
     }
 
     if (Array.isArray(defaults?.common?.methods)) {
@@ -106,7 +135,7 @@ export class RouteIOFactory {
     }
 
     if (Array.isArray(defaults?.[method]?.interfaces)) {
-      imports.push(...defaults[method].interfaces);
+      interfaces.push(...defaults[method].interfaces);
     }
 
     if (Array.isArray(defaults?.[method]?.methods)) {
@@ -142,25 +171,21 @@ export class RouteIOFactory {
       exp,
     };
 
-    const element = ClassSchema.create<RouteElement>(
-      classData,
-      config.reservedTypes,
-      {
-        addons,
-        dependencies,
-      }
-    );
+    const element = ClassSchema.create<RouteElement>(classData, config, {
+      addons,
+      dependencies,
+    });
 
-    const component = Component.create<RouteElement>(
-      id,
-      new RouteIOType(name),
+    const component = Component.create<RouteElement>(config, {
+      id: id || nanoid(),
+      type: RouteIOType.create(componentName, name, method),
       endpoint,
-      componentPath,
+      path: componentPath,
       writeMethod,
       addons,
       element,
-      dependencies
-    );
+      dependencies,
+    });
 
     return component;
   }

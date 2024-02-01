@@ -5,7 +5,7 @@ import {
   ParamSchema,
   ParamTools,
 } from "./param.schema";
-import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
+import { Config, ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { AccessType } from "../../enums";
 import { SchemaTools } from "../schema.tools";
 
@@ -22,6 +22,7 @@ export type ConstructorObject = {
   access: string;
   params: ParamObject[];
   body: string;
+  template: string;
   supr: ConstructorObject;
 };
 
@@ -29,6 +30,7 @@ export type ConstructorData = {
   access?: string;
   params?: ParamData[];
   body?: string;
+  template?: string;
   supr?: ConstructorData;
 };
 
@@ -37,7 +39,7 @@ export type ConstructorConfig = ConstructorJson & ConfigAddons;
 export class ConstructorTools {
   static stringToData(
     str: string,
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ): ConstructorData {
     let access: string = AccessType.Public;
@@ -50,7 +52,7 @@ export class ConstructorTools {
         access = match[1].trim();
       }
       SchemaTools.splitIgnoringBrackets(match[3], ",").forEach((str) => {
-        params.push(ParamTools.stringToData(str, reserved, references));
+        params.push(ParamTools.stringToData(str, config, references));
       });
     } else {
       throw new Error(`Constructor regex match failure`);
@@ -66,27 +68,28 @@ export class ConstructorTools {
 export class ConstructorSchema {
   public static create(
     data: ConstructorJson | ConstructorData | string,
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] },
     isSuper = false
   ) {
     let access: string = AccessType.Public;
     let body: string;
+    let template: string;
     let supr: ConstructorSchema;
     let params: ParamSchema[] = [];
 
     if (typeof data === "string") {
-      const ctor = ConstructorTools.stringToData(data, reserved, references);
+      const ctor = ConstructorTools.stringToData(data, config, references);
       access = ctor.access;
       ctor.params.forEach((p) =>
-        params.push(ParamSchema.create(p, reserved, references))
+        params.push(ParamSchema.create(p, config, references))
       );
     } else {
       body = data.body;
       access = data.access;
 
       if (data.supr) {
-        supr = ConstructorSchema.create(data.supr, reserved, references, true);
+        supr = ConstructorSchema.create(data.supr, config, references, true);
       }
 
       if (Array.isArray(data.params)) {
@@ -96,17 +99,17 @@ export class ConstructorSchema {
               const p = ConfigTools.executeInstructions(
                 param,
                 references,
-                reserved
+                config
               );
               if (p) {
                 params.push(p);
               }
             } else {
-              params.push(ParamSchema.create(param, reserved, references));
+              params.push(ParamSchema.create(param, config, references));
             }
           } else {
-            if (SchemaTools.executeMeta(param, references, reserved)) {
-              params.push(ParamSchema.create(param, reserved, references));
+            if (SchemaTools.executeMeta(param, references, config)) {
+              params.push(ParamSchema.create(param, config, references));
             }
           }
         });
@@ -115,17 +118,19 @@ export class ConstructorSchema {
           params = ConfigTools.executeInstructions(
             data.params,
             references,
-            reserved
+            config
           );
         } else {
-          if (SchemaTools.executeMeta(data.params, references, reserved)) {
-            params.push(ParamSchema.create(data.params, reserved, references));
+          if (SchemaTools.executeMeta(data.params, references, config)) {
+            params.push(ParamSchema.create(data.params, config, references));
           }
         }
       }
+
+      template = (<ConstructorData>data).template;
     }
 
-    const ctor = new ConstructorSchema(access, body, supr);
+    const ctor = new ConstructorSchema(access, body, supr, template);
 
     params.forEach((param) => {
       ctor.addParam(param);
@@ -139,7 +144,8 @@ export class ConstructorSchema {
   private constructor(
     public readonly access: string,
     public readonly body: string,
-    public readonly supr: ConstructorSchema
+    public readonly supr: ConstructorSchema,
+    public readonly template: string,
   ) {}
 
   addParam(param: ParamSchema) {
@@ -161,12 +167,13 @@ export class ConstructorSchema {
   }
 
   toObject(): ConstructorObject {
-    const { access, __params, body, supr } = this;
+    const { access, __params, body, supr, template } = this;
     const ctr: ConstructorObject = {
       access,
       params: __params.map((p) => p.toObject()),
       body,
       supr: supr?.toObject(),
+      template
     };
 
     if (supr) {

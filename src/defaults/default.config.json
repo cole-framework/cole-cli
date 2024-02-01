@@ -13,16 +13,15 @@
   },
   "databases": [
     {
+      "name": "Cache",
+      "alias": "cache",
+      "imports": {},
+      "mappings": []
+    },
+    {
       "name": "MongoDB",
       "alias": "mongo",
-      "imports": {
-        "driver": {
-          "path": "driver import from \"...\""
-        },
-        "storage": {
-          "path": "storage import from \"...\""
-        }
-      },
+      "case_style": "snake",
       "mappings": [
         {
           "db_type": "ObjectID",
@@ -53,23 +52,7 @@
     {
       "name": "MySQL",
       "alias": "mysql",
-      "imports": {
-        "driver": {
-          "path": "driver import from \"...\""
-        },
-        "storage": {
-          "path": "storage import from \"...\""
-        }
-      },
-      "storage": {
-        "name": "MySqlStorage",
-        "source": {
-          "name": "MySqlSource"
-        },
-        "config": {
-          "name": "MySqlConfig"
-        }
-      },
+      "case_style": "snake",
       "mappings": [
         {
           "db_type": "DATETIME",
@@ -182,7 +165,7 @@
                 {
                   "name": "table",
                   "type": "string",
-                  "value": "{{USE addons.table}}"
+                  "value": "{{USE ADDONS(table)}}"
                 }
               ]
             }
@@ -219,7 +202,7 @@
           "exp": true,
           "inheritance": [
             {
-              "meta": "{{IF addons.hasModel IS true}}",
+              "meta": "{{IF ADDONS(hasModel) IS true}}",
               "name": "Entity",
               "generics": [
                 {
@@ -230,7 +213,7 @@
           ],
           "methods": [
             {
-              "meta": "{{IF addons.hasModel IS true}}",
+              "meta": "{{IF ADDONS(hasModel) IS true}}",
               "name": "toModel",
               "params": [],
               "return_type": "{{USE DEPENDENCY(WHERE type.isModel IS true).type}}"
@@ -322,9 +305,9 @@
           "methods": [
             {
               "name": "execute",
-              "params": "{{USE addons.input TO BUILD Array<Param>}}",
-              "return_type": "{{USE addons.output}}",
-              "async": true
+              "params": "{{USE ADDONS(input) TO BUILD Array<Param>}}",
+              "return_type": "{{USE ADDONS(output)}}",
+              "is_async": true
             }
           ]
         }
@@ -397,19 +380,14 @@
           ],
           "interfaces": [
             {
-              "name": "{{USE DEPENDENCY(WHERE type.isRepository IS true).element.name}}",
-              "generics": [
-                {
-                  "dflt": "{{USE DEPENDENCY(WHERE type.isEntity IS true).element.name}}"
-                }
-              ]
+              "name": "{{USE DEPENDENCY(WHERE type.isRepository IS true).element.name}}"              
             }
           ],
           "ctor": {
             "supr": {
               "params": [
                 {
-                  "name": "{{USE DEPENDENCY(WHERE type.isModel IS true).type.type}}",
+                  "name": "{{USE DEPENDENCY(WHERE type.isModel IS true).type.type}}Context",
                   "type": "DataContext<{{USE DEPENDENCY(WHERE type.isEntity IS true).element.name}}, {{USE DEPENDENCY(WHERE type.type IS mongo).element.name}}>"
                 }
               ]
@@ -420,8 +398,18 @@
           "ctor": {
             "params": [
               {
-                "name": "{{USE DEPENDENCY(WHERE type.isModel IS true).type.type}}",
+                "name": "mongoContext",
                 "type": "DataContext<{{USE DEPENDENCY(WHERE type.isEntity IS true).element.name}}, {{USE DEPENDENCY(WHERE type.type IS mongo).element.name}}>"
+              }
+            ]
+          }
+        },
+        "mysql": {
+          "ctor": {
+            "params": [
+              {
+                "name": "mysqlContext",
+                "type": "DataContext<{{USE DEPENDENCY(WHERE type.isEntity IS true).element.name}}, {{USE DEPENDENCY(WHERE type.type IS mysql).element.name}}>"
               }
             ]
           }
@@ -434,7 +422,28 @@
       "element_type": "class",
       "defaults": {
         "common": {
-          "exp": true
+          "exp": true,
+          "methods": [
+            {
+              "name": "create",
+              "params": [],
+              "return": null,
+              "is_async": true,
+              "access": "public",
+              "is_static": true,
+              "body": "{{USE TEMPLATE(repository_factory_method)}}"
+            }
+          ],
+          "imports": [
+            {
+              "list": [
+                "RepositoryImpl",
+                "Repository",
+                "Container"
+              ],
+              "path": "@cole-framework/api-core"
+            }
+          ]
         },
         "mongo": {
           "imports": [
@@ -446,24 +455,19 @@
                 "MongoSource"
               ],
               "path": "@cole-framework/storage-mongodb"
-            },
+            }
+          ]
+        },
+        "mysql": {
+          "imports": [
             {
               "list": [
-                "RepositoryImpl",
-                "Container"
+                "MySqlCollectionSource",
+                "MySqlConfig",
+                "MySqlQueryBuilders",
+                "MySqlSource"
               ],
-              "path": "@cole-framework/api-core"
-            }
-          ],
-          "props": [],
-          "methods": [
-            {
-              "name": "create",
-              "params": [],
-              "return": null,
-              "async": true,
-              "access": "public",
-              "static": true
+              "path": "@cole-framework/storage-mysql"
             }
           ]
         }
@@ -489,7 +493,7 @@
           "methods": [
             {
               "name": "create",
-              "static": true,
+              "is_static": true,
               "params": [
                 {
                   "name": "handler",
@@ -511,7 +515,7 @@
                 {
                   "name": "path",
                   "type": "string",
-                  "value": "{{USE addons.path}}"
+                  "value": "{{USE ADDONS(path)}}"
                 },
                 {
                   "name": "handler",
@@ -609,6 +613,14 @@
       "defaults": {
         "common": {
           "exp": true,
+          "imports": [
+            {
+              "list": [
+                "RouteIO"
+              ],
+              "path": "@cole-framework/api-core"
+            }
+          ],
           "interfaces": [
             {
               "name": "RouteIO",
@@ -648,8 +660,8 @@
       }
     },
     "toolset": {
-      "name_pattern": "{{pascal name}}Toolsets",
-      "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/{{kebab layer}}/tools/{{kebab name}}.toolsets.ts",
+      "name_pattern": "{{pascal name}}Toolset",
+      "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/{{kebab layer}}/tools/{{kebab name}}.tools.ts",
       "element_type": "class",
       "defaults": {
         "common": {

@@ -9,17 +9,18 @@ export class PropTemplateModel {
     dependencies: Dependency[],
     config: Config
   ) {
-    const { access, name, type, is_optional, is_readonly, is_static, value } =
+    const { access, name, type, is_optional, is_readonly, is_static, value, template } =
       schema;
 
     return new PropTemplateModel(
       access,
       name,
-      TemplateModelTools.generateNameFromType(type, dependencies, config),
+      TemplateModelTools.generateNameFromType(type),
       is_optional,
       is_readonly,
       is_static,
-      value
+      value,
+      template
     );
   }
 
@@ -30,6 +31,7 @@ export class PropTemplateModel {
     public is_optional: boolean,
     public is_readonly: boolean,
     public is_static: boolean,
-    public value: any
+    public value: any,
+    public template: any
   ) {}
 }

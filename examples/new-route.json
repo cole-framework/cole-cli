@@ -1,35 +1,25 @@
 {
-  "controllers": [
-    {
-      "name": "xxx",
-      "endpoint": "xxx",
-      "handlers": [
-        {
-          "name": "getFoo",
-          "input": "Array<Entity<Fooo>>",
-          "output": "Array<Entity<Bar>>"
-        }
-      ]
-    }
-  ],
   "routes": [
     {
-      "name": "Foo",
+      "name": "xyz",
       "endpoint": "xxx",
-      "controller": "xxx",
-      "handler": "getFoo",
+      "controller": "xyz",
+      "handler": "getXyz",
       "request": {
+        "path": "/xyz/:id",
         "method": "GET",
-        "path": "foo/:id",
         "validate": false,
-        "auth": "jwt",
-        "body": { "foo":"string", "bar":"number" },
-        "headers": {}
+        "auth": "none",
+        "body": {
+          "p1": "string"
+        }
       },
       "response": {
-        "200": "OK",
-        "500": "Error",
-        "404": { "foo":"string", "bar":"number" }
+        "200": {
+          "q1": "RouteModel<Qwerty>",
+          "q2": "string"
+        },
+        "404": "Array<unknown>"
       }
     }
   ]

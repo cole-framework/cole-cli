@@ -9,15 +9,17 @@ export class ParamTemplateModel {
     dependencies: Dependency[],
     config: Config
   ) {
-    const { access, name, type, is_optional, is_readonly, value } = schema;
+    const { access, name, type, is_optional, is_readonly, value, template } =
+      schema;
 
     return new ParamTemplateModel(
       access,
       name,
-      TemplateModelTools.generateNameFromType(type, dependencies, config),
+      TemplateModelTools.generateNameFromType(type),
       is_optional,
       is_readonly,
-      value
+      value,
+      template
     );
   }
 
@@ -27,6 +29,7 @@ export class ParamTemplateModel {
     public type: string,
     public is_optional: boolean,
     public is_readonly: boolean,
-    public value: any
+    public value: any,
+    public template: any
   ) {}
 }

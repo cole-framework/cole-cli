@@ -1,10 +1,5 @@
 import { isMainThread, parentPort, threadId } from "worker_threads";
-import {
-  FileOutput,
-  FileTemplateModel,
-  SourceCodeWriter,
-  fileOrDirExists,
-} from "./";
+import { FileTemplateModel, SourceCodeWriter } from "./";
 import { FileTransport } from "./transport/file.transport";
 import { ConsoleTransport } from "./transport/console.transport";
 import { TypeScriptFileTemplate } from "../defaults/typescript.file-template";

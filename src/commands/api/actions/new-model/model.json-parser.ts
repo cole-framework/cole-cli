@@ -30,7 +30,7 @@ export class ModelJsonParser {
 
       for (const type of types) {
         if (
-          models.find((m) => m.type.name === data.name && m.type.type === type)
+          models.find((m) => m.type.ref === data.name && m.type.type === type)
         ) {
           continue;
         }
@@ -51,18 +51,18 @@ export class ModelJsonParser {
         if (type.isModel) {
           let m;
           m = models.find(
-            (m) => m.type.name === type.name && m.type.type === type.type
+            (m) => m.type.ref === type.ref && m.type.type === type.type
           );
           if (!m) {
             m = ModelFactory.create(
-              { name: type.name, endpoint: model.endpoint, type: type.type },
+              { name: type.ref, endpoint: model.endpoint, type: type.type },
               writeMethod.dependency,
               config,
               []
             );
             models.push(m);
           }
-          model.addDependency(m);
+          model.addDependency(m, config);
         } else if (type.isEntity) {
           //
         }

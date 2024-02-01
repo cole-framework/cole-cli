@@ -16,16 +16,21 @@ export class FunctionTemplateModel {
     dependencies: Dependency[],
     config: Config
   ) {
-    const { name, is_async, return_type, generics, params, body, exp } = schema;
+    const {
+      name,
+      is_async,
+      return_type,
+      generics,
+      params,
+      body,
+      exp,
+      template,
+    } = schema;
 
     return new FunctionTemplateModel(
       exp,
       name,
-      TemplateModelTools.generateNameFromType(
-        return_type,
-        dependencies,
-        config
-      ),
+      TemplateModelTools.generateNameFromType(return_type),
       is_async,
       Array.isArray(params)
         ? params.map((p) => ParamTemplateModel.create(p, dependencies, config))
@@ -33,7 +38,8 @@ export class FunctionTemplateModel {
       BodyTemplateModel.create(body),
       Array.isArray(generics)
         ? generics.map((g) => GenericTemplateModel.create(g))
-        : []
+        : [],
+      template
     );
   }
 
@@ -44,6 +50,7 @@ export class FunctionTemplateModel {
     public is_async: boolean,
     public params: ParamTemplateModel[],
     public body: BodyTemplateModel,
-    public generics: GenericTemplateModel[]
+    public generics: GenericTemplateModel[],
+    public template: string
   ) {}
 }

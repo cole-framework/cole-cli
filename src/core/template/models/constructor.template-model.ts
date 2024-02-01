@@ -10,7 +10,7 @@ export class ConstructorTemplateModel {
     dependencies: Dependency[],
     config: Config
   ) {
-    const { access, params, body, supr } = schema;
+    const { access, params, body, supr, template } = schema;
 
     return new ConstructorTemplateModel(
       access,
@@ -18,7 +18,8 @@ export class ConstructorTemplateModel {
         ? params.map((p) => ParamTemplateModel.create(p, dependencies, config))
         : [],
       BodyTemplateModel.create(body),
-      supr ? ConstructorTemplateModel.create(supr, dependencies, config) : null
+      supr ? ConstructorTemplateModel.create(supr, dependencies, config) : null,
+      template
     );
   }
 
@@ -26,6 +27,7 @@ export class ConstructorTemplateModel {
     public access: string,
     public params: ParamTemplateModel[],
     public body: BodyTemplateModel,
-    public supr: ConstructorTemplateModel
+    public supr: ConstructorTemplateModel,
+    public template: string
   ) {}
 }

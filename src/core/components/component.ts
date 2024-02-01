@@ -21,6 +21,7 @@ import {
   ImportData,
 } from "./schemas";
 import { ComponentTools } from "./component.tools";
+import { Config } from "../config";
 
 export interface ElementWithProps {
   props: PropSchema[];
@@ -59,6 +60,7 @@ export interface ElementWithImports {
 
 export type ElementObject = {
   name: string;
+  template?: string;
   exp?: ExportObject;
   inheritance?: InheritanceObject[];
   ctor?: ConstructorObject;
@@ -102,15 +104,28 @@ export class Component<
     Element extends ComponentElement,
     ElementAddons = unknown,
   >(
-    id: string,
-    type: TypeInfo,
-    endpoint: string,
-    path: string,
-    writeMethod: WriteMethod,
-    addons: ElementAddons,
-    element: Element,
-    dependencies: Component[]
+    config: Config,
+    data: {
+      id: string;
+      type: TypeInfo;
+      endpoint: string;
+      path: string;
+      writeMethod: WriteMethod;
+      addons: ElementAddons;
+      element: Element;
+      dependencies: Component[];
+    }
   ): Component<Element, ElementAddons> {
+    const {
+      id,
+      type,
+      endpoint,
+      path,
+      writeMethod,
+      addons,
+      element,
+      dependencies,
+    } = data;
     const component = new Component(
       id || nanoid(),
       type,
@@ -123,7 +138,7 @@ export class Component<
 
     if (Array.isArray(dependencies)) {
       dependencies.forEach((d) => {
-        component.addDependency(d);
+        component.addDependency(d, config);
       });
     }
 
@@ -142,7 +157,7 @@ export class Component<
     public readonly element: Element
   ) {}
 
-  addDependency(dependency: Component) {
+  addDependency(dependency: Component, config: Config) {
     const { id, path, type, element } = dependency;
 
     if (dependency && this.hasDependency(dependency) === false) {
@@ -169,7 +184,7 @@ export class Component<
             impt["list"] = [element.name];
           }
 
-          this.element.addImport(ImportSchema.create(impt, []));
+          this.element.addImport(ImportSchema.create(impt, config));
         }
       }
     }
@@ -180,7 +195,7 @@ export class Component<
       this.__dependencies.findIndex((d) => {
         return (
           d.name === dependency.element.name &&
-          d.type.name === dependency.type.name &&
+          d.type.ref === dependency.type.ref &&
           d.type.type === dependency.type.type &&
           d.path === dependency.path
         );

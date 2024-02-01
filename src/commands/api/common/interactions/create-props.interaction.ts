@@ -2,7 +2,7 @@ import { Texts, TypeInfo, WriteMethod } from "../../../../core";
 import { PropJson } from "../../../../core/components";
 import { Config } from "../../../../core/config";
 import { EntityJson, ModelJson } from "../../actions";
-import { CreatePropInteraction } from "./create-prop-data.interaction";
+import { CreatePropInteraction } from "./create-prop.interaction";
 import { Interaction } from "./interaction";
 import { InteractionPrompts } from "./interaction-prompts";
 
@@ -41,7 +41,7 @@ export class CreatePropsInteraction extends Interaction<InteractionResult> {
         prop = await new CreatePropInteraction(texts).run();
         result.props.push(prop);
 
-        const type = TypeInfo.create(prop.type, config.reservedTypes);
+        const type = TypeInfo.create(prop.type, config);
 
         if (dependencies_write_method !== WriteMethod.Skip) {
           if (
@@ -51,7 +51,7 @@ export class CreatePropsInteraction extends Interaction<InteractionResult> {
             ))
           ) {
             result.models.push({
-              name: type.name,
+              name: type.ref,
               types: ["json"],
               endpoint: context.endpoint,
             });
@@ -62,7 +62,7 @@ export class CreatePropsInteraction extends Interaction<InteractionResult> {
             ))
           ) {
             result.entities.push({
-              name: type.name,
+              name: type.ref,
               endpoint: context.endpoint,
             });
           }

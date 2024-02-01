@@ -1,5 +1,5 @@
 import { camelCase } from "change-case";
-import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
+import { Config, ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { AccessType } from "../../enums";
 import { TypeInfo, UnknownType } from "../../type.info";
 import { SchemaTools } from "../schema.tools";
@@ -15,6 +15,7 @@ export type PropObject = {
   is_readonly: boolean;
   is_static: boolean;
   value: any;
+  template: string;
 };
 
 export type PropData = {
@@ -25,6 +26,7 @@ export type PropData = {
   is_readonly?: boolean;
   is_static?: boolean;
   value?: unknown;
+  template?: string;
 };
 export type PropJson = {
   name?: string;
@@ -41,7 +43,7 @@ export type PropConfig = PropJson & ConfigAddons;
 export class PropTools {
   static stringToData(
     str: string,
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ): PropData {
     let name: string;
@@ -58,7 +60,7 @@ export class PropTools {
       if (match[4]) {
         const temp = match[4].trim();
         if (ConfigTools.hasInstructions(temp)) {
-          name = ConfigTools.executeInstructions(temp, references, reserved);
+          name = ConfigTools.executeInstructions(temp, references, config);
         } else {
           name = temp;
         }
@@ -67,21 +69,21 @@ export class PropTools {
       if (match[7]) {
         let temp = match[7].trim();
         if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, config);
         }
         if (TypeInfo.isType(temp)) {
           type = temp;
         } else {
-          type = TypeInfo.create(temp, reserved);
+          type = TypeInfo.create(temp, config);
         }
       } else {
-        type = new UnknownType();
+        type = UnknownType.create();
       }
 
       if (match[9]) {
         const temp = match[9].trim();
         if (ConfigTools.hasInstructions(temp)) {
-          value = ConfigTools.executeInstructions(temp, references, reserved);
+          value = ConfigTools.executeInstructions(temp, references, config);
         } else {
           value = temp;
         }
@@ -107,13 +109,13 @@ export class PropTools {
   }
   static arrayToData(
     data: (string | PropJson)[],
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ) {
     if (Array.isArray(data)) {
       return data.map((item) => {
         if (typeof item === "string") {
-          return PropTools.stringToData(item, reserved, references);
+          return PropTools.stringToData(item, config, references);
         }
         let value;
         let type;
@@ -122,14 +124,14 @@ export class PropTools {
         if (typeof item.value === "string") {
           const temp = item.value.trim();
           if (ConfigTools.hasInstructions(temp)) {
-            value = ConfigTools.executeInstructions(temp, references, reserved);
+            value = ConfigTools.executeInstructions(temp, references, config);
           } else {
             value = temp;
           }
         } else {
           value = SchemaTools.parseValue(item.value, (value) => {
             return ConfigTools.hasInstructions(value)
-              ? ConfigTools.executeInstructions(value, references, reserved)
+              ? ConfigTools.executeInstructions(value, references, config)
               : value;
           });
         }
@@ -137,19 +139,19 @@ export class PropTools {
         if (typeof item.type === "string") {
           let temp = item.type.trim();
           if (ConfigTools.hasInstructions(temp)) {
-            temp = ConfigTools.executeInstructions(temp, references, reserved);
+            temp = ConfigTools.executeInstructions(temp, references, config);
           }
           if (TypeInfo.isType(temp)) {
             type = temp;
           } else {
-            type = TypeInfo.create(temp, reserved);
+            type = TypeInfo.create(temp, config);
           }
         }
 
         if (typeof item.name === "string") {
           const temp = item.name.trim();
           if (ConfigTools.hasInstructions(temp)) {
-            name = ConfigTools.executeInstructions(temp, references, reserved);
+            name = ConfigTools.executeInstructions(temp, references, config);
           } else {
             name = temp;
           }
@@ -175,8 +177,8 @@ export class PropTools {
 export class PropSchema {
   public static create(
     data: string | PropJson | PropData,
-    reserved: ReservedType[],
-    references?: { [key: string]: unknown; dependencies: any[] }
+    config: Config,
+    references: { [key: string]: unknown; dependencies: any[] }
   ): PropSchema {
     if (!data) {
       return null;
@@ -189,9 +191,10 @@ export class PropSchema {
     let isStatic: boolean;
     let isOptional: boolean;
     let access: string;
+    let template: string;
 
     if (typeof data === "string") {
-      const prop = PropTools.stringToData(data, reserved, references);
+      const prop = PropTools.stringToData(data, config, references);
       name = prop.name;
       isOptional = prop.is_optional;
       isReadonly = prop.is_readonly;
@@ -208,40 +211,42 @@ export class PropSchema {
       if (typeof data.type === "string") {
         let temp = data.type.trim();
         if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, config);
         }
         if (TypeInfo.isType(temp)) {
           type = temp;
         } else {
-          type = TypeInfo.create(temp, reserved);
+          type = TypeInfo.create(temp, config);
         }
       } else if (TypeInfo.isType(data.type)) {
         type = data.type;
       } else {
-        type = new UnknownType();
+        type = UnknownType.create();
       }
 
       if (typeof data.value === "string") {
         const temp = data.value.trim();
         if (ConfigTools.hasInstructions(temp)) {
-          value = ConfigTools.executeInstructions(temp, references, reserved);
+          value = ConfigTools.executeInstructions(temp, references, config);
         } else {
           value = temp;
         }
       } else {
         value = SchemaTools.parseValue(data.value, (value) => {
           return ConfigTools.hasInstructions(value)
-            ? ConfigTools.executeInstructions(value, references, reserved)
+            ? ConfigTools.executeInstructions(value, references, config)
             : value;
         });
       }
 
       const tempName = data.name.trim();
       if (ConfigTools.hasInstructions(tempName)) {
-        name = ConfigTools.executeInstructions(tempName, references, reserved);
+        name = ConfigTools.executeInstructions(tempName, references, config);
       } else {
         name = tempName;
       }
+
+      template = (<PropData>data).template;
     }
 
     return new PropSchema(
@@ -251,7 +256,8 @@ export class PropSchema {
       isOptional,
       isReadonly,
       isStatic,
-      value
+      value,
+      template
     );
   }
 
@@ -262,7 +268,8 @@ export class PropSchema {
     public readonly isOptional: boolean,
     public readonly isReadonly: boolean,
     public readonly isStatic: boolean,
-    public readonly value: any
+    public readonly value: any,
+    public readonly template: string
   ) {}
 
   toObject(): PropObject {
@@ -274,6 +281,7 @@ export class PropSchema {
       isReadonly: is_readonly,
       isStatic: is_static,
       value,
+      template,
     } = this;
 
     return {
@@ -284,6 +292,7 @@ export class PropSchema {
       is_readonly,
       is_static,
       value,
+      template,
     };
   }
 

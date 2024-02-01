@@ -1,5 +1,5 @@
 export const use_template_regex =
-  /{{\s*USE TEMPLATE\s*\(([a-zA-Z0-9-_.]+)\)\s*}}/i;
+  /{{TEMPLATE\s*\(([a-zA-Z0-9-_.]+)\)\s*}}/i;
 
 export class BodyTemplateModel {
   static create(body: string) {

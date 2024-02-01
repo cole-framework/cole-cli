@@ -6,6 +6,7 @@ import { GeneralConfigData } from "./general-config.types";
 
 export type ConfigAddons = {
   meta?: string;
+  template?: string;
 };
 
 export type GeneratedPath = {

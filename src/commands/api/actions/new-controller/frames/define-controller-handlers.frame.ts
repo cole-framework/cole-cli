@@ -34,7 +34,7 @@ export class DefineControllerHandlersFrame extends Frame<ControllerHandlers> {
       return (
         types.findIndex(
           (r) =>
-            r.name.toLowerCase() === type.name.toLowerCase() &&
+            r.ref.toLowerCase() === type.ref.toLowerCase() &&
             r.type.type === type.type
         ) === -1
       );
@@ -42,7 +42,7 @@ export class DefineControllerHandlersFrame extends Frame<ControllerHandlers> {
     if (type.isEntity) {
       return (
         types.findIndex(
-          (r) => r.name.toLowerCase() === type.name.toLowerCase()
+          (r) => r.ref.toLowerCase() === type.ref.toLowerCase()
         ) === -1
       );
     }
@@ -69,7 +69,7 @@ export class DefineControllerHandlersFrame extends Frame<ControllerHandlers> {
         if (apiConfig.dependencies_write_method !== WriteMethod.Skip) {
           const types = [];
           if (handler.output) {
-            const rt = TypeInfo.create(handler.output, config.reservedTypes);
+            const rt = TypeInfo.create(handler.output, config);
             if (rt.isComponentType && this.isUnique(types, rt)) {
               types.push(rt);
             }
@@ -77,7 +77,7 @@ export class DefineControllerHandlersFrame extends Frame<ControllerHandlers> {
 
           if (Array.isArray(handler.input)) {
             handler.input.forEach((str) => {
-              const param = ParamSchema.create(str, config.reservedTypes);
+              const param = ParamSchema.create(str, config);
               if (
                 param.type.isComponentType &&
                 this.isUnique(types, param.type)
@@ -95,11 +95,11 @@ export class DefineControllerHandlersFrame extends Frame<ControllerHandlers> {
               ))
             ) {
               const c = result.models.find(
-                (m) => m.name === type.name && m.types.includes(type.type)
+                (m) => m.name === type.ref && m.types.includes(type.type)
               );
               if (!c) {
                 result.models.push({
-                  name: type.name,
+                  name: type.ref,
                   types: [type.type],
                   endpoint: context.endpoint,
                 });
@@ -110,10 +110,10 @@ export class DefineControllerHandlersFrame extends Frame<ControllerHandlers> {
                 texts.get("non_standard_type_detected__create_one")
               ))
             ) {
-              const c = result.entities.find((m) => m.name === type.name);
+              const c = result.entities.find((m) => m.name === type.ref);
               if (!c) {
                 result.entities.push({
-                  name: type.name,
+                  name: type.ref,
                   endpoint: context.endpoint,
                 });
               }

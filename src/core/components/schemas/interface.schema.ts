@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { ConfigTools, ReservedType } from "../../config";
+import { Config, ConfigTools, ReservedType } from "../../config";
 import { TypeInfo } from "../../type.info";
 import { SchemaTools } from "../schema.tools";
 import {
@@ -71,7 +71,7 @@ export type InterfaceConfig = InterfaceJson;
 export class InterfaceSchema {
   public static create(
     data: InterfaceData | InterfaceJson,
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ) {
     if (!data) {
@@ -89,11 +89,11 @@ export class InterfaceSchema {
       data.inheritance.forEach((i) => {
         if (typeof i === "string") {
           inheritance.push(
-            InheritanceSchema.create({ name: i }, reserved, references)
+            InheritanceSchema.create({ name: i }, config, references)
           );
         } else {
-          if (SchemaTools.executeMeta(i, references, reserved)) {
-            inheritance.push(InheritanceSchema.create(i, reserved, references));
+          if (SchemaTools.executeMeta(i, references, config)) {
+            inheritance.push(InheritanceSchema.create(i, config, references));
           }
         }
       });
@@ -101,7 +101,7 @@ export class InterfaceSchema {
 
     let name;
     if (ConfigTools.hasInstructions(data.name)) {
-      name = ConfigTools.executeInstructions(data.name, references, reserved);
+      name = ConfigTools.executeInstructions(data.name, references, config);
     } else {
       name = data.name;
     }
@@ -115,32 +115,32 @@ export class InterfaceSchema {
 
     if (Array.isArray(data.props)) {
       data.props.forEach((p) => {
-        if (SchemaTools.executeMeta(p, references, reserved)) {
-          intf.addProp(PropSchema.create(p, reserved, references));
+        if (SchemaTools.executeMeta(p, references, config)) {
+          intf.addProp(PropSchema.create(p, config, references));
         }
       });
     }
 
     if (Array.isArray(data.methods)) {
       data.methods.forEach((m) => {
-        if (SchemaTools.executeMeta(m, references, reserved)) {
-          intf.addMethod(MethodSchema.create(m, reserved, references));
+        if (SchemaTools.executeMeta(m, references, config)) {
+          intf.addMethod(MethodSchema.create(m, config, references));
         }
       });
     }
 
     if (Array.isArray(data.generics)) {
       data.generics.forEach((g) => {
-        if (SchemaTools.executeMeta(g, references, reserved)) {
-          intf.addGeneric(GenericSchema.create(g, reserved, references));
+        if (SchemaTools.executeMeta(g, references, config)) {
+          intf.addGeneric(GenericSchema.create(g, config, references));
         }
       });
     }
 
     if (Array.isArray(data.imports)) {
       data.imports.forEach((i) => {
-        if (SchemaTools.executeMeta(i, references, reserved)) {
-          intf.addImport(ImportSchema.create(i, reserved, references));
+        if (SchemaTools.executeMeta(i, references, config)) {
+          intf.addImport(ImportSchema.create(i, config, references));
         }
       });
     }

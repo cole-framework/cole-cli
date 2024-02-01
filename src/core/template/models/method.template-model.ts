@@ -22,16 +22,13 @@ export class MethodTemplateModel {
       params,
       body,
       supr,
+      template,
     } = schema;
 
     return new MethodTemplateModel(
       access,
       name,
-      TemplateModelTools.generateNameFromType(
-        return_type,
-        dependencies,
-        config
-      ),
+      TemplateModelTools.generateNameFromType(return_type),
       is_async,
       is_static,
       params.map((p) => ParamTemplateModel.create(p, dependencies, config)),
@@ -39,7 +36,8 @@ export class MethodTemplateModel {
       supr ? MethodTemplateModel.create(supr, dependencies, config) : null,
       Array.isArray(generics)
         ? generics.map((g) => GenericTemplateModel.create(g))
-        : []
+        : [],
+      template
     );
   }
 
@@ -52,6 +50,7 @@ export class MethodTemplateModel {
     public params: ParamTemplateModel[],
     public body: BodyTemplateModel,
     public supr: MethodTemplateModel,
-    public generics: GenericTemplateModel[]
+    public generics: GenericTemplateModel[],
+    public template: string
   ) {}
 }

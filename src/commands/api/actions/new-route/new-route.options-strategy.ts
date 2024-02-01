@@ -1,9 +1,9 @@
 import chalk from "chalk";
-import { Strategy } from "../../../../../core/strategy";
-import { NewRouteOptions, RouteJson } from "../types";
-import { Texts, RouteMethodType } from "../../../../../core";
-import { ApiJsonParser } from "../../../common/api-json.parser";
-import { ApiConfig } from "../../../common";
+import { Strategy } from "../../../../core/strategy";
+import { NewRouteOptions, RouteJson } from "./types";
+import { Texts, RouteMethodType } from "../../../../core";
+import { ApiJsonParser } from "../../common/api-json.parser";
+import { ApiConfig, ApiGenerator } from "../../common";
 
 export class NewRouteOptionsStrategy extends Strategy {
   public async apply(apiConfig: ApiConfig, options: NewRouteOptions) {
@@ -58,12 +58,17 @@ export class NewRouteOptionsStrategy extends Strategy {
       controller,
     };
 
-    const result = new ApiJsonParser(apiConfig, config, texts).build({
+    const schema = new ApiJsonParser(apiConfig, config, texts).build({
       routes: [route],
     });
 
-    console.log("->", JSON.stringify(result, null, 2));
+    const result = await new ApiGenerator(config).generate(schema);
 
-    return result;
+    if (result.isFailure) {
+      console.log(result.failure.error);
+      process.exit(1);
+    } else {
+      process.exit(0);
+    }
   }
 }

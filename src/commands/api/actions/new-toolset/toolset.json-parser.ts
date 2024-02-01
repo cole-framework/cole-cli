@@ -34,7 +34,7 @@ export class ToolsetJsonParser {
         continue;
       }
 
-      if (toolsets.find((e) => e.type.name === name)) {
+      if (toolsets.find((e) => e.type.ref === name)) {
         continue;
       }
 
@@ -54,25 +54,25 @@ export class ToolsetJsonParser {
         if (type.isModel) {
           let model;
           model = modelsRef.find(
-            (m) => m.type.name === type.name && m.type.type === type.type
+            (m) => m.type.ref === type.ref && m.type.type === type.type
           );
 
           if (!model) {
             model = ModelFactory.create(
-              { name: type.name, endpoint: toolset.endpoint, type: type.type },
+              { name: type.ref, endpoint: toolset.endpoint, type: type.type },
               writeMethod.dependency,
               config,
               []
             );
             models.push(model);
           }
-          toolset.addDependency(model);
+          toolset.addDependency(model, config);
         } else if (type.isEntity) {
           let e;
-          e = entitiesRef.find((m) => m.type.name === type.name);
+          e = entitiesRef.find((m) => m.type.ref === type.ref);
           if (!e) {
             e = EntityFactory.create(
-              { name: type.name, endpoint: toolset.endpoint },
+              { name: type.ref, endpoint: toolset.endpoint },
               null,
               writeMethod.dependency,
               config,
@@ -80,7 +80,7 @@ export class ToolsetJsonParser {
             );
             entities.push(e);
           }
-          toolset.addDependency(e);
+          toolset.addDependency(e, config);
         }
       });
     });

@@ -5,7 +5,8 @@ export class Pattern {
     pattern: string,
     replacements: { [key: string]: string }
   ): string {
-    const match = pattern.match(/{{\s*(\w+)\s+(\w+)\s*}}/g);
+    let value = pattern;
+    const match = value.match(/{{\s*(\w+)\s+(\w+)\s*}}/g);
 
     if (Array.isArray(match)) {
       for (const m of match) {
@@ -13,10 +14,12 @@ export class Pattern {
         const useCase = caseType === "kebab" ? `paramCase` : `${caseType}Case`;
 
         if (replacements[prop] && changeCase[useCase]) {
-          pattern = pattern.replace(m, changeCase[useCase](replacements[prop]));
+          value = value.replace(m, changeCase[useCase](replacements[prop]));
+        } else if (!replacements[prop]) {
+          value = value.replace(m, "");
         }
       }
     }
-    return pattern;
+    return value.replace(/[-]+/g, "-").replace(/\/-/g, "/");
   }
 }

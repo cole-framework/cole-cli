@@ -19,10 +19,10 @@ export class UseCaseJsonParse {
   buildOutput(data: UseCaseJson, modelsRef: Model[], entitiesRef: Entity[]) {
     const { config, writeMethod } = this;
     const { endpoint } = data;
-    const outputType = TypeInfo.create(data.output, config.reservedTypes);
+    const outputType = TypeInfo.create(data.output, config);
 
     if (outputType.isModel) {
-      const m = modelsRef.find((m) => m.type.name === outputType.name);
+      const m = modelsRef.find((m) => m.type.ref === outputType.ref);
 
       if (m) {
         return m;
@@ -30,7 +30,7 @@ export class UseCaseJsonParse {
 
       return ModelFactory.create(
         {
-          name: outputType.name,
+          name: outputType.ref,
           type: outputType.type,
           endpoint,
         },
@@ -41,7 +41,7 @@ export class UseCaseJsonParse {
     }
 
     if (outputType.isEntity) {
-      const e = entitiesRef.find((e) => e.type.name === outputType.name);
+      const e = entitiesRef.find((e) => e.type.ref === outputType.ref);
 
       if (e) {
         return e;
@@ -49,7 +49,7 @@ export class UseCaseJsonParse {
 
       return EntityFactory.create(
         {
-          name: outputType.name,
+          name: outputType.ref,
           endpoint,
         },
         null,
@@ -95,25 +95,25 @@ export class UseCaseJsonParse {
         if (type.isModel) {
           let model;
           model = modelsRef.find(
-            (m) => m.type.name === type.name && m.type.type === type.type
+            (m) => m.type.ref === type.ref && m.type.type === type.type
           );
 
           if (!model) {
             model = ModelFactory.create(
-              { name: type.name, endpoint: useCase.endpoint, type: type.type },
+              { name: type.ref, endpoint: useCase.endpoint, type: type.type },
               writeMethod.dependency,
               config,
               []
             );
             models.push(model);
           }
-          useCase.addDependency(model);
+          useCase.addDependency(model, config);
         } else if (type.isEntity) {
           let entity;
-          entity = entitiesRef.find((m) => m.type.name === type.name);
+          entity = entitiesRef.find((m) => m.type.ref === type.ref);
           if (!entity) {
             entity = EntityFactory.create(
-              { name: type.name, endpoint: useCase.endpoint },
+              { name: type.ref, endpoint: useCase.endpoint },
               null,
               writeMethod.dependency,
               config,
@@ -121,7 +121,7 @@ export class UseCaseJsonParse {
             );
             entities.push(entity);
           }
-          useCase.addDependency(entity);
+          useCase.addDependency(entity, config);
         }
       });
 

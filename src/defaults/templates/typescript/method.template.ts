@@ -1,4 +1,5 @@
 import { MethodTemplateModel } from "../../../core";
+import { ComponentTemplates } from "../components";
 import { ArgumentTemplate } from "./argument.template";
 import { ParamTemplate } from "./param.template";
 
@@ -14,6 +15,11 @@ export class MethodTemplate {
     model: MethodTemplateModel,
     elementType: "class" | "abstract_class" | "interface"
   ): string {
+
+    if (model.template) {
+      return ComponentTemplates.get(model.template)(model, elementType);
+    }
+
     const _ACCESS_ = model.access || "";
     const _ASYNC_ = model.is_async ? "async" : "";
     const _STATIC_ = model.is_static ? "static" : "";

@@ -1,4 +1,4 @@
-import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
+import { Config, ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { AccessType } from "../../enums";
 import { TypeInfo, UnknownType } from "../../type.info";
 import { SchemaTools } from "../schema.tools";
@@ -28,6 +28,7 @@ export type MethodObject = {
   is_static: boolean;
   params: ParamObject[];
   body: string;
+  template: string;
   supr: MethodObject;
   generics: GenericObject[];
 };
@@ -40,6 +41,7 @@ export type MethodData = {
   is_static?: boolean;
   params?: ParamData[];
   body?: string;
+  template?: string;
   supr?: MethodData;
   generics?: GenericData[];
 };
@@ -61,7 +63,7 @@ export type MethodConfig = MethodJson & ConfigAddons;
 export class MethodTools {
   static stringToData(
     str: string,
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ): MethodData {
     let name: string;
@@ -97,7 +99,7 @@ export class MethodTools {
       if (match[4]) {
         let temp = match[4].trim();
         if (ConfigTools.hasInstructions(temp)) {
-          name = ConfigTools.executeInstructions(temp, references, reserved);
+          name = ConfigTools.executeInstructions(temp, references, config);
         } else {
           name = temp;
         }
@@ -106,22 +108,22 @@ export class MethodTools {
       if (match[10]) {
         let temp = match[10].trim();
         if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, config);
         }
         returnType = TypeInfo.isType(temp)
           ? temp
-          : TypeInfo.create(temp, reserved);
+          : TypeInfo.create(temp, config);
       } else {
-        returnType = new UnknownType();
+        returnType = UnknownType.create();
       }
 
       body = match[12]?.trim();
 
       SchemaTools.splitIgnoringBrackets(match[6], ",").forEach((str) => {
-        generics.push(GenericTools.stringToData(str, reserved, references));
+        generics.push(GenericTools.stringToData(str, config, references));
       });
       SchemaTools.splitIgnoringBrackets(match[8], ",").forEach((str) => {
-        params.push(ParamTools.stringToData(str, reserved, references));
+        params.push(ParamTools.stringToData(str, config, references));
       });
     } else {
       throw new Error(`Method regex match failure`);
@@ -142,13 +144,13 @@ export class MethodTools {
 
   static arrayToData(
     data: (string | MethodJson)[],
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ) {
     if (Array.isArray(data)) {
       return data.map((item) => {
         if (typeof item === "string") {
-          return MethodTools.stringToData(item, reserved, references);
+          return MethodTools.stringToData(item, config, references);
         }
         let name = item.name;
         let return_type;
@@ -156,20 +158,16 @@ export class MethodTools {
         if (typeof item.return_type === "string") {
           let temp = item.return_type.trim();
           if (ConfigTools.hasInstructions(temp)) {
-            temp = ConfigTools.executeInstructions(temp, references, reserved);
+            temp = ConfigTools.executeInstructions(temp, references, config);
           }
           return_type = TypeInfo.isType(temp)
             ? temp
-            : TypeInfo.create(temp, reserved);
+            : TypeInfo.create(temp, config);
         }
 
         const tempName = item.name.trim();
         if (ConfigTools.hasInstructions(tempName)) {
-          name = ConfigTools.executeInstructions(
-            tempName,
-            references,
-            reserved
-          );
+          name = ConfigTools.executeInstructions(tempName, references, config);
         } else {
           name = tempName;
         }
@@ -177,7 +175,7 @@ export class MethodTools {
         return {
           name,
           params: Array.isArray(item.params)
-            ? ParamTools.arrayToData(item.params, reserved, references)
+            ? ParamTools.arrayToData(item.params, config, references)
             : [],
           access: item.access,
           is_async: item.is_async,
@@ -193,7 +191,7 @@ export class MethodTools {
 export class MethodSchema {
   public static create(
     data: MethodData | MethodJson | string,
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ): MethodSchema {
     if (!data) {
@@ -207,22 +205,21 @@ export class MethodSchema {
     let isAsync: boolean;
     let isStatic: boolean;
     let body: string;
+    let template: string;
     let supr: MethodSchema;
     let generics: GenericSchema[] = [];
 
     if (typeof data === "string") {
-      const mth = MethodTools.stringToData(data, reserved, references);
+      const mth = MethodTools.stringToData(data, config, references);
       name = mth.name;
       access = mth.access;
-      params = mth.params.map((p) =>
-        ParamSchema.create(p, reserved, references)
-      );
+      params = mth.params.map((p) => ParamSchema.create(p, config, references));
       returnType = mth.return_type;
       isAsync = mth.is_async;
       isStatic = mth.is_static;
       body = mth.body;
       generics = mth.generics.map((g) =>
-        GenericSchema.create(g, reserved, references)
+        GenericSchema.create(g, config, references)
       );
     } else {
       access = data.access || AccessType.Public;
@@ -232,7 +229,7 @@ export class MethodSchema {
 
       const tempName = data.name.trim();
       if (ConfigTools.hasInstructions(tempName)) {
-        name = ConfigTools.executeInstructions(tempName, references, reserved);
+        name = ConfigTools.executeInstructions(tempName, references, config);
       } else {
         name = tempName;
       }
@@ -242,11 +239,11 @@ export class MethodSchema {
       } else if (typeof data.return_type === "string") {
         let temp = data.return_type.trim();
         if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, config);
         }
         returnType = TypeInfo.isType(temp)
           ? temp
-          : TypeInfo.create(temp, reserved);
+          : TypeInfo.create(temp, config);
       }
 
       if (Array.isArray(data.params)) {
@@ -256,17 +253,17 @@ export class MethodSchema {
               const p = ConfigTools.executeInstructions(
                 param,
                 references,
-                reserved
+                config
               );
               if (p) {
                 params.push(p);
               }
             } else {
-              params.push(ParamSchema.create(param, reserved, references));
+              params.push(ParamSchema.create(param, config, references));
             }
           } else {
-            if (SchemaTools.executeMeta(param, references, reserved)) {
-              params.push(ParamSchema.create(param, reserved, references));
+            if (SchemaTools.executeMeta(param, references, config)) {
+              params.push(ParamSchema.create(param, config, references));
             }
           }
         });
@@ -275,28 +272,30 @@ export class MethodSchema {
           params = ConfigTools.executeInstructions(
             data.params,
             references,
-            reserved
+            config
           );
         } else {
-          if (SchemaTools.executeMeta(data.params, references, reserved)) {
-            params.push(ParamSchema.create(data.params, reserved, references));
+          if (SchemaTools.executeMeta(data.params, references, config)) {
+            params.push(ParamSchema.create(data.params, config, references));
           }
         }
       }
 
       if (Array.isArray(data.generics)) {
         data.generics.forEach((g) => {
-          if (SchemaTools.executeMeta(g, references, reserved)) {
-            generics.push(GenericSchema.create(g, reserved, references));
+          if (SchemaTools.executeMeta(g, references, config)) {
+            generics.push(GenericSchema.create(g, config, references));
           }
         });
       }
 
       if (data.supr) {
-        if (SchemaTools.executeMeta(data.supr, references, reserved)) {
-          supr = MethodSchema.create(data.supr, reserved, references);
+        if (SchemaTools.executeMeta(data.supr, references, config)) {
+          supr = MethodSchema.create(data.supr, config, references);
         }
       }
+
+      template = (<MethodData>data).template;
     }
 
     const method = new MethodSchema(
@@ -306,7 +305,8 @@ export class MethodSchema {
       isStatic,
       isAsync,
       body,
-      supr
+      supr,
+      template
     );
 
     params.forEach((param) => {
@@ -330,7 +330,8 @@ export class MethodSchema {
     public readonly isStatic: boolean,
     public readonly isAsync: boolean,
     public readonly body: string,
-    public readonly supr: MethodSchema
+    public readonly supr: MethodSchema,
+    public readonly template: string
   ) {}
 
   addParam(param: ParamSchema) {
@@ -380,6 +381,7 @@ export class MethodSchema {
       isStatic,
       name,
       returnType,
+      template,
     } = this;
 
     const mth: MethodObject = {
@@ -392,6 +394,7 @@ export class MethodSchema {
       is_static: isStatic,
       name,
       return_type: returnType,
+      template,
     };
 
     return mth;

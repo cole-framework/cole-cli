@@ -9,6 +9,7 @@ import {
   Config,
   MapperType,
 } from "../../../../core";
+import { nanoid } from "nanoid";
 
 export class MapperFactory {
   static create(
@@ -123,25 +124,21 @@ export class MapperFactory {
       is_abstract: config.components.mapper.elementType === "abstract_class",
     };
 
-    const element = ClassSchema.create<MapperElement>(
-      classData,
-      config.reservedTypes,
-      {
-        addons,
-        dependencies,
-      }
-    );
+    const element = ClassSchema.create<MapperElement>(classData, config, {
+      addons,
+      dependencies,
+    });
 
-    const component = Component.create<MapperElement, MapperAddons>(
-      id,
-      new MapperType(name, storage),
+    const component = Component.create<MapperElement, MapperAddons>(config, {
+      id: nanoid(),
+      type: MapperType.create(componentName, name, storage),
       endpoint,
-      componentPath,
+      path: componentPath,
       writeMethod,
       addons,
       element,
-      dependencies
-    );
+      dependencies,
+    });
 
     return component;
   }

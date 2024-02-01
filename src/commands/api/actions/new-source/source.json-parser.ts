@@ -1,5 +1,11 @@
 import chalk from "chalk";
-import { Config, MethodTools, PropTools, Texts, WriteMethod } from "../../../../core";
+import {
+  Config,
+  MethodTools,
+  PropTools,
+  Texts,
+  WriteMethod,
+} from "../../../../core";
 import { Entity, EntityFactory } from "../new-entity";
 import { Model, ModelFactory } from "../new-model";
 import { SourceFactory } from "./source.factory";
@@ -38,7 +44,7 @@ export class SourceJsonParser {
         let model;
         if (
           sources.find(
-            (m) => m.type.name === data.name && m.type.type === storage
+            (m) => m.type.ref === name && m.type.type === storage
           )
         ) {
           continue;
@@ -46,7 +52,7 @@ export class SourceJsonParser {
 
         model = modelsRef.find(
           (m) =>
-            (m.type.name === data.model || m.type.name === name) &&
+            (m.type.ref === data.model || m.type.ref === name) &&
             m.type.type === storage
         );
 
@@ -70,11 +76,11 @@ export class SourceJsonParser {
             storage,
             table,
             endpoint,
-            props: PropTools.arrayToData(props, config.reservedTypes, {
+            props: PropTools.arrayToData(props, config, {
               dependencies: [],
               addons: {},
             }),
-            methods: MethodTools.arrayToData(methods, config.reservedTypes, {
+            methods: MethodTools.arrayToData(methods, config, {
               dependencies: [],
               addons: {},
             }),
@@ -89,25 +95,25 @@ export class SourceJsonParser {
           if (type.isModel) {
             let model;
             model = modelsRef.find(
-              (m) => m.type.name === type.name && m.type.type === type.type
+              (m) => m.type.ref === type.ref && m.type.type === type.type
             );
 
             if (!model) {
               model = ModelFactory.create(
-                { name: type.name, endpoint: source.endpoint, type: type.type },
+                { name: type.ref, endpoint: source.endpoint, type: type.type },
                 writeMethod.dependency,
                 config,
                 []
               );
               models.push(model);
             }
-            source.addDependency(model);
+            source.addDependency(model, config);
           } else if (type.isEntity) {
             let e;
-            e = entities.find((m) => m.type.name === type.name);
+            e = entities.find((m) => m.type.ref === type.ref);
             if (!e) {
               e = EntityFactory.create(
-                { name: type.name, endpoint: source.endpoint },
+                { name: type.ref, endpoint: source.endpoint },
                 null,
                 writeMethod.dependency,
                 config,
@@ -115,7 +121,7 @@ export class SourceJsonParser {
               );
               entities.push(e);
             }
-            source.addDependency(e);
+            source.addDependency(e, config);
           }
         });
 

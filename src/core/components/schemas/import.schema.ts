@@ -1,5 +1,5 @@
 import path from "path";
-import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
+import { Config, ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { SchemaTools } from "../schema.tools";
 
 export type ImportData = {
@@ -75,7 +75,7 @@ export class ImportTools {
 export class ImportSchema {
   public static create(
     data: string | ImportData | ImportJson,
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ) {
     let dflt;
@@ -90,7 +90,7 @@ export class ImportSchema {
         dflt = ConfigTools.executeInstructions(
           match.dflt,
           references,
-          reserved
+          config
         );
       } else {
         dflt = match.dflt;
@@ -100,7 +100,7 @@ export class ImportSchema {
         alias = ConfigTools.executeInstructions(
           match.alias,
           references,
-          reserved
+          config
         );
       } else {
         alias = match.alias;
@@ -110,7 +110,7 @@ export class ImportSchema {
         path = ConfigTools.executeInstructions(
           match.path,
           references,
-          reserved
+          config
         );
       } else {
         path = match.path;
@@ -118,7 +118,7 @@ export class ImportSchema {
       if (Array.isArray(match.list)) {
         match.list.forEach((l) => {
           if (ConfigTools.hasInstructions(l)) {
-            list.push(ConfigTools.executeInstructions(l, references, reserved));
+            list.push(ConfigTools.executeInstructions(l, references, config));
           } else {
             list.push(l);
           }
@@ -126,7 +126,7 @@ export class ImportSchema {
       }
     } else {
       if (ConfigTools.hasInstructions(data.dflt)) {
-        dflt = ConfigTools.executeInstructions(data.dflt, references, reserved);
+        dflt = ConfigTools.executeInstructions(data.dflt, references, config);
       } else {
         dflt = data.dflt;
       }
@@ -135,7 +135,7 @@ export class ImportSchema {
         alias = ConfigTools.executeInstructions(
           data.alias,
           references,
-          reserved
+          config
         );
       } else {
         alias = data.alias;
@@ -147,7 +147,7 @@ export class ImportSchema {
         tempPath = ConfigTools.executeInstructions(
           data.path,
           references,
-          reserved
+          config
         );
       } else {
         tempPath = data.path;
@@ -161,7 +161,7 @@ export class ImportSchema {
       if (Array.isArray(data.list)) {
         data.list.forEach((l) => {
           if (ConfigTools.hasInstructions(l)) {
-            list.push(ConfigTools.executeInstructions(l, references, reserved));
+            list.push(ConfigTools.executeInstructions(l, references, config));
           } else {
             list.push(l);
           }

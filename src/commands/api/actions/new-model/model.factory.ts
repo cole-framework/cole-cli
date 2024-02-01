@@ -23,7 +23,7 @@ export class ModelFactory {
     const componentName = config.components.model.generateName(name, {
       type,
     });
-
+    const typeLC = type.toLowerCase();
     const componentPath = config.components.model.generatePath({
       name,
       type,
@@ -53,19 +53,19 @@ export class ModelFactory {
       props.push(...defaults.common.props);
     }
 
-    if (Array.isArray(defaults?.[type]?.imports)) {
-      defaults[type].imports.forEach((i) => {
+    if (Array.isArray(defaults?.[typeLC]?.imports)) {
+      defaults[typeLC].imports.forEach((i) => {
         i.ref_path = componentPath;
         imports.push(i);
       });
     }
 
-    if (Array.isArray(defaults?.[type]?.generics)) {
-      generics.push(...defaults[type].generics);
+    if (Array.isArray(defaults?.[typeLC]?.generics)) {
+      generics.push(...defaults[typeLC].generics);
     }
 
-    if (Array.isArray(defaults?.[type]?.props)) {
-      props.push(...defaults[type].props);
+    if (Array.isArray(defaults?.[typeLC]?.props)) {
+      props.push(...defaults[typeLC].props);
     }
 
     if (Array.isArray(data.generics)) {
@@ -76,12 +76,14 @@ export class ModelFactory {
       props.push(...data.props);
     }
 
-    props.forEach((p) => {
-      const mapping = dbConfig.mappings.find((m) => m.codeType === p.type);
-      if (mapping) {
-        p.type = mapping.dbType;
-      }
-    });
+    if (dbConfig) {
+      props.forEach((p) => {
+        const mapping = dbConfig.mappings.find((m) => m.codeType === p.type);
+        if (mapping) {
+          p.type = mapping.dbType;
+        }
+      });
+    }
 
     const element = TypeSchema.create<ModelElement>(
       {
@@ -93,23 +95,23 @@ export class ModelFactory {
         alias,
         exp,
       } as TypeJson,
-      config.reservedTypes,
+      config,
       {
         addons,
         dependencies,
       }
     );
 
-    const component = Component.create<ModelElement, ModelAddons>(
-      id || nanoid(),
-      new ModelType(name, type),
+    const component = Component.create<ModelElement, ModelAddons>(config, {
+      id: id || nanoid(),
+      type: ModelType.create(componentName, name, type),
       endpoint,
-      componentPath,
+      path: componentPath,
       writeMethod,
       addons,
       element,
-      dependencies
-    );
+      dependencies,
+    });
 
     return component;
   }

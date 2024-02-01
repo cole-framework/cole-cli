@@ -41,7 +41,7 @@ import {
   ImportObject,
   ImportSchema,
 } from "./import.schema";
-import { ReservedType } from "../../config";
+import { Config, ReservedType } from "../../config";
 import { SchemaTools } from "../schema.tools";
 import { TypeInfo } from "../../type.info";
 
@@ -56,6 +56,7 @@ export type ClassObject = {
   generics?: GenericObject[];
   imports?: ImportObject[];
   name: string;
+  template?: string;
 };
 
 export type ClassData = {
@@ -70,6 +71,7 @@ export type ClassData = {
   imports?: ImportData[];
   name: string;
   id?: string;
+  template?: string;
 };
 
 export type ClassJson = {
@@ -89,7 +91,7 @@ export type ClassJson = {
 export class ClassSchema {
   public static create<T>(
     data: ClassData | ClassJson,
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ): T {
     if (!data) {
@@ -105,8 +107,8 @@ export class ClassSchema {
     }
 
     if (data.ctor) {
-      if (SchemaTools.executeMeta(data.ctor, references, reserved)) {
-        ctor = ConstructorSchema.create(data.ctor, reserved, references);
+      if (SchemaTools.executeMeta(data.ctor, references, config)) {
+        ctor = ConstructorSchema.create(data.ctor, config, references);
       }
     }
 
@@ -114,11 +116,11 @@ export class ClassSchema {
       data.inheritance.forEach((i) => {
         if (typeof i === "string") {
           inheritance.push(
-            InheritanceSchema.create({ name: i }, reserved, references)
+            InheritanceSchema.create({ name: i }, config, references)
           );
         } else {
-          if (SchemaTools.executeMeta(i, references, reserved)) {
-            inheritance.push(InheritanceSchema.create(i, reserved, references));
+          if (SchemaTools.executeMeta(i, references, config)) {
+            inheritance.push(InheritanceSchema.create(i, config, references));
           }
         }
       });
@@ -129,45 +131,46 @@ export class ClassSchema {
       data.name,
       exp,
       ctor,
-      inheritance
+      inheritance,
+      (<ClassData>data).template
     );
 
     if (Array.isArray(data.interfaces)) {
       data.interfaces.forEach((i) => {
-        if (SchemaTools.executeMeta(i, references, reserved)) {
-          cls.addInterface(InterfaceSchema.create(i, reserved, references));
+        if (SchemaTools.executeMeta(i, references, config)) {
+          cls.addInterface(InterfaceSchema.create(i, config, references));
         }
       });
     }
 
     if (Array.isArray(data.props)) {
       data.props.forEach((p) => {
-        if (SchemaTools.executeMeta(p, references, reserved)) {
-          cls.addProp(PropSchema.create(p, reserved, references));
+        if (SchemaTools.executeMeta(p, references, config)) {
+          cls.addProp(PropSchema.create(p, config, references));
         }
       });
     }
 
     if (Array.isArray(data.methods)) {
       data.methods.forEach((m) => {
-        if (SchemaTools.executeMeta(m, references, reserved)) {
-          cls.addMethod(MethodSchema.create(m, reserved, references));
+        if (SchemaTools.executeMeta(m, references, config)) {
+          cls.addMethod(MethodSchema.create(m, config, references));
         }
       });
     }
 
     if (Array.isArray(data.generics)) {
       data.generics.forEach((g) => {
-        if (SchemaTools.executeMeta(g, references, reserved)) {
-          cls.addGeneric(GenericSchema.create(g, reserved, references));
+        if (SchemaTools.executeMeta(g, references, config)) {
+          cls.addGeneric(GenericSchema.create(g, config, references));
         }
       });
     }
 
     if (Array.isArray(data.imports)) {
       data.imports.forEach((i) => {
-        if (SchemaTools.executeMeta(i, references, reserved)) {
-          cls.addImport(ImportSchema.create(i, reserved, references));
+        if (SchemaTools.executeMeta(i, references, config)) {
+          cls.addImport(ImportSchema.create(i, config, references));
         }
       });
     }
@@ -187,7 +190,8 @@ export class ClassSchema {
     public readonly name: string,
     public readonly exp: ExportSchema,
     public readonly ctor: ConstructorSchema,
-    inheritance: InheritanceSchema[] = []
+    inheritance: InheritanceSchema[] = [],
+    private template: string
   ) {
     inheritance.forEach((i) => {
       this.__inheritance.push(i);
@@ -233,7 +237,7 @@ export class ClassSchema {
           p.path === path &&
           p.alias === alias &&
           p.dflt === dflt &&
-          impt.list.every((i) => list.includes(i))
+          list.every((i) => p.list.includes(i))
       ) > -1
     );
   }
@@ -326,6 +330,7 @@ export class ClassSchema {
       __generics,
       __interfaces,
       __imports,
+      template
     } = this;
 
     const cls: ClassObject = {
@@ -339,6 +344,7 @@ export class ClassSchema {
       generics: __generics.map((g) => g.toObject()),
       interfaces: __interfaces.map((i) => i.toObject()),
       imports: __imports.map((i) => i.toObject()),
+      template
     };
 
     return cls;

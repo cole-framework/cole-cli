@@ -1,11 +1,9 @@
 import chalk from "chalk";
-import { ConfigLoader, WriteMethod } from "../../../../core";
-import {
-  NewRouteInteractiveStrategy,
-  NewRouteOptionsStrategy,
-} from "./strategies";
+import { ConfigLoader } from "../../../../core";
 import { NewRouteOptions } from "./types";
 import { ApiConfig } from "../../common";
+import { NewRouteOptionsStrategy } from "./new-route.options-strategy";
+import { NewRouteInteractiveStrategy } from "./new-route.interactive-strategy";
 
 export const newRoute = async (options: NewRouteOptions) => {
   const { content: config, failure } = ConfigLoader.load("route");

@@ -1,29 +1,27 @@
-import { Texts } from "../../../../core";
-import { PropJson } from "../../../../core/components";
-import { Interaction } from "./interaction";
-import { InteractionPrompts } from "./interaction-prompts";
+import { PropJson, Texts } from "../../../../../../core";
+import { Interaction, InteractionPrompts } from "../../../../common";
 
-export class CreatePropInteraction extends Interaction<PropJson> {
+export class CreateObjectPropInteraction extends Interaction<PropJson> {
   constructor(private texts: Texts) {
     super();
   }
   public async run(message?: string): Promise<PropJson> {
     const { texts } = this;
     return InteractionPrompts.form<PropJson>(
-      message || texts.get("FORM_PROP"),
+      message || texts.get("form_prop"),
       [
         {
           name: "name",
-          message: texts.get("NAME"),
+          message: texts.get("name"),
         },
         {
           name: "type",
-          message: texts.get("TYPE"),
+          message: texts.get("type"),
           initial: "string",
         },
         {
           name: "value",
-          message: texts.get("DEFAULT_VALUE"),
+          message: texts.get("default_value"),
         },
         {
           name: "access",

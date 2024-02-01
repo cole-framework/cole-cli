@@ -82,7 +82,7 @@ export class CreateToolsetFrame extends Frame<ApiJson> {
             const componentTypes: TypeInfo[] = [];
             if (Array.isArray(method.params)) {
               method.params.forEach((param) => {
-                const p = ParamSchema.create(param, config.reservedTypes);
+                const p = ParamSchema.create(param, config);
                 p.listTypes().forEach((type) => {
                   ComponentTools.filterComponentTypes(type).forEach(
                     (componentType) => {
@@ -116,7 +116,7 @@ export class CreateToolsetFrame extends Frame<ApiJson> {
                     texts
                   ).run({
                     endpoint,
-                    name: componentType.name,
+                    name: componentType.ref,
                     types: [componentType.type],
                   });
                 } else if (componentType.isEntity) {
@@ -126,7 +126,7 @@ export class CreateToolsetFrame extends Frame<ApiJson> {
                     texts
                   ).run({
                     endpoint,
-                    name: componentType.name,
+                    name: componentType.ref,
                   });
                 }
 

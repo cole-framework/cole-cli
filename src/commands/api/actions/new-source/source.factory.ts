@@ -8,6 +8,7 @@ import {
   Config,
   WriteMethod,
 } from "../../../../core";
+import { nanoid } from "nanoid";
 
 export class SourceFactory {
   public static create(
@@ -125,25 +126,21 @@ export class SourceFactory {
       is_abstract: config.components.source.elementType === "abstract_class",
     };
 
-    const element = ClassSchema.create<SourceElement>(
-      classData,
-      config.reservedTypes,
-      {
-        addons,
-        dependencies,
-      }
-    );
+    const element = ClassSchema.create<SourceElement>(classData, config, {
+      addons,
+      dependencies,
+    });
 
-    const component = Component.create<SourceElement, SourceAddons>(
-      id,
-      new SourceType(name, storage),
+    const component = Component.create<SourceElement, SourceAddons>(config, {
+      id: id || nanoid(),
+      type: SourceType.create(componentName, name, storage),
       endpoint,
-      componentPath,
+      path: componentPath,
       writeMethod,
       addons,
       element,
-      dependencies
-    );
+      dependencies,
+    });
 
     return component;
   }

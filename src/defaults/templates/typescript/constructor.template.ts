@@ -1,6 +1,8 @@
 import { ConstructorTemplateModel } from "../../../core";
+import { ComponentTemplates } from "../components";
 import { ArgumentTemplate } from "./argument.template";
 import { ParamTemplate } from "./param.template";
+import { SuperTemplate } from "./super.template";
 
 export const CONSTRUCTOR_TEMPLATE = `_ACCESS_ constructor(_PARAMS_) {
   _SUPER_
@@ -9,24 +11,16 @@ export const CONSTRUCTOR_TEMPLATE = `_ACCESS_ constructor(_PARAMS_) {
 
 export class ConstructorTemplate {
   static parse(model: ConstructorTemplateModel): string {
+    if (model.template) {
+      return ComponentTemplates.get(model.template)(model);
+    }
+
     const _ACCESS_ = model.access || "";
     const _PARAMS_ = model.params.map((p) => ParamTemplate.parse(p)).join(", ");
     let _SUPER_ = "";
 
     if (model.supr) {
-      if (model.supr.params.length > 0) {
-        _SUPER_ = `super(${model.supr.params
-          .reduce((acc, p) => {
-            if (p) {
-              acc.push(ArgumentTemplate.parse(p));
-            }
-
-            return acc;
-          }, [])
-          .join(", ")});`;
-      } else {
-        _SUPER_ = "super();";
-      }
+      _SUPER_ = SuperTemplate.parse(model.supr);
     }
 
     let _BODY_ = "";

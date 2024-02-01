@@ -86,23 +86,23 @@ export class ToolsetFactory {
         exp,
         is_abstract: config.components.toolset.elementType === "abstract_class",
       } as ClassJson,
-      config.reservedTypes,
+      config,
       {
         addons,
         dependencies,
       }
     );
 
-    const component = Component.create<ToolsetElement>(
-      id || nanoid(),
-      new ToolsetType(name),
+    const component = Component.create<ToolsetElement>(config, {
+      id: id || nanoid(),
+      type: ToolsetType.create(componentName, name),
       endpoint,
-      componentPath,
+      path: componentPath,
       writeMethod,
       addons,
       element,
-      dependencies
-    );
+      dependencies,
+    });
 
     return component;
   }

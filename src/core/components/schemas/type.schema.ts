@@ -1,4 +1,4 @@
-import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
+import { Config, ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { TypeInfo, ObjectType, UnknownType } from "../../type.info";
 import { SchemaTools } from "../schema.tools";
 import {
@@ -61,7 +61,7 @@ export type TypeConfig = TypeJson & ConfigAddons;
 export class TypeTools {
   static stringToData(
     str: string,
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ): TypeData {
     let type: TypeInfo;
@@ -74,7 +74,7 @@ export class TypeTools {
     name = match[1].trim();
 
     SchemaTools.splitIgnoringBrackets(match[3], ",").forEach((str) => {
-      generics.push(GenericTools.stringToData(str, reserved, references));
+      generics.push(GenericTools.stringToData(str, config, references));
     });
 
     if (match[5]) {
@@ -83,13 +83,13 @@ export class TypeTools {
         Object.keys(obj).forEach((key) => {
           props.push({ name: key, type: obj[key] });
         });
-        type = new ObjectType();
+        type = ObjectType.create();
       } catch (e) {
         let temp = match[5].trim();
         if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, config);
         }
-        type = TypeInfo.create(temp, reserved);
+        type = TypeInfo.create(temp, config);
       }
     }
 
@@ -105,7 +105,7 @@ export class TypeTools {
 export class TypeSchema {
   public static create<T>(
     data: string | TypeData | TypeJson,
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ) {
     if (!data) {
@@ -121,12 +121,12 @@ export class TypeSchema {
     let imports = [];
 
     if (typeof data === "string") {
-      const tp = TypeTools.stringToData(data, reserved, references);
+      const tp = TypeTools.stringToData(data, config, references);
       type = tp.type;
       name = tp.name;
-      props = tp.props.map((p) => PropSchema.create(p, reserved, references));
+      props = tp.props.map((p) => PropSchema.create(p, config, references));
       generics = tp.generics.map((g) =>
-        GenericSchema.create(g, reserved, references)
+        GenericSchema.create(g, config, references)
       );
     } else {
       name = data.name;
@@ -135,13 +135,13 @@ export class TypeSchema {
         let temp = data.type.trim();
 
         if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, reserved);
+          temp = ConfigTools.executeInstructions(temp, references, config);
         }
-        type = TypeInfo.create(temp, reserved);
+        type = TypeInfo.create(temp, config);
       } else if (TypeInfo.isType(data.type)) {
         type = data.type;
       } else {
-        type = new UnknownType();
+        type = UnknownType.create();
       }
 
       if (data.exp) {
@@ -150,7 +150,7 @@ export class TypeSchema {
 
       if (Array.isArray(data.props)) {
         data.props.forEach((p) => {
-          props.push(PropSchema.create(p, reserved, references));
+          props.push(PropSchema.create(p, config, references));
         });
       }
 
@@ -158,9 +158,9 @@ export class TypeSchema {
         let temp = data.alias.trim();
 
         if (ConfigTools.hasInstructions(temp)) {
-          alias = ConfigTools.executeInstructions(temp, references, reserved);
+          alias = ConfigTools.executeInstructions(temp, references, config);
         } else {
-          alias = TypeInfo.create(temp, reserved);
+          alias = TypeInfo.create(temp, config);
         }
       } else if (TypeInfo.isType(data.alias)) {
         alias = data.alias;
@@ -177,8 +177,8 @@ export class TypeSchema {
     props.forEach((p) => t.addProp(p));
 
     imports.forEach((i) => {
-      if (SchemaTools.executeMeta(i, references, reserved)) {
-        t.addImport(ImportSchema.create(i, reserved, references));
+      if (SchemaTools.executeMeta(i, references, config)) {
+        t.addImport(ImportSchema.create(i, config, references));
       }
     });
 

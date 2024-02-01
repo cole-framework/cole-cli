@@ -129,114 +129,61 @@ export class ComponentsConfig {
     public readonly toolset: ComponentConfig
   ) {}
 
-  public generateName(type: TypeInfo): string {
-    if (type.isModel) {
-      return this.model.generateName(type.name, { type: type.type });
-    }
-    if (type.isEntity) {
-      return this.entity.generateName(type.name);
-    }
-    if (type.isSource) {
-      return this.source.generateName(type.name, { type: type.type });
-    }
-    if (type.isUseCase) {
-      return this.useCase.generateName(type.name);
-    }
-    if (type.isRepository) {
-      return this.repository.generateName(type.name);
-    }
-    if (type.isRepositoryFactory) {
-      return this.repositoryFactory.generateName(type.name);
-    }
-    if (type.isRepositoryImpl) {
-      return this.repositoryImpl.generateName(type.name);
-    }
-    if (type.isController) {
-      return this.controller.generateName(type.name);
-    }
-    if (type.isMapper) {
-      return this.mapper.generateName(type.name, { type: type.type });
-    }
-    if (type.isRoute) {
-      return this.route.generateName(type.name, {
-        type: type.type,
-        method: type.type,
-      });
-    }
-    if (type.isRouteModel) {
-      return this.routeModel.generateName(type.name, {
-        type: type.type,
-        method: type.type,
-      });
-    }
-    if (type.isRouteIO) {
-      return this.routeIO.generateName(type.name, {
-        type: type.type,
-        method: type.type,
-      });
-    }
-    if (type.isToolset) {
-      return this.toolset.generateName(type.name);
-    }
-
-    return type.name;
-  }
-
   public generatePath(type: TypeInfo): string {
     if (type.isModel) {
-      return this.model.generatePath({ name: type.name, type: type.type }).path;
+      return this.model.generatePath({ name: type.ref, type: type.type }).path;
     }
     if (type.isEntity) {
-      return this.entity.generatePath({ name: type.name }).path;
+      return this.entity.generatePath({ name: type.ref }).path;
     }
     if (type.isSource) {
-      return this.source.generatePath({ name: type.name, type: type.type })
+      return this.source.generatePath({ name: type.ref, type: type.type })
         .path;
     }
     if (type.isUseCase) {
-      return this.useCase.generatePath({ name: type.name }).path;
+      return this.useCase.generatePath({ name: type.ref }).path;
     }
     if (type.isRepository) {
-      return this.repository.generatePath({ name: type.name }).path;
+      return this.repository.generatePath({ name: type.ref }).path;
     }
     if (type.isRepositoryFactory) {
-      return this.repositoryFactory.generatePath({ name: type.name }).path;
+      return this.repositoryFactory.generatePath({ name: type.ref }).path;
     }
     if (type.isRepositoryImpl) {
-      return this.repositoryImpl.generatePath({ name: type.name }).path;
+      return this.repositoryImpl.generatePath({ name: type.ref }).path;
     }
     if (type.isController) {
-      return this.controller.generatePath({ name: type.name }).path;
+      return this.controller.generatePath({ name: type.ref }).path;
     }
     if (type.isMapper) {
-      return this.mapper.generatePath({ name: type.name, type: type.type })
+      return this.mapper.generatePath({ name: type.ref, type: type.type })
         .path;
     }
     if (type.isRoute) {
       return this.route.generatePath({
-        name: type.name,
+        name: type.ref,
         type: type.type,
         method: type.type,
       }).path;
     }
     if (type.isRouteModel) {
       return this.routeModel.generatePath({
-        name: type.name,
+        name: type.ref,
         type: type.type,
         method: type.type,
       }).path;
     }
     if (type.isRouteIO) {
       return this.routeIO.generatePath({
-        name: type.name,
+        name: type.ref,
         type: type.type,
         method: type.type,
       }).path;
     }
     if (type.isToolset) {
-      return this.toolset.generatePath({ name: type.name }).path;
+      return this.toolset.generatePath({ name: type.ref }).path;
     }
 
-    return type.name;
+    return '/undefined_path/';
   }
 }

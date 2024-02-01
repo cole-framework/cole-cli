@@ -24,11 +24,12 @@ export class RouteModelFactory {
       type,
       method,
     });
-
+    const typeLC = type?.toLowerCase() || "json";
+    const methodLC = method?.toLowerCase() || "";
     const componentPath = config.components.routeModel.generatePath({
       name,
-      type,
-      method,
+      type: typeLC,
+      method: methodLC,
       endpoint,
     }).path;
     const imports = [];
@@ -55,19 +56,19 @@ export class RouteModelFactory {
       props.push(...defaults.common.props);
     }
 
-    if (Array.isArray(defaults?.[type]?.imports)) {
-      defaults[type].imports.forEach((i) => {
+    if (Array.isArray(defaults?.[methodLC]?.imports)) {
+      defaults[methodLC].imports.forEach((i) => {
         i.ref_path = componentPath;
         imports.push(i);
       });
     }
 
-    if (Array.isArray(defaults?.[type]?.generics)) {
-      generics.push(...defaults[type].generics);
+    if (Array.isArray(defaults?.[methodLC]?.generics)) {
+      generics.push(...defaults[methodLC].generics);
     }
 
-    if (Array.isArray(defaults?.[type]?.props)) {
-      props.push(...defaults[type].props);
+    if (Array.isArray(defaults?.[methodLC]?.props)) {
+      props.push(...defaults[methodLC].props);
     }
 
     if (Array.isArray(data.generics)) {
@@ -81,12 +82,12 @@ export class RouteModelFactory {
     const element = TypeSchema.create<RouteModelElement>(
       {
         name: componentName,
-        type,
+        type: typeLC,
         props,
         generics,
         exp,
       } as TypeJson,
-      config.reservedTypes,
+      config,
       {
         addons,
         dependencies,
@@ -94,14 +95,17 @@ export class RouteModelFactory {
     );
 
     const component = Component.create<RouteModelElement, RouteModelAddons>(
-      nanoid(),
-      new RouteModelType(name, type),
-      endpoint,
-      componentPath,
-      writeMethod,
-      addons,
-      element,
-      dependencies
+      config,
+      {
+        id: nanoid(),
+        type: RouteModelType.create(componentName, name, method, type),
+        endpoint,
+        path: componentPath,
+        writeMethod,
+        addons,
+        element,
+        dependencies,
+      }
     );
 
     return component;

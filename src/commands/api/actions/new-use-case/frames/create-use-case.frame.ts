@@ -76,7 +76,7 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
           param = await new CreateParamInteraction(texts).run();
           input.add(param);
 
-          const type = TypeInfo.create(param.type, config.reservedTypes);
+          const type = TypeInfo.create(param.type, config);
 
           if (apiConfig.dependencies_write_method !== WriteMethod.Skip) {
             if (
@@ -87,13 +87,13 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
             ) {
               if (type.isModel) {
                 result.models.push({
-                  name: type.name,
+                  name: type.ref,
                   types: [type.type],
                   endpoint,
                 });
               } else if (type.isEntity) {
                 result.entities.push({
-                  name: type.name,
+                  name: type.ref,
                   endpoint,
                 });
               }
@@ -130,8 +130,8 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
         const o = await new InputTextInteraction(
           texts.get("please_enter_use_case_output")
         ).run();
-        const type = TypeInfo.create(o, config.reservedTypes);
-        output = type.ref;
+        const type = TypeInfo.create(o, config);
+        output = type.tag;
       } else {
         output = "void";
       }

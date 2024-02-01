@@ -22,8 +22,7 @@ export class UseCaseFactory {
 
     const addons = {
       input: data.input,
-      output:
-        output?.type || TypeInfo.create(data.output, config.reservedTypes),
+      output: output?.type || TypeInfo.create(data.output, config),
     };
 
     const interfaces = [];
@@ -98,25 +97,21 @@ export class UseCaseFactory {
       is_abstract: config.components.useCase.elementType === "abstract_class",
     };
 
-    const element = ClassSchema.create<UseCaseElement>(
-      classData,
-      config.reservedTypes,
-      {
-        addons,
-        dependencies,
-      }
-    );
+    const element = ClassSchema.create<UseCaseElement>(classData, config, {
+      addons,
+      dependencies,
+    });
 
-    const component = Component.create<UseCaseElement>(
+    const component = Component.create<UseCaseElement>(config, {
       id,
-      new UseCaseType(name),
+      type: UseCaseType.create(componentName, name),
       endpoint,
-      componentPath,
+      path: componentPath,
       writeMethod,
-      null,
+      addons: {},
       element,
-      dependencies
-    );
+      dependencies,
+    });
 
     return component;
   }

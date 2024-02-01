@@ -32,14 +32,14 @@ export class EntityJsonParser {
         continue;
       }
 
-      if (entities.find((e) => e.type.name === name)) {
+      if (entities.find((e) => e.type.ref === name)) {
         continue;
       }
 
       if (
         has_model &&
         modelsRef.findIndex(
-          (m) => m.type.name === name && m.type.type === "json"
+          (m) => m.type.ref === name && m.type.type === "json"
         ) === -1
       ) {
         model = ModelFactory.create(
@@ -69,25 +69,25 @@ export class EntityJsonParser {
         if (type.isModel) {
           let model;
           model = modelsRef.find(
-            (m) => m.type.name === type.name && m.type.type === type.type
+            (m) => m.type.ref === type.ref && m.type.type === type.type
           );
 
           if (!model) {
             model = ModelFactory.create(
-              { name: type.name, endpoint: entity.endpoint, type: type.type },
+              { name: type.ref, endpoint: entity.endpoint, type: type.type },
               writeMethod.dependency,
               config,
               []
             );
             models.push(model);
           }
-          entity.addDependency(model);
+          entity.addDependency(model, config);
         } else if (type.isEntity) {
           let e;
-          e = entities.find((m) => m.type.name === type.name);
+          e = entities.find((m) => m.type.ref === type.ref);
           if (!e) {
             e = EntityFactory.create(
-              { name: type.name, endpoint: entity.endpoint },
+              { name: type.ref, endpoint: entity.endpoint },
               null,
               writeMethod.dependency,
               config,
@@ -95,7 +95,7 @@ export class EntityJsonParser {
             );
             entities.push(e);
           }
-          entity.addDependency(e);
+          entity.addDependency(e, config);
         }
       });
     });

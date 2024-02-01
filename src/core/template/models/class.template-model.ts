@@ -26,6 +26,7 @@ export class ClassTemplateModel {
       imports,
       name,
       is_abstract,
+      template,
     } = schema;
 
     return new ClassTemplateModel(
@@ -54,7 +55,8 @@ export class ClassTemplateModel {
         : [],
       Array.isArray(imports)
         ? imports.map((i) => ImportTemplateModel.create(i))
-        : []
+        : [],
+      template
     );
   }
 
@@ -68,6 +70,7 @@ export class ClassTemplateModel {
     public props: PropTemplateModel[],
     public methods: MethodTemplateModel[],
     public generics: GenericTemplateModel[],
-    public imports: ImportTemplateModel[]
+    public imports: ImportTemplateModel[],
+    public template: string
   ) {}
 }

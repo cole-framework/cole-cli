@@ -1,4 +1,4 @@
-import { ConfigAddons, ConfigTools, ReservedType } from "../../config";
+import { Config, ConfigAddons, ConfigTools, ReservedType } from "../../config";
 import { SchemaTools } from "../schema.tools";
 import {
   GenericData,
@@ -27,7 +27,7 @@ export type InheritanceConfig = InheritanceJson & ConfigAddons;
 export class InheritanceSchema {
   public static create(
     data: string | InheritanceData | InheritanceJson,
-    reserved: ReservedType[],
+    config: Config,
     references?: { [key: string]: unknown; dependencies: any[] }
   ) {
     if (!data) {
@@ -42,7 +42,7 @@ export class InheritanceSchema {
       const temp = data.trim();
 
       if (ConfigTools.hasInstructions(temp)) {
-        name = ConfigTools.executeInstructions(temp, references, reserved);
+        name = ConfigTools.executeInstructions(temp, references, config);
       } else {
         name = temp;
       }
@@ -50,7 +50,7 @@ export class InheritanceSchema {
       const temp = data.name.trim();
 
       if (ConfigTools.hasInstructions(temp)) {
-        name = ConfigTools.executeInstructions(temp, references, reserved);
+        name = ConfigTools.executeInstructions(temp, references, config);
       } else {
         name = temp;
       }
@@ -63,8 +63,8 @@ export class InheritanceSchema {
     inth = new InheritanceSchema(name);
 
     generics.forEach((g) => {
-      if (SchemaTools.executeMeta(g, references, reserved)) {
-        inth.addGeneric(GenericSchema.create(g, reserved, references));
+      if (SchemaTools.executeMeta(g, references, config)) {
+        inth.addGeneric(GenericSchema.create(g, config, references));
       }
     });
 

@@ -85,26 +85,26 @@ export class EntityFactory {
         exp,
         is_abstract: config.components.entity.elementType === "abstract_class",
       } as ClassJson,
-      config.reservedTypes,
+      config,
       {
         addons,
         dependencies: [model, ...dependencies],
       }
     );
 
-    const component = Component.create<EntityElement, EntityAddons>(
-      id || nanoid(),
-      new EntityType(name),
+    const component = Component.create<EntityElement, EntityAddons>(config, {
+      id: id || nanoid(),
+      type: EntityType.create(componentName, name),
       endpoint,
-      componentPath,
+      path: componentPath,
       writeMethod,
       addons,
       element,
-      dependencies
-    );
+      dependencies,
+    });
 
     if (model) {
-      component.addDependency(model);
+      component.addDependency(model, config);
     }
 
     return component;
