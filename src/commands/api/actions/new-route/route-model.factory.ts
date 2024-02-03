@@ -17,7 +17,7 @@ export class RouteModelFactory {
     config: Config,
     dependencies: Component[]
   ): Component<RouteModelElement, RouteModelAddons> {
-    const { method, name, type, endpoint } = data;
+    const { method, name, type, endpoint, alias } = data;
     const addons = { modelType: type };
     const { defaults } = config.components.routeModel;
     const componentName = config.components.routeModel.generateName(name, {
@@ -86,6 +86,7 @@ export class RouteModelFactory {
         props,
         generics,
         exp,
+        alias,
       } as TypeJson,
       config,
       {

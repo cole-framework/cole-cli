@@ -11,36 +11,33 @@ export class NewRouteOptionsStrategy extends Strategy {
     const texts = await Texts.load();
 
     if (!options.endpoint && config.components.route.isEndpointRequired()) {
-      console.log(chalk.red(texts.get("MISSING_ENDPOINT")));
+      console.log(chalk.red(texts.get("missing_endpoint")));
       process.exit(1);
     }
 
-    const { endpoint, name, path, auth, validate, method } = options;
+    const {
+      endpoint,
+      name,
+      path,
+      auth,
+      validate,
+      method,
+      controller,
+      handler,
+    } = options;
     let body;
     let response;
-    let controllerWithMethod = options.handler.split(/\s*[\.]\s*/);
-    let handler;
-    let controller = controllerWithMethod[0];
-    if (controllerWithMethod[1]) {
-      const match = controllerWithMethod[1].match(
-        /^(\w+)\s*(\(([a-zA-Z0-9\<\>_ ]+)\))?(:([a-zA-Z0-9\<\>_ ]+))?$/
-      );
-      if (match) {
-        handler = match[1];
-        // handler.input = match[3];
-        // handler.output = match[5];
-      }
-    }
+
     try {
-      body = JSON.parse(options.body);
+      body = JSON.parse(options.body.replace(/'/g, '"'));
     } catch (error) {
       body = options.body;
     }
 
     try {
-      response = JSON.parse(options.response);
+      response = JSON.parse(options.response.replace(/'/g, '"'));
     } catch (error) {
-      body = options.response;
+      response = options.response;
     }
 
     const route: RouteJson = {
@@ -57,6 +54,8 @@ export class NewRouteOptionsStrategy extends Strategy {
       handler,
       controller,
     };
+
+    console.log("JSON", JSON.stringify(route, null, 2));
 
     const schema = new ApiJsonParser(apiConfig, config, texts).build({
       routes: [route],

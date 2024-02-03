@@ -15,7 +15,8 @@ export type NewRouteOptions = DefaultCliOptions & {
   name: string;
   path: string;
   method: string;
-  handler: string; // "controller_id/name.method_id/name"
+  controller: string;
+  handler: string;
   endpoint?: string;
   auth?: string;
   validate?: boolean;
@@ -69,6 +70,7 @@ export type RouteModelData = {
   name: string;
   endpoint?: string;
   type: string;
+  alias?: any;
   props?: (PropJson | string)[];
   generics?: GenericJson[];
 };

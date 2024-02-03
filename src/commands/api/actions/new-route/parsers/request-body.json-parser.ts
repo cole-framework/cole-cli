@@ -26,6 +26,7 @@ export class RequestBodyJsonParser {
 
     if (typeof request.body === "string") {
       const type = TypeInfo.create(request.body, config);
+
       if (type.isModel) {
         const body = modelsRef.find(
           (m) => m.type.ref === type.ref && m.type.type === type.type
@@ -34,6 +35,22 @@ export class RequestBodyJsonParser {
         if (body) {
           return body;
         }
+      } else if (type.isPrimitive) {
+        const m = RouteModelFactory.create(
+          {
+            name,
+            endpoint,
+            method: request.method,
+            type: RouteModelLabel.RequestBody,
+            alias: type.ref,
+          },
+          writeMethod.dependency,
+          config,
+          dependencies
+        );
+        models.push(m);
+        dependencies.push(m);
+        return m;
       }
     } else if (typeof request.body === "object") {
       Object.keys(request.body).forEach((key) => {

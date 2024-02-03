@@ -165,7 +165,7 @@
                 {
                   "name": "table",
                   "type": "string",
-                  "value": "{{USE ADDONS(table)}}"
+                  "value": "{{USE ADDONS().table}}"
                 }
               ]
             }
@@ -202,7 +202,7 @@
           "exp": true,
           "inheritance": [
             {
-              "meta": "{{IF ADDONS(hasModel) IS true}}",
+              "meta": "{{IF ADDONS().hasModel IS true}}",
               "name": "Entity",
               "generics": [
                 {
@@ -213,7 +213,7 @@
           ],
           "methods": [
             {
-              "meta": "{{IF ADDONS(hasModel) IS true}}",
+              "meta": "{{IF ADDONS().hasModel IS true}}",
               "name": "toModel",
               "params": [],
               "return_type": "{{USE DEPENDENCY(WHERE type.isModel IS true).type}}"
@@ -305,8 +305,8 @@
           "methods": [
             {
               "name": "execute",
-              "params": "{{USE ADDONS(input) TO BUILD Array<Param>}}",
-              "return_type": "{{USE ADDONS(output)}}",
+              "params": "{{USE ADDONS().input TO BUILD Array<Param>}}",
+              "return_type": "{{USE ADDONS().output}}",
               "is_async": true
             }
           ]
@@ -431,7 +431,7 @@
               "is_async": true,
               "access": "public",
               "is_static": true,
-              "body": "{{USE TEMPLATE(repository_factory_method)}}"
+              "body": "{{TEMPLATE(repository_factory_method)}}"
             }
           ],
           "imports": [
@@ -490,6 +490,14 @@
       "defaults": {
         "common": {
           "exp": true,
+          "imports": [
+            {
+              "list": [
+                "RouteHandler"
+              ],
+              "path": "@cole-framework/api-core"
+            }
+          ],
           "methods": [
             {
               "name": "create",
@@ -511,16 +519,16 @@
               }
             ],
             "supr": {
+              "template": "route_ctor_supr",
               "params": [
                 {
                   "name": "path",
                   "type": "string",
-                  "value": "{{USE ADDONS(path)}}"
+                  "value": "{{USE ADDONS().path}}"
                 },
                 {
                   "name": "handler",
-                  "type": "RouteHandler",
-                  "value": "handler"
+                  "type": "RouteHandler"
                 },
                 {
                   "name": "addons",
@@ -537,11 +545,14 @@
           "imports": [
             {
               "list": [
-                "UnknownObject",
-                "GetRoute",
-                "RouteHandler"
+                "GetRoute"
               ],
               "path": "@cole-framework/api-core"
+            }
+          ],
+          "inheritance": [
+            {
+              "name": "GetRoute"
             }
           ]
         },
@@ -549,11 +560,14 @@
           "imports": [
             {
               "list": [
-                "UnknownObject",
-                "PostRoute",
-                "RouteHandler"
+                "PostRoute"
               ],
               "path": "@cole-framework/api-core"
+            }
+          ],
+          "inheritance": [
+            {
+              "name": "PostRoute"
             }
           ]
         },
@@ -561,11 +575,14 @@
           "imports": [
             {
               "list": [
-                "UnknownObject",
-                "PutRoute",
-                "RouteHandler"
+                "PutRoute"
               ],
               "path": "@cole-framework/api-core"
+            }
+          ],
+          "inheritance": [
+            {
+              "name": "PutRoute"
             }
           ]
         },
@@ -573,11 +590,14 @@
           "imports": [
             {
               "list": [
-                "UnknownObject",
-                "PatchRoute",
-                "RouteHandler"
+                "PatchRoute"
               ],
               "path": "@cole-framework/api-core"
+            }
+          ],
+          "inheritance": [
+            {
+              "name": "PatchRoute"
             }
           ]
         },
@@ -585,11 +605,14 @@
           "imports": [
             {
               "list": [
-                "UnknownObject",
-                "DeleteRoute",
-                "RouteHandler"
+                "DeleteRoute"
               ],
               "path": "@cole-framework/api-core"
+            }
+          ],
+          "inheritance": [
+            {
+              "name": "DeleteRoute"
             }
           ],
           "props": []
@@ -597,8 +620,8 @@
       }
     },
     "route_model": {
-      "name_pattern": "{{pascal name}}{{pascal type}}Model",
-      "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/routes/{{kebab name}}.route-model.ts",
+      "name_pattern": "{{pascal method}}{{pascal name}}{{pascal type}}Model",
+      "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/routes/{{kebab method}}-{{kebab name}}.route-model.ts",
       "element_type": "type",
       "defaults": {
         "common": {
@@ -609,14 +632,16 @@
     "route_io": {
       "name_pattern": "{{pascal method}}{{pascal name}}RouteIO",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/routes/{{kebab method}}-{{kebab name}}.route-io.ts",
-      "element_type": "type",
+      "element_type": "class",
       "defaults": {
         "common": {
           "exp": true,
           "imports": [
             {
               "list": [
-                "RouteIO"
+                "RouteIO",
+                "Response",
+                "Request"
               ],
               "path": "@cole-framework/api-core"
             }
@@ -626,10 +651,10 @@
               "name": "RouteIO",
               "generics": [
                 {
-                  "dflt": "{{USE DEPENDENCY(WHERE type.type IS input).element.name}}"
+                  "dflt": "{{USE ADDONS().input.element.name}}"
                 },
                 {
-                  "dflt": "{{USE DEPENDENCY(WHERE type.type IS output).element.name}}"
+                  "dflt": "{{USE ADDONS().output.element.name}}"
                 }
               ]
             }
@@ -637,21 +662,21 @@
           "methods": [
             {
               "name": "toResponse",
-              "return_type": "{{USE DEPENDENCY(WHERE type.type IS input).type}}",
+              "return_type": "{{USE ADDONS().response.type}}",
               "params": [
                 {
                   "name": "output",
-                  "type": "{{USE DEPENDENCY(WHERE type.type IS output).type}}"
+                  "type": "{{USE ADDONS().output.type}}"
                 }
               ]
             },
             {
               "name": "fromRequest",
-              "return_type": "Response",
+              "return_type": "{{USE ADDONS().input.type}}",
               "params": [
                 {
                   "name": "request",
-                  "type": "Request<{{USE DEPENDENCY(WHERE type.type IS query_params).element.name}}, {{USE DEPENDENCY(WHERE type.type IS path_params).element.name}}, {{USE DEPENDENCY(WHERE type.type IS request_body).element.name}}>"
+                  "type": "{{USE ADDONS().request.type}}"
                 }
               ]
             }
