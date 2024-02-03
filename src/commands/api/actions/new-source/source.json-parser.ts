@@ -31,11 +31,9 @@ export class SourceJsonParser {
       const { name, endpoint, storages, table, props, methods } = data;
 
       if (!endpoint && config.components.source.isEndpointRequired()) {
-        console.log(chalk.red(texts.get("MISSING_ENDPOINT")));
+        console.log(chalk.red(texts.get("missing_endpoint")));
         console.log(
-          chalk.yellow(
-            texts.get("INFO_MAPPER_XXX_SKIPPED_ERROR").replace("###", name)
-          )
+          chalk.yellow(texts.get("component_###_skipped").replace("###", name))
         );
         continue;
       }
@@ -43,9 +41,7 @@ export class SourceJsonParser {
       for (const storage of storages) {
         let model;
         if (
-          sources.find(
-            (m) => m.type.ref === name && m.type.type === storage
-          )
+          sources.find((m) => m.type.ref === name && m.type.type === storage)
         ) {
           continue;
         }

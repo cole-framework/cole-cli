@@ -29,27 +29,6 @@ export class DefineControllerHandlersFrame extends Frame<ControllerHandlers> {
     super(DefineControllerHandlersFrame.NAME);
   }
 
-  private isUnique(types, type) {
-    if (type.isModel) {
-      return (
-        types.findIndex(
-          (r) =>
-            r.ref.toLowerCase() === type.ref.toLowerCase() &&
-            r.type.type === type.type
-        ) === -1
-      );
-    }
-    if (type.isEntity) {
-      return (
-        types.findIndex(
-          (r) => r.ref.toLowerCase() === type.ref.toLowerCase()
-        ) === -1
-      );
-    }
-
-    return true;
-  }
-
   public async run(context: { endpoint: string; name: string }) {
     const { texts, config, apiConfig } = this;
     const result = { handlers: [], models: [], entities: [] };
@@ -67,49 +46,39 @@ export class DefineControllerHandlersFrame extends Frame<ControllerHandlers> {
         result.handlers.push(handler);
 
         if (apiConfig.dependencies_write_method !== WriteMethod.Skip) {
+          let hasComponentType = false;
+
           const types = [];
+          if (handler.input) {
+            let it = TypeInfo.create(handler.input, config);
+
+            if (it.isComponentType) {
+              hasComponentType = true;
+              if (!it.isEntity) {
+                it = TypeInfo.create(`Entity<${it.ref}>`, config);
+              }
+              types.push(it);
+            }
+          }
+
           if (handler.output) {
-            const rt = TypeInfo.create(handler.output, config);
-            if (rt.isComponentType && this.isUnique(types, rt)) {
+            let rt = TypeInfo.create(handler.output, config);
+            if (rt.isComponentType) {
+              hasComponentType = true;
+              if (!rt.isEntity) {
+                rt = TypeInfo.create(`Entity<${rt.ref}>`, config);
+              }
               types.push(rt);
             }
           }
 
-          if (Array.isArray(handler.input)) {
-            handler.input.forEach((str) => {
-              const param = ParamSchema.create(str, config);
-              if (
-                param.type.isComponentType &&
-                this.isUnique(types, param.type)
-              ) {
-                types.push(param.type);
-              }
-            });
-          }
-
-          for (const type of types) {
-            if (
-              type.isModel &&
-              (await InteractionPrompts.confirm(
-                texts.get("non_standard_type_detected__create_one")
-              ))
-            ) {
-              const c = result.models.find(
-                (m) => m.name === type.ref && m.types.includes(type.type)
-              );
-              if (!c) {
-                result.models.push({
-                  name: type.ref,
-                  types: [type.type],
-                  endpoint: context.endpoint,
-                });
-              }
-            } else if (
-              type.isEntity &&
-              (await InteractionPrompts.confirm(
-                texts.get("non_standard_type_detected__create_one")
-              ))
-            ) {
+          if (
+            hasComponentType &&
+            (await InteractionPrompts.confirm(
+              texts.get("non_standard_types_detected__create")
+            ))
+          ) {
+            for (const type of types) {
               const c = result.entities.find((m) => m.name === type.ref);
               if (!c) {
                 result.entities.push({

@@ -402,6 +402,20 @@ export class NullType {
   ) {}
 }
 
+export class VoidType {
+  public readonly isPrimitive = true;
+
+  static create() {
+    return new VoidType(BasicType.Void, BasicType.Void, BasicType.Void);
+  }
+
+  private constructor(
+    public readonly name: string,
+    public readonly ref: string,
+    public readonly tag: string
+  ) {}
+}
+
 export class NaNType {
   public readonly isPrimitive = true;
 
@@ -577,7 +591,7 @@ export class RouteModelType {
     if (type) {
       desc.push(type);
     } else {
-      desc.push('json');
+      desc.push("json");
     }
     return new RouteModelType(
       name,

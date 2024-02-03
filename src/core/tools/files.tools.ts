@@ -71,39 +71,3 @@ export const fetchData = async <T>(path: string): Promise<T> => {
 
   return null;
 };
-
-export const importRelativePath = (
-  importPath: string,
-  sourcePath: string,
-  includeBasename = false
-) => {
-  const importDirname = dirname(importPath);
-  const importName = basename(importPath, ".ts");
-  const relativePath = relative(
-    dirname(sourcePath),
-    includeBasename ? join(importDirname, importName) : importDirname
-  );
-
-  if (/^\.+\//.test(relativePath) === false) {
-    return `./${relativePath}`;
-  }
-
-  return relativePath;
-};
-
-export const getRelativePath = (importPath: string, sourcePath?: string) => {
-  if (!importPath) {
-    return "";
-  }
-
-  if (importPath === sourcePath) {
-    return importPath;
-  }
-
-  // has namespace or is one word or no source path provided
-  if (importPath.startsWith("@") || /^\w+$/.test(importPath) || !sourcePath) {
-    return importPath;
-  }
-
-  return importRelativePath(importPath, sourcePath, importPath.endsWith(".ts"));
-};

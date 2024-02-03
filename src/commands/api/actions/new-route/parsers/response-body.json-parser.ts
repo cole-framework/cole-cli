@@ -30,6 +30,7 @@ export class ResponseBodyJsonParser {
     const { config, writeMethod, models, entities } = this;
     const { endpoint, request, name } = data;
     const props = [];
+    const dependencies = [];
 
     Object.keys(value).forEach((k) => {
       const p = PropSchema.create(`${k}:${value[k]}`, config, {
@@ -42,54 +43,55 @@ export class ResponseBodyJsonParser {
           type.isRouteModel &&
           modelsRef.findIndex((m) => m.type.name === type.name) === -1
         ) {
-          models.push(
-            RouteModelFactory.create(
-              { name: type.ref, type: type.type, endpoint, method: "" },
-              writeMethod.dependency,
-              config,
-              []
-            )
+          const model = RouteModelFactory.create(
+            { name: type.ref, type: type.type, endpoint, method: "" },
+            writeMethod.dependency,
+            config,
+            []
           );
+          models.push(model);
+          dependencies.push(model);
         } else if (
           type.isModel &&
           modelsRef.findIndex((m) => m.type.name === type.name) === -1
         ) {
-          models.push(
-            ModelFactory.create(
-              { name: type.ref, type: type.type, endpoint },
-              writeMethod.dependency,
-              config,
-              []
-            )
+          const model = ModelFactory.create(
+            { name: type.ref, type: type.type, endpoint },
+            writeMethod.dependency,
+            config,
+            []
           );
+          models.push(model);
+          dependencies.push(model);
         } else if (
           type.isEntity &&
           entitiesRef.findIndex((m) => m.type.ref === type.ref) === -1
         ) {
-          entities.push(
-            EntityFactory.create(
-              { name: type.ref, endpoint },
-              null,
-              writeMethod.dependency,
-              config,
-              []
-            )
+          const entity = EntityFactory.create(
+            { name: type.ref, endpoint },
+            null,
+            writeMethod.dependency,
+            config,
+            []
           );
+
+          entities.push(entity);
+          dependencies.push(entity);
         }
       });
     });
 
     const model = RouteModelFactory.create(
       {
-        name: `${pascalCase(name)}${status}`,
+        name,
         endpoint,
         method: request.method,
-        type: RouteModelLabel.ResponseStatusBody,
+        type:`Status${status}`,
         props,
       },
       writeMethod.dependency,
       config,
-      []
+      dependencies
     );
 
     models.push(model);
@@ -100,6 +102,7 @@ export class ResponseBodyJsonParser {
     const { config, writeMethod, models } = this;
     const { endpoint, request, response, name } = data;
     const props = [];
+    const dependencies = [];
 
     if (typeof response === "string") {
       const type = TypeInfo.create(response, config);
@@ -127,7 +130,9 @@ export class ResponseBodyJsonParser {
             modelsRef,
             entitiesRef
           );
-          type = model?.type;
+
+          type = model.type;
+          dependencies.push(model);
         }
         props.push(
           PropSchema.create(
@@ -154,7 +159,7 @@ export class ResponseBodyJsonParser {
       },
       writeMethod.dependency,
       config,
-      []
+      dependencies
     );
 
     models.push(model);

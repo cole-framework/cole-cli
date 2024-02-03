@@ -48,6 +48,9 @@ export class WorkerPool {
       const worker = this.availableWorkers.pop();
 
       worker.on("message", (message) => {
+        if (message?.status === "log") {
+          console.log(message.data);
+        }
         if (message?.status === "complete") {
           this.availableWorkers.push(worker);
 

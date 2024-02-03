@@ -1,7 +1,7 @@
 export const hasBody = (body: unknown) => {
   if (
     typeof body === "string" ||
-    (typeof body === "object" && Object.keys(body).length > 0) ||
+    (!!body && typeof body === "object" && Object.keys(body).length > 0) ||
     (Array.isArray(body) && body.length > 0)
   ) {
     return true;
@@ -15,7 +15,3 @@ export const hasParams = (path: string) => {
 
   return /\:\w+/g.test(pathParams) && /\w+/g.test(queryParams);
 };
-
-
-
-

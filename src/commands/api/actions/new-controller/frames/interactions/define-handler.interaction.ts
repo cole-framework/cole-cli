@@ -1,8 +1,8 @@
-import { MethodJson, Texts } from "../../../../../../core";
+import { SchemaTools, Texts } from "../../../../../../core";
 import { Interaction, InteractionPrompts } from "../../../../common";
 import { HandlerJson } from "../../types";
 
-export class DefineHandlerInteraction extends Interaction<MethodJson> {
+export class DefineHandlerInteraction extends Interaction<HandlerJson> {
   constructor(private texts: Texts) {
     super();
   }

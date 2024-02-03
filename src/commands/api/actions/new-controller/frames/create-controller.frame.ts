@@ -33,10 +33,10 @@ export class CreateControllerFrame extends Frame<ApiJson> {
     }
   ) {
     const { texts, config, apiConfig } = this;
-    const { name, endpoint, entities, models, handlers } = context;
+    const { name, endpoint, handlers } = context;
     const result: ApiJson = {
-      models: [...models],
-      entities: [...entities],
+      models: [],
+      entities: [],
       controllers: [],
     };
     const componentName = config.components.controller.generateName(name);

@@ -6,9 +6,11 @@ export const IMPORT_TEMPLATE = `import _IMPORT_ from "_PATH_";`;
 export class ImportTemplate {
   static parse(model: ImportTemplateModel): string {
     let _IMPORT_;
+
     const _PATH_ = model.path
       ? model.path.replace(extname(model.path), "")
       : "";
+
     if (model.alias) {
       _IMPORT_ = `* as ${model.alias}`;
     } else {

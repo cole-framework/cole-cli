@@ -16,7 +16,9 @@ export class ConstructorTemplate {
     }
 
     const _ACCESS_ = model.access || "";
-    const _PARAMS_ = model.params.map((p) => ParamTemplate.parse(p)).join(", ");
+    const _PARAMS_ = model.params
+      .map((p) => ParamTemplate.parse(p, { skipAccess: true }))
+      .join(", ");
     let _SUPER_ = "";
 
     if (model.supr) {

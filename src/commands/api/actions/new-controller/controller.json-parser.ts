@@ -43,6 +43,10 @@ export class ControllerInputJsonParser {
       type = entity.type;
     } else if (typeof handler.input === "string") {
       type = TypeInfo.create(handler.input, config);
+
+      if (type.isComponentType && !type.isEntity) {
+        type = TypeInfo.create(`Entity<${type.ref}>`, config);
+      }
     }
 
     return { entity, type };
@@ -78,6 +82,9 @@ export class ControllerOutputJsonParser {
       type = entity.type;
     } else if (typeof handler.output === "string") {
       type = TypeInfo.create(handler.output, config);
+      if (type.isComponentType && !type.isEntity) {
+        type = TypeInfo.create(`Entity<${type.ref}>`, config);
+      }
     } else {
       type = PrimitiveType.create("void");
     }
@@ -128,16 +135,19 @@ export class ControllerJsonParser {
         handlers.forEach((handler) => {
           if (typeof handler === "object") {
             const i = this.inputParser.build(handler, endpoint);
-            if (i) {
-              handler.input = i.type.name;
+            if (i.type) {
+              handler.input = i.type.tag;
               if (i.entity) {
                 entities.push(i.entity);
               }
             }
+
             const o = this.outputParser.build(handler, endpoint);
-            handler.output = o.type.name;
-            if (o.entity) {
-              entities.push(o.entity);
+            if (o.type) {
+              handler.output = o.type.tag;
+              if (o.entity) {
+                entities.push(o.entity);
+              }
             }
           }
         });

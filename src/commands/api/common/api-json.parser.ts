@@ -227,6 +227,8 @@ export class ApiJsonParser {
   }
 
   build(json: ApiJson): ApiSchema {
+    // console.log("JSON", JSON.stringify(json, null, 2));
+
     this.parseModels(json.models || []);
     this.parseEntities(json.entities || []);
     this.parseMappers(json.mappers || []);

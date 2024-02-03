@@ -70,6 +70,8 @@ export class SelectRequestBodyTypeFrame extends Frame<RequestBodyType> {
       );
     } else if (request_body === "various") {
       request_body = "any";
+    } else if (request_body === "none") {
+      request_body = null;
     }
 
     return { request_body };

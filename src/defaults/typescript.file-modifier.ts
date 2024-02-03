@@ -1,3 +1,4 @@
+import { extname } from "path";
 import {
   ClassTemplateModel,
   ExportTemplateModel,
@@ -43,7 +44,8 @@ export class TypeScriptFileModifier {
   private updateFileCode(line: number, code: string) {
     this.__updated = true;
     const lines = this.__file.rawCode.split("\n");
-    lines.splice(line + 1, 0, code);
+    lines.splice(line, 0, code);
+
     this.__file = TypeScriptFileReader.readCode(lines.join("\n"));
   }
 
@@ -52,7 +54,7 @@ export class TypeScriptFileModifier {
     const lastImport = this.__file.imports.at(-1);
 
     if (lastImport) {
-      this.updateFileCode(lastImport.endLine + 1, newImportCode);
+      this.updateFileCode(lastImport.endLine, newImportCode);
     } else {
       this.__updated = true;
       this.__file = TypeScriptFileReader.readCode(
@@ -66,7 +68,7 @@ export class TypeScriptFileModifier {
     const lastExport = this.__file.imports.at(-1);
 
     if (lastExport) {
-      this.updateFileCode(lastExport.endLine + 1, newExportCode);
+      this.updateFileCode(lastExport.endLine, newExportCode);
     } else {
       this.__updated = true;
       this.__file = TypeScriptFileReader.readCode(
@@ -85,7 +87,7 @@ export class TypeScriptFileModifier {
     if (lastType) {
       this.updateFileCode(lastType.endLine, newTypeCode);
     } else if (lastImport) {
-      this.updateFileCode(lastImport.endLine + 1, newTypeCode);
+      this.updateFileCode(lastImport.endLine, newTypeCode);
     } else if (firstFunction) {
       this.updateFileCode(lastImport.startLine - 1, newTypeCode);
     } else if (firstClass) {
@@ -125,7 +127,7 @@ export class TypeScriptFileModifier {
     if (lastInterface) {
       this.updateFileCode(lastInterface.endLine, newInterfaceCode);
     } else if (lastImport) {
-      this.updateFileCode(lastImport.endLine + 1, newInterfaceCode);
+      this.updateFileCode(lastImport.endLine, newInterfaceCode);
     } else if (firstClass) {
       this.updateFileCode(firstClass.startLine - 1, newInterfaceCode);
     } else {
@@ -196,7 +198,7 @@ export class TypeScriptFileModifier {
     if (lastFunction) {
       this.updateFileCode(lastFunction.endLine, newFunctionCode);
     } else if (lastImport) {
-      this.updateFileCode(lastImport.endLine + 1, newFunctionCode);
+      this.updateFileCode(lastImport.endLine, newFunctionCode);
     } else if (firstClass) {
       this.updateFileCode(firstClass.startLine - 1, newFunctionCode);
     } else {
@@ -211,9 +213,9 @@ export class TypeScriptFileModifier {
     classInfo: TypeScriptClassInfo,
     model: MethodTemplateModel
   ) {
-    const lastEqAccessMethod =  classInfo.methods.filter(
-      (m) => m.accessibility === model.access
-    ).pop();
+    const lastEqAccessMethod = classInfo.methods
+      .filter((m) => m.accessibility === model.access)
+      .pop();
     let startLine = -1;
 
     if (lastEqAccessMethod) {
@@ -241,9 +243,9 @@ export class TypeScriptFileModifier {
     classInfo: TypeScriptClassInfo,
     model: PropTemplateModel
   ) {
-    const lastEqAccessProp = classInfo.props.filter(
-      (p) => p.accessibility === model.access
-    ).pop();
+    const lastEqAccessProp = classInfo.props
+      .filter((p) => p.accessibility === model.access)
+      .pop();
     let startLine = -1;
 
     if (lastEqAccessProp) {
@@ -259,17 +261,22 @@ export class TypeScriptFileModifier {
     }
   }
 
-  // modify(file: TypeScriptFileInfo, model: FileTemplateModel): FileOutput {
   modify(model: FileTemplateModel): FileOutput {
     const file = this.__file;
     model.content.exports.forEach((virtual) => {
-      if (file.exports.findIndex((c) => c.path === virtual.path) === -1) {
+      const ep = virtual.path.replace(extname(virtual.path), "");
+      if (file.exports.findIndex((c) => c.path === ep) === -1) {
         this.addExport(virtual);
       }
     });
 
     model.content.imports.forEach((virtual) => {
-      if (file.imports.findIndex((c) => c.path === virtual.path) === -1) {
+      const ep = virtual.path.replace(extname(virtual.path), "");
+      if (
+        file.imports.findIndex((c) => {
+          return c.path === ep;
+        }) === -1
+      ) {
         this.addImport(virtual);
       }
     });
@@ -278,7 +285,11 @@ export class TypeScriptFileModifier {
       const type = file.types.find((c) => c.name === virtual.name);
       if (type) {
         virtual.props.forEach((item) => {
-          if (type.props.findIndex((m) => m.name === item.name) === -1) {
+          if (
+            type.props.findIndex((m) => {
+              return m.name === item.name;
+            }) === -1
+          ) {
             this.addTypeProperty(type, item);
           }
         });
@@ -320,7 +331,11 @@ export class TypeScriptFileModifier {
           }
         });
         virtual.props.forEach((item) => {
-          if (clss.props.findIndex((m) => m.name === item.name) === -1) {
+          if (
+            clss.props.findIndex((m) => {
+              return m.name === item.name;
+            }) === -1
+          ) {
             this.addClassProperty(clss, item);
           }
         });

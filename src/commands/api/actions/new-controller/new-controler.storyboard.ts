@@ -17,18 +17,29 @@ import {
 
 export class NewControllerResolver extends StoryResolver<ApiJson> {
   resolve(timeline: TimelineFrame[]): ApiJson {
-    for (const frame of timeline) {
-      if (frame.name === CreateControllerFrame.NAME) {
-        return frame.output;
-      }
-    }
-
-    return {
+    const result = {
       models: [],
       entities: [],
       controllers: [],
       routes: [],
     };
+
+    for (const frame of timeline) {
+      if (frame.name === DefineControllerHandlersFrame.NAME) {
+        result.models.push(...frame.output.models);
+        result.entities.push(...frame.output.entities);
+      } else if (frame.name === CreateRoutesForHandlersFrame.NAME) {
+        result.routes.push(...frame.output.routes);
+        result.models.push(...frame.output.models);
+        result.entities.push(...frame.output.entities);
+      } else if (frame.name === CreateControllerFrame.NAME) {
+        result.controllers.push(...frame.output.controllers);
+        result.models.push(...frame.output.models);
+        result.entities.push(...frame.output.entities);
+      }
+    }
+
+    return result;
   }
 }
 

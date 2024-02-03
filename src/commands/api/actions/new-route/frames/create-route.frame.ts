@@ -5,10 +5,10 @@ import {
   ApiJson,
   SelectComponentWriteMethodInteraction,
 } from "../../../common";
-import { RouteDescription } from "./describe-route.frame";
 import { RouteNameAndEndpoint } from "./define-route-name-and-endpoint.frame";
 import { RequestBodyType } from "./select-request-body-type.frame";
 import { ResponseBodyType } from "./select-response-body-type.frame";
+import { RouteDescription } from "./interactions/describe-route.interaction";
 
 export class CreateRouteFrame extends Frame<ApiJson> {
   public static NAME = "create_route_frame";
@@ -41,9 +41,6 @@ export class CreateRouteFrame extends Frame<ApiJson> {
       response_body,
     } = context;
     const result: ApiJson = {
-      models: [],
-      entities: [],
-      controllers: [],
       routes: [],
     };
     const componentName = config.components.route.generateName(name);
@@ -69,7 +66,7 @@ export class CreateRouteFrame extends Frame<ApiJson> {
         auth,
       };
 
-      if (request_body !== "none") {
+      if (request_body) {
         request["body"] = request_body;
       }
 

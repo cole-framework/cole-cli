@@ -22,6 +22,7 @@ export class RequestBodyJsonParser {
     const { config, writeMethod, models, entities } = this;
     const { endpoint, request, name } = data;
     const props = [];
+    const dependencies = [];
 
     if (typeof request.body === "string") {
       const type = TypeInfo.create(request.body, config);
@@ -46,27 +47,27 @@ export class RequestBodyJsonParser {
             type.isModel &&
             modelsRef.findIndex((m) => m.type.name === type.name) === -1
           ) {
-            models.push(
-              ModelFactory.create(
-                { name: type.ref, type: type.type, endpoint },
-                writeMethod.dependency,
-                config,
-                []
-              )
+            const m = ModelFactory.create(
+              { name: type.ref, type: type.type, endpoint },
+              writeMethod.dependency,
+              config,
+              []
             );
+            models.push(m);
+            dependencies.push(m);
           } else if (
             type.isEntity &&
             entitiesRef.findIndex((m) => m.type.ref === type.ref) === -1
           ) {
-            entities.push(
-              EntityFactory.create(
-                { name: type.ref, endpoint },
-                null,
-                writeMethod.dependency,
-                config,
-                []
-              )
+            const e = EntityFactory.create(
+              { name: type.ref, endpoint },
+              null,
+              writeMethod.dependency,
+              config,
+              []
             );
+            entities.push(e);
+            dependencies.push(e);
           }
         });
       });
@@ -84,7 +85,7 @@ export class RequestBodyJsonParser {
       },
       writeMethod.dependency,
       config,
-      []
+      dependencies
     );
 
     models.push(model);

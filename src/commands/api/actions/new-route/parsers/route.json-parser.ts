@@ -130,7 +130,9 @@ export class RouteJsonParser {
         { name: handlerName, input: inputProps },
         endpoint
       );
-      entities.push(entity);
+      if (entity) {
+        entities.push(entity);
+      }
       return entity;
     }
 
@@ -204,7 +206,9 @@ export class RouteJsonParser {
           { name: handlerName, output },
           endpoint
         );
-        entities.push(entity);
+        if (entity) {
+          entities.push(entity);
+        }
         return entity;
       }
     }
@@ -240,7 +244,13 @@ export class RouteJsonParser {
       let io;
       const { name, endpoint, request, response } = data;
 
-      if (routes.find((r) => r.type.ref === name)) {
+      if (
+        routes.find(
+          (r) =>
+            r.type.ref === name &&
+            r.type.type.toLowerCase() === request.method.toLowerCase()
+        )
+      ) {
         continue;
       }
 

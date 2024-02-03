@@ -138,7 +138,7 @@ export class TypeScriptFileInfo {
 
 export const createPropInfo = (item: any): PropertyInfo => {
   return {
-    name: item.name,
+    name: item.key.name,
     value: item.value,
     startLine: item.loc.start.line,
     endLine: item.loc.end.line,
