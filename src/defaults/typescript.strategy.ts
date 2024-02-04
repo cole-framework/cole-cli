@@ -115,6 +115,10 @@ export class TypeScriptTemplateModelStrategy extends Strategy {
       api.use_cases.forEach((item) =>
         this.updateTemplateModel(templateModels, item)
       );
+      
+      api.test_suites.forEach((item) =>
+        this.updateTemplateModel(templateModels, item)
+      );
 
       const models = Array.from(templateModels, ([, value]) => value);
 

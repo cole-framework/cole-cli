@@ -11,3 +11,5 @@ export * from "./method.template-model";
 export * from "./param.template-model";
 export * from "./prop.template-model";
 export * from "./type.template-model";
+export * from "./test-case.template-model";
+export * from "./test-suite.template-model";

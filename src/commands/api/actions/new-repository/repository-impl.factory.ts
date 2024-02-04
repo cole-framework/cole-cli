@@ -26,7 +26,7 @@ export class RepositoryImplFactory {
   ): Component<RepositoryElement> {
     const dependencies: Component[] = [entity, repository];
     const { id, name, endpoint } = data;
-    const { defaults } = config.components.repositoryImpl;
+    const { defaults } = config.components.repository_impl;
     const addons = {};
     const interfaces = [];
     const methods = [];
@@ -37,8 +37,8 @@ export class RepositoryImplFactory {
     let ctor: any = { params: [], supr: null };
     let exp;
 
-    const componentName = config.components.repositoryImpl.generateName(name);
-    const componentPath = config.components.repositoryImpl.generatePath({
+    const componentName = config.components.repository_impl.generateName(name);
+    const componentPath = config.components.repository_impl.generatePath({
       name,
       endpoint,
     }).path;
@@ -140,7 +140,7 @@ export class RepositoryImplFactory {
       imports,
       exp,
       is_abstract:
-        config.components.repositoryImpl.elementType === "abstract_class",
+        config.components.repository_impl.elementType === "abstract_class",
     };
 
     const element = ClassSchema.create<RepositoryElement>(classData, config, {

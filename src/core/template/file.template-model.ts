@@ -1,5 +1,6 @@
 import { ComponentData } from "../components";
 import { Config } from "../config";
+import { workerLog } from "../worker.tools";
 import {
   ClassTemplateModel,
   ExportTemplateModel,
@@ -9,8 +10,10 @@ import {
   MethodTemplateModel,
   ParamTemplateModel,
   PropTemplateModel,
+  TestCaseTemplateModel,
   TypeTemplateModel,
 } from "./models";
+import { TestSuiteTemplateModel } from "./models/test-suite.template-model";
 
 export type FileTemplateContent = {
   exports: ExportTemplateModel[];
@@ -19,6 +22,7 @@ export type FileTemplateContent = {
   functions: FunctionTemplateModel[];
   classes: ClassTemplateModel[];
   interfaces: InterfaceTemplateModel[];
+  test_suites: TestSuiteTemplateModel[];
 };
 
 export class FileTemplateModel {
@@ -29,6 +33,7 @@ export class FileTemplateModel {
     functions: [],
     classes: [],
     interfaces: [],
+    test_suites: [],
   };
 
   constructor(
@@ -41,6 +46,7 @@ export class FileTemplateModel {
       functions?: FunctionTemplateModel[];
       classes?: ClassTemplateModel[];
       interfaces?: InterfaceTemplateModel[];
+      test_suites?: TestSuiteTemplateModel[];
     }
   ) {
     if (content) {
@@ -50,14 +56,15 @@ export class FileTemplateModel {
       this.content.imports = content.imports || [];
       this.content.interfaces = content.interfaces || [];
       this.content.exports = content.exports || [];
+      this.content.test_suites = content.test_suites || [];
     }
   }
 
   update(data: ComponentData, config: Config) {
     const {
-      content: { imports, types, functions, classes, interfaces },
+      content: { imports, types, functions, classes, interfaces, test_suites },
     } = this;
-    
+
     if (Array.isArray(data.element.imports)) {
       data.element.imports.forEach((newImport) => {
         const impt = imports.find((imp) => imp.path === newImport.path);
@@ -117,21 +124,25 @@ export class FileTemplateModel {
       if (type) {
         data.element.props.forEach((item) => {
           if (type.props.findIndex((prop) => prop.name === item.name) === -1) {
-            type.props.push(PropTemplateModel.create(item, data.dependencies, config));
+            type.props.push(
+              PropTemplateModel.create(item, data.dependencies, config)
+            );
           }
         });
       } else {
-        types.push(TypeTemplateModel.create(data.element, data.dependencies, config));
+        types.push(
+          TypeTemplateModel.create(data.element, data.dependencies, config)
+        );
       }
-    }
-
-    if (data.type.isInterface) {
+    } else if (data.type.isInterface) {
       const intf = interfaces.find((i) => i.name === data.element.name);
 
       if (intf) {
         data.element.props.forEach((item) => {
           if (intf.props.findIndex((prop) => prop.name === item.name) === -1) {
-            intf.props.push(PropTemplateModel.create(item, data.dependencies, config));
+            intf.props.push(
+              PropTemplateModel.create(item, data.dependencies, config)
+            );
           }
         });
         data.element.methods.forEach((item) => {
@@ -146,11 +157,24 @@ export class FileTemplateModel {
           InterfaceTemplateModel.create(data.element, data.dependencies, config)
         );
       }
-      //TODO: temp sol --- before adding isClass  
+      //TODO: temp sol --- before adding isClass
       return;
-    }
+    } else if (data.type.isTestSuite) {
+      const suite = test_suites.find((i) => i.name === data.element.name);
 
-    if (
+      if (suite) {
+        // update
+        data.element.tests.forEach((item) => {
+          if (suite.tests.findIndex((tst) => tst.name === item.name) === -1) {
+            suite.tests.push(TestCaseTemplateModel.create(item));
+          }
+        });
+      } else {
+        test_suites.push(
+          TestSuiteTemplateModel.create(data.element, data.dependencies, config)
+        );
+      }
+    } else if (
       data.type.isComponentType &&
       !data.type.isModel &&
       !data.type.isRouteModel
@@ -160,7 +184,9 @@ export class FileTemplateModel {
       if (cls) {
         data.element.props.forEach((item) => {
           if (cls.props.findIndex((prop) => prop.name === item.name) === -1) {
-            cls.props.push(PropTemplateModel.create(item, data.dependencies, config));
+            cls.props.push(
+              PropTemplateModel.create(item, data.dependencies, config)
+            );
           }
         });
         data.element.methods.forEach((item) => {

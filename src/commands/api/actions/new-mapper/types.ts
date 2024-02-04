@@ -5,6 +5,7 @@ import {
   ComponentElement,
   ElementWithGenerics,
   ElementWithImports,
+  ElementWithMethods,
   ElementWithProps,
 } from "../../../../core";
 import { DefaultCliOptions } from "../../common/api.types";
@@ -41,6 +42,7 @@ export type MapperAddons = {
 
 export type MapperElement = ElementWithImports &
   ElementWithProps &
+  ElementWithMethods &
   ElementWithGenerics &
   ComponentElement;
 

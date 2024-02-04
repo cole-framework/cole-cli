@@ -66,7 +66,7 @@ export abstract class TypeInfo {
     const useCaseMatch = data.match(/^UseCase\s*<\s*(\w+)\s*>/i);
     if (useCaseMatch) {
       const ref = useCaseMatch[1];
-      const name = config.components.useCase.generateName(ref);
+      const name = config.components.use_case.generateName(ref);
       return UseCaseType.create(name, ref);
     }
 
@@ -89,7 +89,7 @@ export abstract class TypeInfo {
     );
     if (repositoryImplMatch) {
       const ref = repositoryImplMatch[1];
-      const name = config.components.repositoryImpl.generateName(ref);
+      const name = config.components.repository_impl.generateName(ref);
       return RepositoryImplType.create(name, ref);
     }
 
@@ -98,7 +98,7 @@ export abstract class TypeInfo {
     );
     if (repositoryFactoryMatch) {
       const ref = repositoryFactoryMatch[1];
-      const name = config.components.repositoryFactory.generateName(ref);
+      const name = config.components.repository_factory.generateName(ref);
       return RepositoryFactoryType.create(name, ref);
     }
 
@@ -135,7 +135,7 @@ export abstract class TypeInfo {
       const ref = routeModelMatch[1];
       const method = routeModelMatch[2]?.toLowerCase();
       const type = routeModelMatch[3]?.toLowerCase();
-      const name = config.components.routeModel.generateName(ref, {
+      const name = config.components.route_model.generateName(ref, {
         type,
         method,
       });
@@ -146,7 +146,7 @@ export abstract class TypeInfo {
     if (routeIOMatch) {
       const ref = routeIOMatch[1];
       const method = routeModelMatch[2]?.toLowerCase();
-      const name = config.components.routeIO.generateName(ref, { method });
+      const name = config.components.route_io.generateName(ref, { method });
       return RouteIOType.create(name, ref, method);
     }
 
@@ -307,6 +307,7 @@ export abstract class TypeInfo {
     public readonly isRouteIO?: boolean,
     public readonly isRouteModel?: boolean,
     public readonly isConfigInstructionType?: boolean,
+    public readonly isTestSuite?: boolean,
     public readonly type?: string,
     public readonly component?: string,
     public readonly chain?: (TypeInfo | "|" | "&")[]
@@ -496,6 +497,22 @@ export class ToolsetType {
 
   static create(name: string, ref: string) {
     return new ToolsetType(name, ref, `Toolset<${name}>`);
+  }
+}
+
+export class TestSuiteType {
+  public readonly isTestSuite = true;
+  public readonly isComponentType = true;
+
+  private constructor(
+    public readonly name: string,
+    public readonly ref: string,
+    public readonly tag: string,
+    public readonly type: string
+  ) {}
+
+  static create(name: string, ref: string, type: string) {
+    return new TestSuiteType(name, ref, `TestSuite<${name},${type}>`, type);
   }
 }
 

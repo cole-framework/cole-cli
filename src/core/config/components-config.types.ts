@@ -22,6 +22,7 @@ export type FrameworkDefaults = {
   generics?: GenericConfig[];
   ctor?: ConstructorConfig;
   exp?: ExportConfig;
+  tests?: any;
 };
 
 export type ComponentConfigData = {

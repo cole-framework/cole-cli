@@ -36,8 +36,6 @@ export class NewRepositoryOptionsStrategy extends Strategy {
       repository.contexts.push(...storages);
     }
 
-    console.log(JSON.stringify(repository, null, 2));
-
     const schema = new ApiJsonParser(apiConfig, config, texts).build({
       repositories: [repository],
     });

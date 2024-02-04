@@ -10,3 +10,5 @@ export * from "./method.schema";
 export * from "./param.schema";
 export * from "./prop.schema";
 export * from "./type.schema";
+
+export * from "./test-suite.schema";

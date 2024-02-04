@@ -13,6 +13,7 @@ import { Route, RouteIO } from "../actions/new-route";
 import { Source } from "../actions/new-source";
 import { Toolset } from "../actions/new-toolset";
 import { UseCase } from "../actions/new-use-case";
+import { TestSuite } from "../actions/new-test-suite";
 
 export class ApiSchema {
   public readonly toolsets = new ApiComponentCollection<Toolset>();
@@ -29,6 +30,7 @@ export class ApiSchema {
     new ApiComponentCollection<RepositoryImpl>();
   public readonly repository_factories =
     new ApiComponentCollection<RepositoryFactory>();
+  public readonly test_suites = new ApiComponentCollection<TestSuite>();
 
   toObject(): ApiObject {
     const {
@@ -44,6 +46,7 @@ export class ApiSchema {
       repositories,
       repository_impls,
       repository_factories,
+      test_suites,
     } = this;
 
     return {
@@ -61,6 +64,7 @@ export class ApiSchema {
       repository_factories: repository_factories
         .toArray()
         .map((i) => i.toObject()),
+      test_suites: test_suites.toArray().map((i) => i.toObject()),
     };
   }
 }

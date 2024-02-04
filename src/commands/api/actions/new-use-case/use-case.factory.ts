@@ -18,7 +18,7 @@ export class UseCaseFactory {
   ): Component<UseCaseElement> {
     const dependencies = [];
     const { id, name, endpoint } = data;
-    const { defaults } = config.components.useCase;
+    const { defaults } = config.components.use_case;
 
     const addons = {
       input: data.input,
@@ -34,8 +34,8 @@ export class UseCaseFactory {
     let ctor;
     let exp;
 
-    const componentName = config.components.useCase.generateName(name);
-    const componentPath = config.components.useCase.generatePath({
+    const componentName = config.components.use_case.generateName(name);
+    const componentPath = config.components.use_case.generatePath({
       name,
       endpoint,
     }).path;
@@ -94,7 +94,7 @@ export class UseCaseFactory {
       ctor,
       imports,
       exp,
-      is_abstract: config.components.useCase.elementType === "abstract_class",
+      is_abstract: config.components.use_case.elementType === "abstract_class",
     };
 
     const element = ClassSchema.create<UseCaseElement>(classData, config, {

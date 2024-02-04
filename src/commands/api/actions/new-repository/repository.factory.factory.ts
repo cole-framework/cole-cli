@@ -28,7 +28,7 @@ export class RepositoryFactoryFactory {
   ): Component<RepositoryElement> {
     const dependencies: Component[] = [];
     const { id, name, endpoint } = data;
-    const { defaults } = config.components.repositoryFactory;
+    const { defaults } = config.components.repository_factory;
     const addons = {};
     const interfaces = [];
     const methods = [];
@@ -40,8 +40,8 @@ export class RepositoryFactoryFactory {
     let exp;
 
     const componentName =
-      config.components.repositoryFactory.generateName(name);
-    const componentPath = config.components.repositoryFactory.generatePath({
+      config.components.repository_factory.generateName(name);
+    const componentPath = config.components.repository_factory.generatePath({
       name,
       endpoint,
     }).path;

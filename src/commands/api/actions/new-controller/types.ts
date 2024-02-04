@@ -33,6 +33,7 @@ export type ControllerData = ClassJson & {
     name: string;
     input?: string;
     output?: string;
+    prompt?: string;
   }[];
 };
 

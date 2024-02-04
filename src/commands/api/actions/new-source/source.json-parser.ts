@@ -4,16 +4,20 @@ import {
   MethodTools,
   PropTools,
   Texts,
+  TestCaseSchema,
   WriteMethod,
 } from "../../../../core";
 import { Entity, EntityFactory } from "../new-entity";
 import { Model, ModelFactory } from "../new-model";
 import { SourceFactory } from "./source.factory";
 import { SourceJson, Source } from "./types";
+import { ApiConfig } from "../../common";
+import { TestSuite, TestSuiteFactory } from "../new-test-suite";
 
 export class SourceJsonParser {
   constructor(
     private config: Config,
+    private apiConfig: ApiConfig,
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {}
@@ -21,11 +25,17 @@ export class SourceJsonParser {
   build(
     list: SourceJson[],
     modelsRef: Model[]
-  ): { sources: Source[]; models: Model[]; entities: Entity[] } {
-    const { config, texts, writeMethod } = this;
+  ): {
+    sources: Source[];
+    models: Model[];
+    entities: Entity[];
+    test_suites: TestSuite[];
+  } {
+    const { config, apiConfig, texts, writeMethod } = this;
     const sources: Source[] = [];
     const models: Model[] = [];
     const entities: Entity[] = [];
+    const test_suites: TestSuite[] = [];
 
     for (const data of list) {
       const { name, endpoint, storages, table, props, methods } = data;
@@ -86,6 +96,28 @@ export class SourceJsonParser {
           config
         );
 
+        if (!apiConfig.skip_tests && source.element.methods.length > 0) {
+          //
+          const suite = TestSuiteFactory.create(
+            { name, endpoint, type: "unit_tests" },
+            source,
+            writeMethod.component,
+            config
+          );
+
+          source.element.methods.forEach((method) => {
+            suite.element.addTest(
+              TestCaseSchema.create({
+                group: { name: suite.element.name, is_async: false },
+                is_async: method.isAsync,
+                name: method.name,
+                methods: [method],
+              })
+            );
+          });
+          test_suites.push(suite);
+        }
+
         source.unresolvedDependencies.forEach((type) => {
           // MODEL DEPENDENCY
           if (type.isModel) {
@@ -125,6 +157,6 @@ export class SourceJsonParser {
       }
     }
 
-    return { sources, models, entities };
+    return { sources, models, entities, test_suites };
   }
 }

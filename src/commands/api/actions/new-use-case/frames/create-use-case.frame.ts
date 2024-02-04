@@ -19,6 +19,7 @@ import {
 import { CreateEntityFrame } from "../../new-entity";
 import { CreateModelsFrame } from "../../new-model";
 import { pascalCase } from "change-case";
+import { CreateParamsInteraction } from "../../../common/interactions/create-params.interaction";
 
 export class CreateUseCaseFrame extends Frame<ApiJson> {
   public static NAME = "create_use_case_frame";
@@ -51,8 +52,8 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
     let res: ApiJson;
     let output;
     const input = new Set<ParamJson>();
-    const componentName = config.components.useCase.generateName(name);
-    const componentPath = config.components.useCase.generatePath({
+    const componentName = config.components.use_case.generateName(name);
+    const componentPath = config.components.use_case.generatePath({
       name,
       endpoint,
     }).path;
@@ -71,41 +72,19 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
           texts.get("does_the_use_case_have_an_input")
         )
       ) {
-        let param;
-        do {
-          param = await new CreateParamInteraction(texts).run();
-          input.add(param);
-
-          const type = TypeInfo.create(param.type, config);
-
-          if (apiConfig.dependencies_write_method !== WriteMethod.Skip) {
-            if (
-              type.isComponentType &&
-              (await InteractionPrompts.confirm(
-                texts.get("non_standard_type_detected__create_one")
-              ))
-            ) {
-              if (type.isModel) {
-                result.models.push({
-                  name: type.ref,
-                  types: [type.type],
-                  endpoint,
-                });
-              } else if (type.isEntity) {
-                result.entities.push({
-                  name: type.ref,
-                  endpoint,
-                });
-              }
-            }
-          }
-        } while (
-          await InteractionPrompts.confirm(
-            texts
-              .get("param_###_has_been_added__add_more")
-              .replace("###", param?.name)
-          )
+        const { params, ...deps } = await new CreateParamsInteraction(
+          texts,
+          config,
+          apiConfig.dependencies_write_method
+        ).run(
+          {
+            endpoint,
+            target: "use case",
+          },
+          { skipQuestion: true }
         );
+        result.entities.push(...deps.entities);
+        result.models.push(...deps.models);
       }
 
       const cat = await InteractionPrompts.select<string>(

@@ -10,7 +10,7 @@ export class NewUseCaseOptionsStrategy extends Strategy {
     const { config } = this;
     const texts = await Texts.load();
 
-    if (!options.endpoint && config.components.useCase.isEndpointRequired()) {
+    if (!options.endpoint && config.components.use_case.isEndpointRequired()) {
       console.log(chalk.red(texts.get("missing_endpoint")));
       process.exit(1);
     }

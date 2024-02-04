@@ -19,6 +19,9 @@ import {
   ImportSchema,
   ImportTools,
   ImportData,
+  TestCaseSchema,
+  TestCaseObject,
+  TestSuiteObject,
 } from "./schemas";
 import { ComponentTools } from "./component.tools";
 import { Config } from "../config";
@@ -42,6 +45,13 @@ export interface ElementWithMethods {
   addMethod(method: MethodSchema);
   findMethod(name: string): MethodSchema;
   hasMethod(name: string): boolean;
+}
+
+export interface ElementWithUnitTests {
+  tests: TestCaseSchema[];
+  addTest(test: TestCaseSchema);
+  findTest(name: string): TestCaseSchema;
+  hasTest(name: string): boolean;
 }
 
 export interface ElementWithInterfaces {
@@ -70,6 +80,7 @@ export type ElementObject = {
   interfaces?: InterfaceObject[];
   imports?: ImportObject[];
   functions?: FunctionObject[];
+  tests?: TestCaseObject[];
   alias?: any;
 };
 
@@ -111,9 +122,9 @@ export class Component<
       endpoint: string;
       path: string;
       writeMethod: WriteMethod;
-      addons: ElementAddons;
+      addons?: ElementAddons;
       element: Element;
-      dependencies: Component[];
+      dependencies?: Component[];
     }
   ): Component<Element, ElementAddons> {
     const {

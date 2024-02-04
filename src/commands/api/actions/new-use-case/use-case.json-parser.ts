@@ -1,13 +1,22 @@
 import chalk from "chalk";
-import { Config, Texts, TypeInfo, WriteMethod } from "../../../../core";
+import {
+  Config,
+  Texts,
+  TypeInfo,
+  TestCaseSchema,
+  WriteMethod,
+} from "../../../../core";
 import { Entity, EntityFactory } from "../new-entity";
 import { Model, ModelFactory } from "../new-model";
 import { UseCaseJson, UseCase } from "./types";
 import { UseCaseFactory } from "./use-case.factory";
+import { ApiConfig } from "../../common";
+import { TestSuite, TestSuiteFactory } from "../new-test-suite";
 
 export class UseCaseJsonParse {
   constructor(
     private config: Config,
+    private apiConfig: ApiConfig,
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {}
@@ -64,11 +73,17 @@ export class UseCaseJsonParse {
     list: UseCaseJson[],
     modelsRef: Model[],
     entitiesRef: Entity[]
-  ): { use_cases: UseCase[]; models: Model[]; entities: Entity[] } {
-    const { config, texts, writeMethod } = this;
+  ): {
+    use_cases: UseCase[];
+    models: Model[];
+    entities: Entity[];
+    test_suites: TestSuite[];
+  } {
+    const { config, texts, writeMethod, apiConfig } = this;
     const use_cases: UseCase[] = [];
     const models: Model[] = [];
     const entities: Entity[] = [];
+    const test_suites: TestSuite[] = [];
 
     for (const data of list) {
       const { name, endpoint } = data;
@@ -89,6 +104,28 @@ export class UseCaseJsonParse {
         writeMethod.component,
         config
       );
+
+      if (!apiConfig.skip_tests && useCase.element.methods.length > 0) {
+        //
+        const suite = TestSuiteFactory.create(
+          { name, endpoint, type: "unit_tests" },
+          useCase,
+          writeMethod.component,
+          config
+        );
+
+        useCase.element.methods.forEach((method) => {
+          suite.element.addTest(
+            TestCaseSchema.create({
+              group: { name: suite.element.name, is_async: false },
+              is_async: method.isAsync,
+              name: method.name,
+              methods: [method],
+            })
+          );
+        });
+        test_suites.push(suite);
+      }
 
       useCase.unresolvedDependencies.forEach((type) => {
         // MODEL DEPENDENCY
@@ -128,6 +165,6 @@ export class UseCaseJsonParse {
       use_cases.push(useCase);
     }
 
-    return { use_cases, models, entities };
+    return { use_cases, models, entities, test_suites };
   }
 }

@@ -8,11 +8,14 @@ import {
   PrimitiveType,
   Texts,
   TypeInfo,
+  TestCaseSchema,
 } from "../../../../core";
 import { ControllerFactory } from "./controller.factory";
 import { Entity } from "../new-entity/types";
 import { EntityFactory } from "../new-entity";
 import { pascalCase } from "change-case";
+import { ApiConfig } from "../../common";
+import { TestSuite, TestSuiteFactory } from "../new-test-suite";
 
 export class ControllerInputJsonParser {
   constructor(
@@ -99,6 +102,7 @@ export class ControllerJsonParser {
 
   constructor(
     private config: Config,
+    private apiConfig: ApiConfig,
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {
@@ -110,11 +114,17 @@ export class ControllerJsonParser {
     list: ControllerJson[],
     modelsRef: Model[],
     entitiesRef: Entity[]
-  ): { models: Model[]; entities: Entity[]; controllers: Controller[] } {
-    const { config, texts, writeMethod } = this;
+  ): {
+    models: Model[];
+    entities: Entity[];
+    controllers: Controller[];
+    test_suites: TestSuite[];
+  } {
+    const { config, texts, writeMethod, apiConfig } = this;
     const models: Model[] = [];
     const entities: Entity[] = [];
     const controllers: Controller[] = [];
+    const test_suites: TestSuite[] = [];
 
     for (const data of list) {
       const { name, endpoint, handlers } = data;
@@ -159,6 +169,28 @@ export class ControllerJsonParser {
         config,
         []
       );
+
+      if (!apiConfig.skip_tests && controller.element.methods.length > 0) {
+        //
+        const suite = TestSuiteFactory.create(
+          { name, endpoint, type: "unit_tests" },
+          controller,
+          writeMethod.component,
+          config
+        );
+
+        controller.element.methods.forEach((method) => {
+          suite.element.addTest(
+            TestCaseSchema.create({
+              group: { name: suite.element.name, is_async: false },
+              is_async: method.isAsync,
+              name: method.name,
+              methods: [method],
+            })
+          );
+        });
+        test_suites.push(suite);
+      }
 
       controller.unresolvedDependencies.forEach((type) => {
         // MODEL DEPENDENCY
@@ -213,6 +245,6 @@ export class ControllerJsonParser {
       controllers.push(controller);
     }
 
-    return { controllers, entities, models };
+    return { controllers, entities, models, test_suites };
   }
 }

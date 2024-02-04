@@ -19,14 +19,14 @@ export class RouteModelFactory {
   ): Component<RouteModelElement, RouteModelAddons> {
     const { method, name, type, endpoint, alias } = data;
     const addons = { modelType: type };
-    const { defaults } = config.components.routeModel;
-    const componentName = config.components.routeModel.generateName(name, {
+    const { defaults } = config.components.route_model;
+    const componentName = config.components.route_model.generateName(name, {
       type,
       method,
     });
     const typeLC = type?.toLowerCase() || "json";
     const methodLC = method?.toLowerCase() || "";
-    const componentPath = config.components.routeModel.generatePath({
+    const componentPath = config.components.route_model.generatePath({
       name,
       type: typeLC,
       method: methodLC,

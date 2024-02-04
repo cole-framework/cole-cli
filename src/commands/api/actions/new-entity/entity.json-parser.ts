@@ -2,12 +2,15 @@ import { WriteMethod } from "../../../../core/enums";
 import { Model, ModelFactory } from "../new-model";
 import { Entity, EntityJson } from "./types";
 import chalk from "chalk";
-import { Config, Texts } from "../../../../core";
+import { Config, Texts, TestCaseSchema } from "../../../../core";
 import { EntityFactory } from "./entity.factory";
+import { TestSuite, TestSuiteFactory } from "../new-test-suite";
+import { ApiConfig } from "../../common";
 
 export class EntityJsonParser {
   constructor(
     private config: Config,
+    private apiConfig: ApiConfig,
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {}
@@ -15,10 +18,11 @@ export class EntityJsonParser {
   build(
     list: EntityJson[],
     modelsRef: Model[]
-  ): { models: Model[]; entities: Entity[] } {
-    const { config, texts, writeMethod } = this;
+  ): { models: Model[]; entities: Entity[]; test_suites: TestSuite[] } {
+    const { config, texts, writeMethod, apiConfig } = this;
     const models: Model[] = [];
     const entities: Entity[] = [];
+    const test_suites: TestSuite[] = [];
 
     for (const data of list) {
       const { name, endpoint, has_model, props } = data;
@@ -60,6 +64,28 @@ export class EntityJsonParser {
         []
       );
 
+      if (!apiConfig.skip_tests && entity.element.methods.length > 0) {
+        //
+        const suite = TestSuiteFactory.create(
+          { name, endpoint, type: "unit_tests" },
+          entity,
+          writeMethod.component,
+          config
+        );
+
+        entity.element.methods.forEach((method) => {
+          suite.element.addTest(
+            TestCaseSchema.create({
+              group: { name: suite.element.name, is_async: false },
+              is_async: method.isAsync,
+              name: method.name,
+              methods: [method],
+            })
+          );
+        });
+        test_suites.push(suite);
+      }
+
       entities.push(entity);
     }
 
@@ -100,6 +126,6 @@ export class EntityJsonParser {
       });
     });
 
-    return { entities, models };
+    return { entities, models, test_suites };
   }
 }

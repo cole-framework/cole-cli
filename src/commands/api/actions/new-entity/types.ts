@@ -4,6 +4,7 @@ import {
   ComponentElement,
   ElementWithGenerics,
   ElementWithImports,
+  ElementWithMethods,
   ElementWithProps,
 } from "../../../../core";
 import { ApiJson, DefaultCliOptions } from "../../common/api.types";
@@ -28,6 +29,7 @@ export type EntityAddons = {
 
 export type EntityElement = ElementWithImports &
   ElementWithProps &
+  ElementWithMethods &
   ElementWithGenerics &
   ComponentElement;
 

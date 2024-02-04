@@ -2,13 +2,16 @@ import { WriteMethod } from "../../../../core/enums";
 import { Model, ModelFactory } from "../new-model";
 import { Toolset, ToolsetJson } from "./types";
 import chalk from "chalk";
-import { Config, Texts } from "../../../../core";
+import { Config, Texts, TestCaseSchema } from "../../../../core";
 import { ToolsetFactory } from "./toolset.factory";
 import { Entity, EntityFactory } from "../new-entity";
+import { ApiConfig } from "../../common";
+import { TestSuite, TestSuiteFactory } from "../new-test-suite";
 
 export class ToolsetJsonParser {
   constructor(
     private config: Config,
+    private apiConfig: ApiConfig,
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {}
@@ -17,11 +20,17 @@ export class ToolsetJsonParser {
     list: ToolsetJson[],
     modelsRef: Model[],
     entitiesRef: Entity[]
-  ): { models: Model[]; entities: Entity[]; toolsets: Toolset[] } {
-    const { config, texts, writeMethod } = this;
+  ): {
+    models: Model[];
+    entities: Entity[];
+    toolsets: Toolset[];
+    test_suites: TestSuite[];
+  } {
+    const { config, apiConfig, texts, writeMethod } = this;
     const models: Model[] = [];
     const entities: Entity[] = [];
     const toolsets: Toolset[] = [];
+    const test_suites: TestSuite[] = [];
 
     for (const data of list) {
       const { name, endpoint } = data;
@@ -44,6 +53,28 @@ export class ToolsetJsonParser {
         config,
         []
       );
+
+      if (!apiConfig.skip_tests && toolset.element.methods.length > 0) {
+        //
+        const suite = TestSuiteFactory.create(
+          { name, endpoint, type: "unit_tests" },
+          toolset,
+          writeMethod.component,
+          config
+        );
+
+        toolset.element.methods.forEach((method) => {
+          suite.element.addTest(
+            TestCaseSchema.create({
+              group: { name: suite.element.name, is_async: false },
+              is_async: method.isAsync,
+              name: method.name,
+              methods: [method],
+            })
+          );
+        });
+        test_suites.push(suite);
+      }
 
       toolsets.push(toolset);
     }
@@ -85,6 +116,6 @@ export class ToolsetJsonParser {
       });
     });
 
-    return { entities, toolsets, models };
+    return { entities, toolsets, models, test_suites };
   }
 }

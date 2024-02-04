@@ -45,6 +45,7 @@ export type ApiObject = {
   repository_impls: ComponentData[];
   repository_factories: ComponentData[];
   toolsets: ComponentData[];
+  test_suites: ComponentData[];
 };
 
 export type ApiData = {

@@ -140,6 +140,12 @@
         }
       }
     },
+    "mapper_unit_tests": {
+      "name_pattern": "{{pascal name}}{{pascal type}}MapperUnitTests",
+      "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/data/mappers/__tests__/{{kebab name}}.{{kebab type}}.mapper.unit.test.ts",
+      "element_type": "unit_tests",
+      "defaults": {}
+    },
     "source": {
       "name_pattern": "{{pascal name}}{{pascal type}}Source",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/data/sources/{{kebab name}}.{{kebab type}}.source.ts",
@@ -192,6 +198,12 @@
           ]
         }
       }
+    },
+    "source_unit_tests": {
+      "name_pattern": "{{pascal name}}{{pascal type}}SourceUnitTests",
+      "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/data/sources/__tests__/{{kebab name}}.{{kebab type}}.source.unit.test.ts",
+      "element_type": "unit_tests",
+      "defaults": {}
     },
     "entity": {
       "name_pattern": "{{pascal name}}",
@@ -313,6 +325,12 @@
         }
       }
     },
+    "use_case_unit_tests": {
+      "name_pattern": "{{pascal name}}UseCaseUnitTests",
+      "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/domain/use-cases/__tests__/{{kebab name}}.use-case.unit.test.ts",
+      "element_type": "unit_tests",
+      "defaults": {}
+    },
     "repository": {
       "name_pattern": "{{pascal name}}Repository",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/domain/repositories/{{kebab name}}.repository.ts",
@@ -410,6 +428,12 @@
         }
       }
     },
+    "repository_impl_unit_tests": {
+      "name_pattern": "{{pascal name}}RepositoryImpl",
+      "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/data/repositories/__tests__/{{kebab name}}.repository-impl.unit.test.ts",
+      "element_type": "unit_tests",
+      "defaults": {}
+    },
     "repository_factory": {
       "name_pattern": "{{pascal name}}RepositoryFactory",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/data/repositories/{{kebab name}}.repository-factory.ts",
@@ -467,6 +491,12 @@
         }
       }
     },
+    "repository_factory_unit_tests": {
+      "name_pattern": "{{pascal name}}RepositoryFactoryUnitTests",
+      "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/data/repositories/__tests__/{{kebab name}}.repository-factory.unit.test.ts",
+      "element_type": "unit_tests",
+      "defaults": {}
+    },
     "controller": {
       "name_pattern": "{{pascal name}}Controller",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/domain/controllers/{{kebab name}}.controller.ts",
@@ -476,6 +506,12 @@
           "exp": true
         }
       }
+    },
+    "controller_unit_tests": {
+      "name_pattern": "{{pascal name}}ControllerUnitTests",
+      "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/domain/controllers/__tests__/{{kebab name}}.controller.unit.test.ts",
+      "element_type": "unit_tests",
+      "defaults": {}
     },
     "route": {
       "name_pattern": "{{pascal method}}{{pascal name}}Route",
@@ -678,6 +714,12 @@
         }
       }
     },
+    "route_io_unit_tests": {
+      "name_pattern": "{{pascal method}}{{pascal name}}RouteIO",
+      "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/routes/__tests__/{{kebab method}}-{{kebab name}}.route-io.unit.test.ts",
+      "element_type": "unit_tests",
+      "defaults": {}
+    },
     "toolset": {
       "name_pattern": "{{pascal name}}Toolset",
       "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/{{kebab layer}}/tools/{{kebab name}}.tools.ts",
@@ -687,6 +729,12 @@
           "exp": true
         }
       }
+    },
+    "toolset_unit_tests": {
+      "name_pattern": "{{pascal name}}ToolsetUnitTests",
+      "path_pattern": "{{root}}/endpoints/{{kebab endpoint}}/{{kebab layer}}/tools/__tests__/{{kebab name}}.tools.unit.test.ts",
+      "element_type": "unit_tests",
+      "defaults": {}
     }
   }
 }

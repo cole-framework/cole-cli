@@ -40,7 +40,7 @@ export class RouteIOFactory {
       request: { method },
       endpoint,
     } = data;
-    const { defaults } = config.components.routeIO;
+    const { defaults } = config.components.route_io;
     //temporary
     const request = {
       element: {
@@ -77,11 +77,11 @@ export class RouteIOFactory {
     let inheritance = [];
     let ctor;
     let exp;
-    const componentName = config.components.routeIO.generateName(name, {
+    const componentName = config.components.route_io.generateName(name, {
       type: method,
       method,
     });
-    const componentPath = config.components.routeIO.generatePath({
+    const componentPath = config.components.route_io.generatePath({
       name,
       type: method,
       method,

@@ -55,8 +55,6 @@ export class NewRouteOptionsStrategy extends Strategy {
       controller,
     };
 
-    console.log("JSON", JSON.stringify(route, null, 2));
-
     const schema = new ApiJsonParser(apiConfig, config, texts).build({
       routes: [route],
     });

@@ -6,6 +6,7 @@ import {
   ComponentElement,
   Component,
   ElementWithImports,
+  ElementWithMethods,
 } from "../../../../core";
 import { DefaultCliOptions } from "../../common/api.types";
 
@@ -40,6 +41,7 @@ export type SourceAddons = {
 
 export type SourceElement = ElementWithImports &
   ElementWithProps &
+  ElementWithMethods &
   ElementWithGenerics &
   ComponentElement;
 

@@ -4,6 +4,7 @@ import {
   MethodTools,
   PropTools,
   Texts,
+  TestCaseSchema,
   WriteMethod,
 } from "../../../../core";
 import chalk from "chalk";
@@ -21,10 +22,13 @@ import {
   RepositoryFactory,
 } from "./types";
 import { RepositoryFactoryFactory } from "./repository.factory.factory";
+import { ApiConfig } from "../../common";
+import { TestSuite, TestSuiteFactory } from "../new-test-suite";
 
 export class RepositoryJsonParser {
   constructor(
     private config: Config,
+    private apiConfig: ApiConfig,
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {}
@@ -117,7 +121,7 @@ export class RepositoryJsonParser {
     const entities = [];
     const models = [];
 
-    if (!endpoint && config.components.repositoryImpl.isEndpointRequired()) {
+    if (!endpoint && config.components.repository_impl.isEndpointRequired()) {
       console.log(chalk.red(texts.get("missing_endpoint")));
       console.log(
         chalk.yellow(texts.get("component_###_skipped").replace("###", name))
@@ -192,7 +196,7 @@ export class RepositoryJsonParser {
     const { config, writeMethod, texts } = this;
     const { name, endpoint } = data;
 
-    if (!endpoint && config.components.repositoryImpl.isEndpointRequired()) {
+    if (!endpoint && config.components.repository_impl.isEndpointRequired()) {
       console.log(chalk.red(texts.get("missing_endpoint")));
       console.log(
         chalk.yellow(texts.get("component_###_skipped").replace("###", name))
@@ -229,8 +233,9 @@ export class RepositoryJsonParser {
     entities: Entity[];
     mappers: Mapper[];
     sources: Source[];
+    test_suites: TestSuite[];
   } {
-    const { config, writeMethod } = this;
+    const { config, writeMethod, apiConfig } = this;
     const repositories: Repository[] = [];
     const repository_impls: RepositoryImpl[] = [];
     const repository_factories: RepositoryFactory[] = [];
@@ -238,6 +243,7 @@ export class RepositoryJsonParser {
     const mappers: Mapper[] = [];
     const sources: Source[] = [];
     const entities: Entity[] = [];
+    const test_suites: TestSuite[] = [];
 
     for (const data of list) {
       const ctxs = [];
@@ -369,6 +375,28 @@ export class RepositoryJsonParser {
           impl_result.models.forEach((m) => models.push(m));
           impl_result.entities.forEach((e) => entities.push(e));
           repository_impls.push(impl);
+
+          if (!apiConfig.skip_tests && impl.element.methods.length > 0) {
+            //
+            const suite = TestSuiteFactory.create(
+              { name: data.name, endpoint, type: "unit_tests" },
+              impl,
+              writeMethod.component,
+              config
+            );
+
+            impl.element.methods.forEach((method) => {
+              suite.element.addTest(
+                TestCaseSchema.create({
+                  group: { name: suite.element.name, is_async: false },
+                  is_async: method.isAsync,
+                  name: method.name,
+                  methods: [method],
+                })
+              );
+            });
+            test_suites.push(suite);
+          }
         }
       }
 
@@ -386,6 +414,7 @@ export class RepositoryJsonParser {
       entities,
       mappers,
       sources,
+      test_suites,
     };
   }
 }

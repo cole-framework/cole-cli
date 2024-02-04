@@ -1,6 +1,12 @@
 import chalk from "chalk";
 import { pascalCase } from "change-case";
-import { Config, Texts, TypeInfo, WriteMethod } from "../../../../../core";
+import {
+  Config,
+  Texts,
+  TypeInfo,
+  TestCaseSchema,
+  WriteMethod,
+} from "../../../../../core";
 import {
   Controller,
   ControllerInputJsonParser,
@@ -16,6 +22,8 @@ import { PathParamsJsonParser } from "./path-params.json-parser";
 import { QueryParamsJsonParser } from "./query-params.json-parser";
 import { RequestBodyJsonParser } from "./request-body.json-parser";
 import { ResponseBodyJsonParser } from "./response-body.json-parser";
+import { ApiConfig } from "../../../common";
+import { TestSuite, TestSuiteFactory } from "../../new-test-suite";
 
 export class RouteJsonParser {
   private inputParser: ControllerInputJsonParser;
@@ -31,6 +39,7 @@ export class RouteJsonParser {
 
   constructor(
     private config: Config,
+    private apiConfig: ApiConfig,
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {
@@ -224,9 +233,19 @@ export class RouteJsonParser {
     entities: Entity[];
     routes: Route[];
     route_ios: RouteIO[];
+    test_suites: TestSuite[];
   } {
-    const { config, texts, writeMethod, models, entities, routes, route_ios } =
-      this;
+    const {
+      config,
+      texts,
+      writeMethod,
+      models,
+      entities,
+      routes,
+      route_ios,
+      apiConfig,
+    } = this;
+    const test_suites: TestSuite[] = [];
 
     models.length = 0;
     entities.length = 0;
@@ -257,8 +276,8 @@ export class RouteJsonParser {
       if (
         !endpoint &&
         (config.components.route.isEndpointRequired() ||
-          config.components.routeModel.isEndpointRequired() ||
-          config.components.routeIO.isEndpointRequired())
+          config.components.route_model.isEndpointRequired() ||
+          config.components.route_io.isEndpointRequired())
       ) {
         console.log(chalk.red(texts.get("missing_endpoint")));
         console.log(
@@ -324,6 +343,28 @@ export class RouteJsonParser {
           config
         );
         route_ios.push(io);
+
+        if (!apiConfig.skip_tests && io.element.methods.length > 0) {
+          //
+          const suite = TestSuiteFactory.create(
+            { name, endpoint, type: "unit_tests" },
+            io,
+            writeMethod.component,
+            config
+          );
+
+          io.element.methods.forEach((method) => {
+            suite.element.addTest(
+              TestCaseSchema.create({
+                group: { name: suite.element.name, is_async: false },
+                is_async: method.isAsync,
+                name: method.name,
+                methods: [method],
+              })
+            );
+          });
+          test_suites.push(suite);
+        }
       }
 
       const route = RouteFactory.create(
@@ -335,6 +376,6 @@ export class RouteJsonParser {
       routes.push(route);
     }
 
-    return { routes, route_ios, entities, models };
+    return { routes, route_ios, entities, models, test_suites };
   }
 }

@@ -56,6 +56,7 @@ export type MethodJson = {
   body?: string;
   supr?: MethodJson;
   generics?: (GenericJson | string)[];
+  prompt?: string;
 };
 
 export type MethodConfig = MethodJson & ConfigAddons;
