@@ -127,6 +127,7 @@ export class RepositoryImplFactory {
         generics.push(...defaults[storage].generics);
       }
     }
+
     const classData: ClassData = {
       id,
       name: componentName,

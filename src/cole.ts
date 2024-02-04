@@ -1,13 +1,10 @@
 #!/usr/bin/env node
 
 import * as Commands from "./commands";
-import Logger, { LogLevel } from "./core/tools/logger";
-
 import commander from "commander";
+import { Texts } from "./core";
 
-const logger = Logger.getLogger({
-  minLevel: LogLevel.Debug,
-});
+const texts = Texts.load();
 
 const program = new commander.Command();
 program.description("Cole").enablePositionalOptions();
@@ -20,139 +17,130 @@ const config = program.command("config");
 const newComponent = program.command("new");
 
 newComponent
-  .option("-f, --force", "", false)
-  .option("-j, --json <value>", "path to the json")
-  .option("--skip-tests", "Determines if tests should be included")
-  .option("-w, --with-deps", "Include component dependencies")
+  .option("-f, --force", texts.get("option_force"))
+  .option("-j, --json <value>", texts.get("option_json"))
+  .option("--skip-tests", texts.get("option_skip_tests"))
+  .option("-w, --with-deps", texts.get("option_with_deps"))
+  .description(texts.get("description_new_component(s)"))
   .action((options) => Commands.Api.Actions.fromJson(options));
 
 newComponent
   .command("model")
-  .option("-f, --force", "Determines whether to overwrite existing files")
-  .option("-n, --name <value>", "Name of the model")
-  .option("-e, --endpoint <value>", "Name of the endpoint")
-  .option("-t, --type [values...]", "json, mongo")
-  .option("-p, --props [values...]", "prop1:string, prop2:number")
-  .option("--skip-tests", "Determines if tests should be included")
-  .option("-w, --with-deps", "Include component dependencies")
-  .description("Creates new model file based on provided data.")
+  .option("-f, --force", texts.get("option_force"))
+  .option("-n, --name <value>", texts.get("option_name"))
+  .option("-e, --endpoint <value>", texts.get("option_endpoint"))
+  .option("-t, --type [values...]", texts.get("option_model_type"))
+  .option("-p, --props [values...]", texts.get("option_model_props"))
+  .option("--skip-tests", texts.get("option_skip_tests"))
+  .option("-w, --with-deps", texts.get("option_with_deps"))
+  .description(texts.get("description_new_model"))
   .action((options) => Commands.Api.Actions.newModel(options));
 
 newComponent
   .command("entity")
-  .option("-f, --force", "Determines whether to overwrite existing files")
-  .option("-n, --name <value>", "Name of the entity")
-  .option("-e, --endpoint <value>", "Name of the endpoint")
-  .option("-p, --props [values...]", "prop1:string prop2:number")
-  .option("-m, --model", "Include JSON model")
-  .option("--skip-tests", "Determines if tests should be included")
-  .option("-w, --with-deps", "Include component dependencies")
-  .description("Creates new entity file based on provided data.")
+  .option("-f, --force", texts.get("option_force"))
+  .option("-n, --name <value>", texts.get("option_name"))
+  .option("-e, --endpoint <value>", texts.get("option_endpoint"))
+  .option("-p, --props [values...]", texts.get("option_entity_props"))
+  .option("-m, --with-model", texts.get("option_entity_with_model"))
+  .option("--skip-tests", texts.get("option_skip_tests"))
+  .option("-w, --with-deps", texts.get("option_with_deps"))
+  .description(texts.get("description_new_entity"))
   .action((options) => Commands.Api.Actions.newEntity(options));
 
 newComponent
   .command("toolset")
-  .option("-f, --force", "Determines whether to overwrite existing files")
-  .option("-e, --endpoint <value>", "Name of the endpoint")
-  .option("-n, --name <value>", "Name of the toolset")
-  .option("-l, --layer <value>", "Domain, Data, Infra")
-  .option(
-    "-m, --methods [values...]",
-    "method1(Array<string>):Output, handlerName2"
-  )
-  .option("--skip-tests", "Determines if tests should be included")
-  .option("-w, --with-deps", "Include component dependencies")
-  .description("Creates new controller file based on provided data.")
+  .option("-f, --force", texts.get("option_force"))
+  .option("-e, --endpoint <value>", texts.get("option_endpoint"))
+  .option("-n, --name <value>", texts.get("option_name"))
+  .option("-l, --layer <value>", texts.get("option_toolset_layer"))
+  .option("-m, --methods [values...]", texts.get("option_toolset_methods"))
+  .option("--skip-tests", texts.get("option_skip_tests"))
+  .option("-w, --with-deps", texts.get("option_with_deps"))
+  .description(texts.get("description_new_toolset"))
   .action((options) => Commands.Api.Actions.newToolset(options));
 
 newComponent
   .command("mapper")
-  .option("-f, --force", "Determines whether to overwrite existing files")
-  .option("-n, --name <value>", "Name of the data source")
-  .option("-e, --endpoint <value>", "Name of the endpoint")
-  .option("-s, --storage [values...]", "mongo")
-  .option("-t, --entity <value>", "entity name")
-  .option("-m, --model <value>", "model name")
-  .option("--skip-tests", "Determines if tests should be included")
-  .option("-w, --with-deps", "Include component dependencies")
-  .description("Creates new mapper file based on provided data.")
+  .option("-f, --force", texts.get("option_force"))
+  .option("-n, --name <value>", texts.get("option_name"))
+  .option("-e, --endpoint <value>", texts.get("option_endpoint"))
+  .option("-s, --storage [values...]", texts.get("option_mapper_storages"))
+  .option("-t, --entity <value>", texts.get("option_mapper_entity"))
+  .option("-m, --model <value>", texts.get("option_mapper_model"))
+  .option("--skip-tests", texts.get("option_skip_tests"))
+  .option("-w, --with-deps", texts.get("option_with_deps"))
+  .description(texts.get("description_new_mapper"))
   .action((options) => Commands.Api.Actions.newMapper(options));
 
 newComponent
   .command("use-case")
-  .option("-f, --force", "Determines whether to overwrite existing files")
-  .option("-n, --name <value>", "Name of the use case")
-  .option("-e, --endpoint <value>", "Name of the endpoint")
-  .option("-i, --input [values...]", "prop1:string prop2:number")
-  .option("-o, --output <type>", "number")
-  .option("--skip-tests", "Determines if tests should be included")
-  .option("-w, --with-deps", "Include component dependencies")
-  .description("Creates new use case file based on provided data.")
+  .option("-f, --force", texts.get("option_force"))
+  .option("-n, --name <value>", texts.get("option_name"))
+  .option("-e, --endpoint <value>", texts.get("option_endpoint"))
+  .option("-i, --input [values...]", texts.get("option_use_case_input"))
+  .option("-o, --output <type>", texts.get("option_use_case_output"))
+  .option("--skip-tests", texts.get("option_skip_tests"))
+  .option("-w, --with-deps", texts.get("option_with_deps"))
+  .description(texts.get("description_new_use_case"))
   .action((options) => Commands.Api.Actions.newUseCase(options));
 
 newComponent
   .command("source")
-  .option("-f, --force", "Determines whether to overwrite existing files")
-  .option("-n, --name <value>", "Name of the data source")
-  .option("-e, --endpoint <value>", "Name of the endpoint")
-  .option("-s, --storage [values...]", "mongo")
-  .option("-b, --table <value>", "table name")
-  .option("-m, --model <value>", "model name")
-  .option("--skip-tests", "Determines if tests should be included")
-  .option("-w, --with-deps", "Include component dependencies")
-  .description("Creates new data source file based on provided data.")
+  .option("-f, --force", texts.get("option_force"))
+  .option("-n, --name <value>", texts.get("option_name"))
+  .option("-e, --endpoint <value>", texts.get("option_endpoint"))
+  .option("-s, --storage [values...]", texts.get("option_source_storages"))
+  .option("-b, --table <value>", texts.get("option_source_table"))
+  .option("-m, --model <value>", texts.get("option_source_model_name"))
+  .option("--skip-tests", texts.get("option_skip_tests"))
+  .option("-w, --with-deps", texts.get("option_with_deps"))
+  .description(texts.get("description_new_source"))
   .action((options) => Commands.Api.Actions.newSource(options));
 
 newComponent
   .command("repository")
-  .option("-f, --force", "Determines whether to overwrite existing files")
-  .option("-n, --name <value>", "Name of the repository")
-  .option("-e, --endpoint <value>", "Name of the endpoint")
-  .option("-t, --entity <value>", "(optional) Name of the entity")
-  .option("-m, --model <value>", "model name")
-  .option("-s, --storage [values...]", "mongo")
-  .option("-w, --with-deps", "Include component dependencies")
-  .option("-b, --bundle", "Include interface, implementation and factory")
-  .option("-a, --abstract", "Include interface")
-  .option("-p, --impl", "Include implementation")
-  .option("-c, --factory", "Include factory")
-  .option("--skip-tests", "Determines if tests should be included")
-  .description("Creates new repository file based on provided data.")
+  .option("-f, --force", texts.get("option_force"))
+  .option("-n, --name <value>", texts.get("option_name"))
+  .option("-e, --endpoint <value>", texts.get("option_endpoint"))
+  .option("-t, --entity <value>", texts.get("option_repository_entity"))
+  .option("-m, --model <value>", texts.get("option_repository_model"))
+  .option("-s, --storage [values...]", texts.get("option_repository_storages"))
+  .option("-w, --with-deps", texts.get("option_with_deps"))
+  .option("-a, --no-interface", texts.get("option_repository_no_interface"))
+  .option("-i, --no-impl", texts.get("option_repository_no_impl"))
+  .option("-t, --no-factory", texts.get("option_repository_no_factory"))
+  .option("--skip-tests", texts.get("option_skip_tests"))
+  .description(texts.get("description_new_repository"))
   .action((options) => Commands.Api.Actions.newRepository(options));
 
 newComponent
   .command("route")
-  .option("-f, --force", "Determines whether to overwrite existing files")
-  .option("-n, --name <value>", "Name of the route")
-  .option("-m, --method <value>", "Request method")
-  .option("-p, --path <value>", "/qwerty/:foo?bar=1&baz=true")
-  .option("-c, --controller <value>", "controller name")
-  .option("-h, --handler <value>", "controller method name")
-  .option("-e, --endpoint <value>", "Name of the endpoint")
-  .option("-a, --auth <value>", "jwt")
-  .option("-v, --validate", "Include request validation")
-  .option("-b, --body <value>", "Request body")
-  .option("-r, --response <value>", "Response body")
-  .option("--skip-tests", "Determines if tests should be included")
-  .option("-w, --with-deps", "Include component dependencies")
-  .description("Creates new route file based on provided data.")
+  .option("-f, --force", texts.get("option_force"))
+  .option("-n, --name <value>", texts.get("option_name"))
+  .option("-m, --method <value>", texts.get("option_route_method"))
+  .option("-p, --path <value>", texts.get("option_route_path"))
+  .option("-c, --controller <value>", texts.get("option_route_controller"))
+  .option("-h, --handler <value>", texts.get("option_route_handler"))
+  .option("-e, --endpoint <value>", texts.get("option_endpoint"))
+  .option("-a, --auth <value>", texts.get("option_route_auth"))
+  .option("-v, --validate", texts.get("option_route_validate"))
+  .option("-b, --body <value>", texts.get("option_route_body"))
+  .option("-r, --response <value>", texts.get("option_route_reposnse"))
+  .option("--skip-tests", texts.get("option_skip_tests"))
+  .option("-w, --with-deps", texts.get("option_with_deps"))
+  .description(texts.get("description_new_route"))
   .action((options) => Commands.Api.Actions.newRoute(options));
 
 newComponent
   .command("controller")
-  .option("-f, --force", "Determines whether to overwrite existing files")
-  .option("-e, --endpoint <value>", "Name of the endpoint")
-  .option(
-    "-n, --name <value>",
-    "Name of the controller (If different then endpoint)"
-  )
-  .option(
-    "-h, --handlers [values...]",
-    "handlerName1(Array<string>):Output, handlerName2"
-  )
-  .option("--skip-tests", "Determines if tests should be included")
-  .option("-w, --with-deps", "Include component dependencies")
-  .description("Creates new controller file based on provided data.")
+  .option("-f, --force", texts.get("option_force"))
+  .option("-e, --endpoint <value>", texts.get("option_endpoint"))
+  .option("-n, --name <value>", texts.get("option_name"))
+  .option("-h, --handlers [values...]", texts.get("option_controller_handlers"))
+  .option("--skip-tests", texts.get("option_skip_tests"))
+  .option("-w, --with-deps", texts.get("option_with_deps"))
+  .description(texts.get("description_new_controller"))
   .action((options) => Commands.Api.Actions.newController(options));
 
 /**

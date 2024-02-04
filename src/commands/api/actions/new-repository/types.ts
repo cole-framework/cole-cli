@@ -18,10 +18,9 @@ export type NewRepositoryOptions = DefaultCliOptions & {
   name: string;
   endpoint?: string;
   storage?: string[];
-  impl?: boolean;
-  interface?: boolean;
-  factory?: boolean;
-  bundle?: boolean;
+  noImpl?: boolean;
+  noInterface?: boolean;
+  noFactory?: boolean;
   entity?: string;
   model?: string;
 };

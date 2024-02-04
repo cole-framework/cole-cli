@@ -23,7 +23,6 @@ export type InstructionData = { [key: string]: any; dependencies: any[] };
 9: "Array<Param>"
 */
 const instruction_regex =
-  // /{{\s*(USE|IF)\s+((DEPENDENCY|ADDONS)\s*\([A-Z ]+([a-zA-Z.0-9_]+)(\s+[A-Z=\>\<\! ]+\s+)?([a-zA-Z0-9\"\'\_\- ]+)?\).?)?([a-z.A-Z0-9\[\]-_\(\)]+)(\s+[A-Z_ ]+\s+)?([^}]+)?\s*}}/;
   /{{\s*(USE|IF)\s+(DEPENDENCY|ADDONS)\(([A-Z]+)?\s*([a-zA-Z.0-9_]+)?(\s+[A-Z=\>\<\! ]+\s+)?([a-zA-Z0-9\"\'\_\- ]+)?\).?([a-z.A-Z0-9\[\]-_\(\)]+)?(\s+[A-Z_ ]+\s+)?([^}]+)?\s*}}/;
 
 export class ConfigTools {
@@ -56,6 +55,7 @@ export class ConfigTools {
       let result = value;
       instruction_match.forEach((match) => {
         const parsed = this.parseInstruction(match, data, config);
+
         result = result.replace(match, parsed);
       });
 

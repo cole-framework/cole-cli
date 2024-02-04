@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import { Texts, CliOptionsTools } from "../../../../core";
 import { Strategy } from "../../../../core/strategy";
-import { NewRepositoryOptions } from "./types";
-import { ApiConfig } from "../../common";
+import { NewRepositoryOptions, RepositoryJson } from "./types";
+import { ApiConfig, ApiGenerator, ApiJsonParser } from "../../common";
 
 export class NewRepositoryOptionsStrategy extends Strategy {
   public async apply(apiConfig: ApiConfig, options: NewRepositoryOptions) {
@@ -14,26 +14,41 @@ export class NewRepositoryOptionsStrategy extends Strategy {
       process.exit(1);
     }
 
-    const { endpoint, name, entity, model, impl, factory, bundle, abstract } =
+    const { endpoint, name, entity, model, noFactory, noImpl, noInterface } =
       options;
     const storages = CliOptionsTools.splitArrayOption(options.storage);
-    // const repository: RepositoryJson = {
-    //   name,
-    //   endpoint,
-    //   storages: [...storages],
-    //   model,
-    //   entity,
-    //   has_interface: options.bundle || options.interface,
-    //   has_factory: options.bundle || options.factory,
-    //   has_impl: options.bundle || options.impl,
-    // };
 
-    // const result = new ApiJsonParser(apiConfig, config, texts).build({
-    //   repositories: [repository],
-    // });
+    const repository: RepositoryJson = {
+      name,
+      endpoint,
+      entity: entity || name,
+      contexts: [],
+      build_factory: !noFactory,
+      build_interface: !noInterface,
+      use_default_impl: storages.length === 1 || noImpl === true,
+    };
 
-    // console.log("->", JSON.stringify(result, null, 2));
+    if (model) {
+      storages.forEach((type) => {
+        repository.contexts.push({ type, model });
+      });
+    } else {
+      repository.contexts.push(...storages);
+    }
 
-    // return result;
+    console.log(JSON.stringify(repository, null, 2));
+
+    const schema = new ApiJsonParser(apiConfig, config, texts).build({
+      repositories: [repository],
+    });
+
+    const result = await new ApiGenerator(config).generate(schema);
+
+    if (result.isFailure) {
+      console.log(result.failure.error);
+      process.exit(1);
+    } else {
+      process.exit(0);
+    }
   }
 }

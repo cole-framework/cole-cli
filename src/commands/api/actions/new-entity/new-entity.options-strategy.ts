@@ -16,7 +16,7 @@ export class NewEntityOptionsStrategy extends Strategy {
       process.exit(1);
     }
 
-    const { endpoint, name, model: has_model, props } = options;
+    const { endpoint, name, withModel: has_model, props } = options;
     const entity: EntityJson = {
       name,
       endpoint,

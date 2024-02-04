@@ -327,12 +327,6 @@
                 "injectable"
               ],
               "path": "@cole-framework/api-core"
-            },
-            {
-              "list": [
-                "{{USE DEPENDENCY(WHERE type.isEntity IS true).element.name}}"
-              ],
-              "path": "{{USE DEPENDENCY(WHERE type.isEntity IS true).path}}"
             }
           ],
           "inheritance": [

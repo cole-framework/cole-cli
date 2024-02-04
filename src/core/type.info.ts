@@ -28,27 +28,6 @@ export abstract class TypeInfo {
       return UnknownType.create();
     }
 
-    // WHY?
-    // if (data.type?.name) {
-    //   switch (data.type.name) {
-    //     case "model": {
-    //       return new ModelType(data.name, data.type.type);
-    //     }
-    //     case "route_model": {
-    //       return new ModelType(data.name, data.type.type);
-    //     }
-    //     case "entity": {
-    //       return new EntityType(data.name);
-    //     }
-    //     case "toolset": {
-    //       return new ToolsetType(data.name);
-    //     }
-    //     default: {
-    //       return new UnknownType();
-    //     }
-    //   }
-    // }
-
     const typeLC = data.toLowerCase();
 
     const entityMatch = data.match(/^Entity\s*<\s*(\w+)\s*>/i);
@@ -79,7 +58,7 @@ export abstract class TypeInfo {
     );
     if (dataContextMatch) {
       const entity = dataContextMatch[1];
-      const model = dataContextMatch[2]?.toLowerCase();
+      const model = dataContextMatch[2];
 
       return DataContextType.create(entity, model);
     }

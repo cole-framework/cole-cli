@@ -96,6 +96,7 @@ export class RepositoryJsonParser {
           );
           entities.push(e);
         }
+
         repository.addDependency(e, config);
       }
     });

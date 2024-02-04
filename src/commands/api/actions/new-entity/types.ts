@@ -11,7 +11,7 @@ import { ApiJson, DefaultCliOptions } from "../../common/api.types";
 export type NewEntityOptions = DefaultCliOptions & {
   name: string;
   endpoint?: string;
-  model?: boolean;
+  withModel?: boolean;
   props?: string[];
 };
 

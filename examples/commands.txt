@@ -1,2 +1,3 @@
 node build/cole.js new --json "./examples/new-repository.json" --with-deps
 node build/cole.js new toolset --name fooo -e xxx -l domain -m "splitFoo(p1:string, p2:Model<baz>):Array<number>" -w -f
+node build/cole.js new route -n foo -e xxx -m GET -p "/foo/:id" -c foo -h getFoo -b string -r "{'200': 'string', '404': 'string'}" -w
