@@ -1,56 +1,56 @@
 {
   "models": [
     {
-      "name": "Foo",
-      "endpoint": "xxx",
+      "name": "UserProfile",
+      "endpoint": "shop",
       "types": [
         "json"
       ],
       "props": [
         {
-          "name": "prop1",
-          "type": "Array<Entity<Bar>>"
+          "name": "friends",
+          "type": "Array<Entity<User>>"
         },
         {
-          "name": "prop2",
-          "type": "Model<Baz, mongo>"
+          "name": "preferences",
+          "type": "Model<Preferences, mongo>"
         },
         {
-          "name": "prop3",
-          "type": "Qwerty"
+          "name": "status",
+          "type": "string"
         }
       ]
     },
     {
-      "name": "Bar",
-      "endpoint": "xxx",
+      "name": "Product",
+      "endpoint": "shop",
       "types": [
         "json"
       ],
       "props": [
         {
-          "name": "x",
+          "name": "price",
           "type": "number"
         },
         {
-          "name": "y",
+          "name": "stock",
           "type": "number"
         }
       ]
     },
     {
-      "name": "Baz",
-      "endpoint": "xxx",
+      "name": "Order",
+      "endpoint": "shop",
       "types": [
         "json"
       ],
       "props": [
         {
-          "name": "h",
+          "name": "totalAmount",
           "type": "number"
         },
         {
-          "name": "z",
+          "name": "quantity",
           "type": "number"
         }
       ]

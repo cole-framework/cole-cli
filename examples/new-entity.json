@@ -1,23 +1,39 @@
 {
   "entities": [
     {
-      "name": "Foo",
-      "endpoint": "xxx",
+      "name": "Customer",
+      "endpoint": "shop",
       "has_model": false,
-      "types": [
-        "json"
-      ],
       "props": [
         {
-          "name": "prop1",
-          "type": "Array<Entity<Bar>>"
+          "name": "orders",
+          "type": "Array<Entity<Order>>"
         },
         {
-          "name": "prop2",
-          "type": "Baz"
+          "name": "address",
+          "type": "Address"
         },
         {
-          "name": "prop3",
+          "name": "loyaltyPoints",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "name": "Product",
+      "endpoint": "shop",
+      "has_model": true,
+      "props": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "category",
+          "type": "Category"
+        },
+        {
+          "name": "loyaltyPoints",
           "type": "number"
         }
       ]

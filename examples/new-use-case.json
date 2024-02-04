@@ -1,23 +1,23 @@
 {
   "use_cases": [
     {
-      "name": "Foo",
-      "endpoint": "xxx",
+      "name": "ProcessOrder",
+      "endpoint": "shop",
       "input": [
         {
-          "name": "prop1",
-          "type": "Array<Entity<Bar>>"
+          "name": "orderItems",
+          "type": "Array<Entity<Product>>"
         },
         {
-          "name": "prop2",
-          "type": "Baz"
+          "name": "customerDetails",
+          "type": "Customer"
         },
         {
-          "name": "prop3",
-          "type": "number"
+          "name": "paymentMethod",
+          "type": "string"
         }
       ],
-      "output": "Baz"
+      "output": "OrderConfirmation"
     }
   ]
 }

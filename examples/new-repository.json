@@ -1,29 +1,29 @@
 {
   "repositories": [
     {
-      "name": "Qwerty",
-      "endpoint": "xxx",
+      "name": "Customer",
+      "endpoint": "shop",
       "methods": [],
-      "entity": "Baz",
+      "entity": "Customer",
       "contexts": [
         {
           "type": "mongo",
-          "source": "Foo",
-          "mapper": "Foo",
-          "model": "sebix"
+          "source": "Customer",
+          "mapper": "Customer",
+          "model": "Customer"
         }
       ]
     },
     {
-      "name": "Bar",
-      "endpoint": "xxx",
+      "name": "Order",
+      "endpoint": "shop",
       "contexts": [
         "mongo",
         "sql"
       ],
       "methods": [
         {
-          "name": "addBar"
+          "name": "saveOrder"
         }
       ]
     }

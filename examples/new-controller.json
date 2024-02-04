@@ -1,40 +1,40 @@
 {
   "controllers": [
     {
-      "name": "Foo",
-      "endpoint": "xxx",
+      "name": "User",
+      "endpoint": "shop",
       "handlers": [
         {
-          "name": "getFoooo",
-          "input": "Array<Entity<Fooo>>",
-          "output": { "a": "string", "b": "wtf" }
+          "name": "getUserDetails",
+          "input": "Array<Entity<User>>",
+          "output": { "id": "string", "name": "string" }
         }
       ]
     },
     {
-      "name": "Bar",
-      "endpoint": "xxx",
+      "name": "Product",
+      "endpoint": "shop",
       "handlers": [
         {
-          "name": "getBar",
-          "input": "Array<Entity<Bar>>",
-          "output": "BarO"
+          "name": "getProductInfo",
+          "input": "Array<Entity<Product>>",
+          "output": "ProductDetails"
         }
       ]
     },
     {
-      "name": "Baz",
-      "endpoint": "xxx",
+      "name": "Order",
+      "endpoint": "shop",
       "handlers": [
         {
-          "name": "getBaz"
+          "name": "getOrderStatus"
         }
       ]
     },
     {
-      "name": "Qwerty",
-      "endpoint": "xxx",
-      "handlers": ["getQwerty"]
+      "name": "Inventory",
+      "endpoint": "shop",
+      "handlers": ["checkInventoryAvailability"]
     }
   ]
 }

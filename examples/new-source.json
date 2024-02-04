@@ -1,13 +1,13 @@
 {
   "sources": [
     {
-      "name": "Foo",
-      "endpoint": "xxx",
+      "name": "User",
+      "endpoint": "shop",
       "storages": [
         "mongo"
       ],
-      "model": "sebix",
-      "table": "sebix.collection"
+      "model": "User",
+      "table": "users.collection"
     }
   ]
 }

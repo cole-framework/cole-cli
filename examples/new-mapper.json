@@ -1,49 +1,49 @@
 {
   "mappers": [
     {
-      "name": "Foo",
-      "endpoint": "xxx",
+      "name": "User",
+      "endpoint": "shop",
       "storages": [
         "mongo"
       ],
-      "model": "sebix",
-      "entity": "Bar"
+      "model": "User",
+      "entity": "User"
     },
     {
-      "name": "Bar",
-      "endpoint": "xxx",
+      "name": "Order",
+      "endpoint": "shop",
       "storages": [
         "mongo"
       ],
-      "model": "Bar",
-      "entity": "Bar",
+      "model": "Order",
+      "entity": "Order",
       "props": [
         {
-          "name": "prop1",
-          "type": "Array<Entity<Bar>>"
+          "name": "items",
+          "type": "Array<Entity<Product>>"
         },
         {
-          "name": "prop2",
-          "type": "Model<Baz,mongo>"
+          "name": "customerInfo",
+          "type": "Model<Customer,mongo>"
         }
       ]
     }
   ],
   "models": [
     {
-      "name": "Bar",
-      "endpoint": "xxx",
+      "name": "Order",
+      "endpoint": "shop",
       "types": [
         "json"
       ],
       "props": [
         {
-          "name": "prop1",
-          "type": "Array<Entity<Bar>>"
+          "name": "items",
+          "type": "Array<Entity<Product>>"
         },
         {
-          "name": "prop2",
-          "type": "Model<Baz,mongo>"
+          "name": "customerInfo",
+          "type": "Model<Customer,mongo>"
         }
       ]
     }

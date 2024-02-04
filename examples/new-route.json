@@ -1,26 +1,69 @@
 {
   "routes": [
     {
-      "name": "xyz",
-      "endpoint": "xxx",
-      "controller": "xyz",
-      "handler": "getXyz",
+      "name": "UserProfile",
+      "endpoint": "users",
+      "handler": {
+        "controller": "users",
+        "name": "getUserProfile",
+        "input": "Entity<GetUserProfileInput>",
+        "output": "Entity<User>"
+      },
       "request": {
-        "path": "/xyz/:id",
         "method": "GET",
+        "path": "user/:id",
         "validate": false,
-        "auth": "none",
-        "body": {
-          "p1": "string"
-        }
+        "auth": "jwt",
+        "body": { "userId": "string", "details": "boolean" },
+        "headers": {}
       },
       "response": {
-        "200": {
-          "q1": "RouteModel<Qwerty>",
-          "q2": "string"
-        },
-        "404": "Array<unknown>"
+        "200": "OK",
+        "500": "Error",
+        "404": { "message": "string", "error_code": "number" }
       }
+    },
+    {
+      "name": "ProductDetails",
+      "endpoint": "shop",
+      "handler": {
+        "controller": "shop",
+        "name": "getProductDetails",
+        "input": { "productId": "string", "includeReviews": "boolean" },
+        "output": "Entity<Product>"
+      },
+      "request": {
+        "method": "GET",
+        "path": "product/:id?includeReviews",
+        "validate": false,
+        "body": {},
+        "headers": {}
+      },
+      "response": {
+        "200": "OK",
+        "500": "Error",
+        "404": { "message": "string", "errorCode": "number" }
+      }
+    }
+  ],
+  "entities": [],
+  "models": [
+    {
+      "name": "UserProfile",
+      "endpoint": "shop",
+      "types": [
+        "json"
+      ],
+      "props": [
+        {
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "name": "profileDetails",
+          "type": "UserProfileDetails"
+        }
+      ]
     }
   ]
 }
