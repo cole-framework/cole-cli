@@ -32,9 +32,9 @@ export class DefineProjectFrame extends Frame<ProjectDescription> {
       },
     ];
 
-    let name: string;
-    let language: string;
-    let database: string[];
+    let name = "";
+    let language = "";
+    let database = [];
 
     while (name.length === 0) {
       name = await InteractionPrompts.input(

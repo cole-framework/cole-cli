@@ -32,9 +32,9 @@ export class DefineResourcesFrame extends Frame<ProjectDescription> {
       },
     ];
 
-    let source: string;
-    let language: string;
-    let database: string[];
+    let source = "";
+    let language = "";
+    let database = [];
 
     while (source.length === 0) {
       source = await InteractionPrompts.input(

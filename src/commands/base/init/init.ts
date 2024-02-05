@@ -2,19 +2,13 @@ import chalk from "chalk";
 import { InitOptions } from "./types";
 import { InitInteractiveStrategy } from "./init.interactive-strategy";
 import { InitOptionsStrategy } from "./init.options-strategy";
-import { ConfigLoader, Texts, localConfigPath } from "../../../core";
-import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { Texts, localConfigPath } from "../../../core";
+import { existsSync, mkdirSync } from "fs";
 import { InteractionPrompts } from "../../api";
 import { dirname } from "path";
 
 export const init = async (options: InitOptions) => {
-  const { content: config, failure } = ConfigLoader.load();
-  const texts = Texts.load();
-
-  if (failure) {
-    console.log(chalk.red(failure.error.message));
-    process.exit(1);
-  }
+  const texts = Texts.load(true);
 
   if (existsSync(localConfigPath)) {
     const shouldContinue = await InteractionPrompts.continue(
@@ -29,8 +23,8 @@ export const init = async (options: InitOptions) => {
   }
 
   if (Object.keys(options).length === 0) {
-    new InitOptionsStrategy(config).apply(options);
+    new InitInteractiveStrategy().apply();
   } else {
-    new InitInteractiveStrategy(config).apply();
+    new InitOptionsStrategy().apply(options);
   }
 };

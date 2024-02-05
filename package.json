@@ -2,9 +2,9 @@
   "name": "@cole-framework/cole-cli",
   "version": "0.0.0",
   "description": "",
-  "main": "build/cole-cli.js",
+  "main": "./build/cole.js",
   "bin": {
-    "cole": "./bin/cole-cli"
+    "cole": "./build/cole.js"
   },
   "repository": {
     "type": "git",

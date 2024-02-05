@@ -16,11 +16,8 @@ import DefaultConfig from "../../../../defaults/default.config.json";
 const execAsync = promisify(exec);
 
 export class TypeScriptProjectInitStrategy extends Strategy {
-  constructor(
-    config: Config,
-    private texts: Texts
-  ) {
-    super(config);
+  constructor(private texts: Texts) {
+    super();
   }
 
   async apply(project: ProjectDescription): Promise<Result> {

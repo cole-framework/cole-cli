@@ -5,7 +5,7 @@ import { TypeScriptProjectBuildStrategy } from "./build-strategies";
 export class NewProjectInteractiveStrategy extends Strategy {
   public readonly name = "new_project";
   public async apply() {
-    const texts = Texts.load();
+    const texts = Texts.load(true);
     const newProjectStoryboard = new NewProjectStoryboard(texts);
     const { content, failure } = await newProjectStoryboard.run();
 
@@ -17,7 +17,7 @@ export class NewProjectInteractiveStrategy extends Strategy {
     let buildStrategy: Strategy<Promise<Result>>;
 
     if (["typescript", "ts"].includes(content.language.toLowerCase())) {
-      buildStrategy = new TypeScriptProjectBuildStrategy(this.config, texts);
+      buildStrategy = new TypeScriptProjectBuildStrategy(texts);
     } else {
       throw Error(
         `not_supported_language_###`.replace("###", content.language)

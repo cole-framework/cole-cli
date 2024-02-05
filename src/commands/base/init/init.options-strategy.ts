@@ -42,7 +42,7 @@ export class InitOptionsStrategy extends Strategy {
     let buildStrategy: Strategy<Promise<Result>>;
 
     if (["typescript", "ts"].includes(description.language.toLowerCase())) {
-      buildStrategy = new TypeScriptProjectInitStrategy(this.config, texts);
+      buildStrategy = new TypeScriptProjectInitStrategy(texts);
     } else {
       throw Error(
         `not_supported_language_###`.replace("###", description.language)
