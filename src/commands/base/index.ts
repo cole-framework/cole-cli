@@ -1,2 +1,2 @@
-export * from "./types";
 export * from "./init";
+export * from "./new-project";

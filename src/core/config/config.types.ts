@@ -3,6 +3,7 @@ import { CompilationConfigData } from "./compilation-config.types";
 import { ComponentsConfigData } from "./components-config.types";
 import { DatabaseConfigData } from "./database-config.types";
 import { GeneralConfigData } from "./general-config.types";
+import { WebConfigData } from "./web-config.types";
 
 export type ConfigAddons = {
   meta?: string;
@@ -18,6 +19,7 @@ export type GeneratedPath = {
 export type ConfigData = {
   general: GeneralConfigData;
   compilation: CompilationConfigData;
+  web: WebConfigData;
   databases: DatabaseConfigData[];
   code: CodeConfigData;
   components: ComponentsConfigData;

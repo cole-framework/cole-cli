@@ -5,19 +5,21 @@ import { ComponentsConfigTools } from "./components-config.tools";
 import { ConfigData, ReservedType } from "./config.types";
 import { DatabaseConfig } from "./database-config";
 import { GeneralConfig } from "./general-config";
+import { WebConfig } from "./web-config";
 
 export class Config {
   public static create(data: ConfigData): Config {
     const general = GeneralConfig.create(data.general);
     const compilation = CompilationConfig.create(data.compilation);
     const databases = data.databases.map(DatabaseConfig.create);
+    const web = WebConfig.create(data.web);
     const code = CodeConfig.create(data.code);
     const components = ComponentsConfig.create(
       data.compilation.source_dirname,
       data.components
     );
 
-    return new Config(general, compilation, databases, code, components);
+    return new Config(general, compilation, databases, code, web, components);
   }
 
   private __allReservedTypes: ReservedType[] = [];
@@ -27,6 +29,7 @@ export class Config {
     public readonly compilation: CompilationConfig,
     public readonly databases: DatabaseConfig[],
     public readonly code: CodeConfig,
+    public readonly web: WebConfig,
     public readonly components: ComponentsConfig
   ) {
     if (Array.isArray(databases)) {

@@ -10,13 +10,22 @@ export class DatabaseConfig {
       });
     }
 
-    return new DatabaseConfig(data.name, data.alias, data.case_style, mappings);
+    return new DatabaseConfig(
+      data.name,
+      data.alias,
+      data.case_style,
+      mappings,
+      data.module,
+      data.package
+    );
   }
 
   constructor(
     public readonly name: string,
     public readonly alias: string,
     public readonly caseStyle: string,
-    public readonly mappings: DatabaseMapping[]
+    public readonly mappings: DatabaseMapping[],
+    public readonly module: string,
+    public readonly pckg: string
   ) {}
 }

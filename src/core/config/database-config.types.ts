@@ -5,6 +5,8 @@ export type DatabaseMappingData = {
 export type DatabaseConfigData = {
   name: string;
   alias: string;
+  package?: string;
+  module?: string;
   case_style?: string;
   mappings?: DatabaseMappingData[];
 };

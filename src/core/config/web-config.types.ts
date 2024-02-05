@@ -1,7 +1,6 @@
-export type CodeConfigData = {
+export type WebConfigData = {
   module: string;
   name: string;
   alias: string;
-  types: string[];
   package?: string;
 };

@@ -11,6 +11,12 @@
     "thread_count": -1,
     "transport": "file"
   },
+  "web": {
+    "name": "Express.js",
+    "alias": "express",
+    "package": "express",
+    "module": "@cole-framework/cole-express"
+  },
   "databases": [
     {
       "name": "Cache",
@@ -19,6 +25,8 @@
       "mappings": []
     },
     {
+      "package": "mongo",
+      "module": "@cole-framework/cole-storage-mongo",
       "name": "MongoDB",
       "alias": "mongo",
       "case_style": "snake",
@@ -50,6 +58,8 @@
       ]
     },
     {
+      "package": "mysql",
+      "module": "@cole-framework/cole-storage-mysql",
       "name": "MySQL",
       "alias": "mysql",
       "case_style": "snake",
@@ -62,9 +72,10 @@
     }
   ],
   "code": {
-    "module": "@cole-framework/code-cli-typescript",
+    "module": "@cole-framework/cole-ts",
     "name": "TypeScript",
     "alias": "typescript",
+    "package": "typescript",
     "types": [
       "string",
       "number",
