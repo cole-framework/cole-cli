@@ -150,11 +150,10 @@ export abstract class TypeInfo {
       return RouteIOType.create(name, ref, method);
     }
 
-    ///
-
-    if (data.includes("|") || data.includes("&")) {
+    const multiMatch = data.match(/^MultiType\s*<\s*([a-zA-Z0-9|& <>]+)\s*>/i);
+    if (multiMatch) {
       const chain = new Set<TypeInfo | "|" | "&">();
-      const match = data.match(/[a-zA-Z0-9<>, ]+|[|&]/g);
+      const match = routeIOMatch[1].match(/[a-zA-Z0-9<>, ]+|[|&]/g);
       match.forEach((str) => {
         if (str !== "|" && str !== "&") {
           chain.add(TypeInfo.create(str.trim(), config));
@@ -795,7 +794,7 @@ export class MultiType {
       }
       return name;
     }, "");
-    return new MultiType(name, "multi_type", chain, tag);
+    return new MultiType(name, "multi_type", chain, `MultiType<${tag}>`);
   }
 
   public readonly isMultiType = true;

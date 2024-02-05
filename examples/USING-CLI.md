@@ -3,9 +3,37 @@
 ## Before you start
 
 **A general note for all components.** 
-_1. Do not use the component type in the name, e.g. Model, Entity, Repository etc. The names are created based on the pattern in the general configuration file. If you have not changed this configuration, the names will be formulated taking into account the type of component (the exception is Entity). Remember that you can modify the configuration file and define this pattern and name the components whatever you want._
+Do not use the component type in the name, e.g. Model, Entity, Repository etc. The names are created based on the pattern in the general configuration file. If you have not changed this configuration, the names will be formulated taking into account the type of component (the exception is Entity). Remember that you can modify the configuration file and define this pattern and name the components whatever you want.
 
-_2. In certain places, the application creates components according to guidelines defined in the code. If, for example, you want to use a specific type of component, like model or entity, as a parameter type, you must embed the name in an appropriate tag, e.g. Model<User> or Entity<User>. In the case of components that depend on the type of data provider, e.g. Model, RouteModel, Source. Tags may contain additional information, e.g. Model<User, mongo> (will create a model with properties appropriate for the mongo database)_
+
+When naming types, please use tags. By default, names such as `User` will be treated as a JSON model type. If you wish to use a different component in a specific situation, you have the following tags available:
+
+- `Entity<type_name>`: Specifies an entity type.
+- `Model<type_name, database_name>`: Defines a model type with an associated database.
+- `RouteModel<type_name, http_method>`: Indicates a model type used specifically for routing, including the HTTP method.
+
+Other components are also available but are not applicable in JSON configuration or CLI commands. These components should not be used as types:
+
+- `Repository<type_name>`
+- `RepositoryImpl<type_name>`
+- `RepositoryFactory<type_name>`
+- `Controller<type_name>`
+- `Source<type_name, database_name>`
+- `Mapper<type_name, database_name>`
+- `UseCase<type_name>`
+- `Route<type_name, http_method>`
+- `RouteIO<type_name, http_method>`
+- `Toolset<type_name>`
+
+Basic types such as `string`, `number`, `boolean`, `object`, `void`, `unknown`, etc., will remain in their standard form. If you wish to declare a more complex type, such as an array, set, or map, you should use the following tags:
+
+- `Array<type_name>`: Defines an array of a specific type.
+- `Set<type_name>`: Specifies a set of a unique type.
+- `Map<key_type_name, value_type_name>`: Indicates a map with key-value pairs, specifying their types.
+
+If there could be multiple types, use the `MultiType` tag:
+
+- `MultiType<type_name & type_name | type_name>`: Allows for the declaration of a variable that can be of multiple types, using a combination of `&` (and) and `|` (or) to specify the options.
 
 ### Basic JSON Structures
 
