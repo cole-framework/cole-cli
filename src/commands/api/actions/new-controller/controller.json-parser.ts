@@ -14,7 +14,7 @@ import { ControllerFactory } from "./controller.factory";
 import { Entity } from "../new-entity/types";
 import { EntityFactory } from "../new-entity";
 import { pascalCase } from "change-case";
-import { ApiConfig } from "../../common";
+import { ProjectConfig } from "../../common";
 import { TestSuite, TestSuiteFactory } from "../new-test-suite";
 
 export class ControllerInputJsonParser {
@@ -102,7 +102,7 @@ export class ControllerJsonParser {
 
   constructor(
     private config: Config,
-    private apiConfig: ApiConfig,
+    private projectConfig: ProjectConfig,
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {
@@ -120,7 +120,7 @@ export class ControllerJsonParser {
     controllers: Controller[];
     test_suites: TestSuite[];
   } {
-    const { config, texts, writeMethod, apiConfig } = this;
+    const { config, texts, writeMethod, projectConfig } = this;
     const models: Model[] = [];
     const entities: Entity[] = [];
     const controllers: Controller[] = [];
@@ -170,7 +170,7 @@ export class ControllerJsonParser {
         []
       );
 
-      if (!apiConfig.skip_tests && controller.element.methods.length > 0) {
+      if (!projectConfig.skip_tests && controller.element.methods.length > 0) {
         //
         const suite = TestSuiteFactory.create(
           { name, endpoint, type: "unit_tests" },

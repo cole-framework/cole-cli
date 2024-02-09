@@ -5,7 +5,7 @@ import {
   StoryboardSession,
   TimelineFrame,
 } from "../../../../core/storyboard-session";
-import { ApiConfig, ApiJson } from "../../common";
+import { ProjectConfig, ApiJson } from "../../common";
 import {
   CreateRouteFrame,
   DefineRouteNameAndEndpointFrame,
@@ -41,7 +41,7 @@ export class NewRouteStoryboard extends Storyboard<any> {
   constructor(
     texts: Texts,
     config: Config,
-    apiConfig: ApiConfig,
+    projectConfig: ProjectConfig,
     session?: StoryboardSession
   ) {
     super(
@@ -57,22 +57,25 @@ export class NewRouteStoryboard extends Storyboard<any> {
       })
       .addFrame(new SelectRequestBodyTypeFrame(texts))
       .addFrame(new SelectResponseBodyTypeFrame(texts))
-      .addFrame(new DescribeControllerFrame(config, apiConfig, texts), (t) => {
-        const { name, endpoint } = t.getFrame(0).output;
-        const { controller, handler, path } = t.getFrame(1).output;
-        const { request_body } = t.getFrame(2).output;
-        const { response_body } = t.getFrame(3).output;
-        return {
-          name,
-          endpoint,
-          controller,
-          handler,
-          path,
-          request_body,
-          response_body,
-        };
-      })
-      .addFrame(new CreateRouteFrame(config, apiConfig, texts), (t) => {
+      .addFrame(
+        new DescribeControllerFrame(config, projectConfig, texts),
+        (t) => {
+          const { name, endpoint } = t.getFrame(0).output;
+          const { controller, handler, path } = t.getFrame(1).output;
+          const { request_body } = t.getFrame(2).output;
+          const { response_body } = t.getFrame(3).output;
+          return {
+            name,
+            endpoint,
+            controller,
+            handler,
+            path,
+            request_body,
+            response_body,
+          };
+        }
+      )
+      .addFrame(new CreateRouteFrame(config, projectConfig, texts), (t) => {
         const { name, endpoint } = t.getFrame(0).output;
         const { path, http_method, controller, handler, auth, validate } =
           t.getFrame(1).output;

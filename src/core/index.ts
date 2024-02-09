@@ -5,7 +5,6 @@ export * from "./config";
 export * from "./template";
 export * from "./tools";
 export * from "./components";
-export * from "./texts";
 export * from "./consts";
 export * from "./enums";
 export * from "./failure";
@@ -15,3 +14,6 @@ export * from "./state-manager";
 export * from "./worker-pool";
 export * from "./strategy";
 export * from "./transport";
+
+export * from "./plugin-map.service";
+export * from "./plugin-config.service";

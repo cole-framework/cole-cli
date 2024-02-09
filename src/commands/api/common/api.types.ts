@@ -9,7 +9,7 @@ import { SourceJson } from "../actions/new-source";
 import { ToolsetJson } from "../actions/new-toolset";
 
 import { UseCaseJson } from "../actions/new-use-case";
-import { ApiConfig } from "./api.config";
+import { ProjectConfig } from "./project.config";
 
 export type DefaultCliOptions = {
   skipTests?: boolean;
@@ -49,6 +49,6 @@ export type ApiObject = {
 };
 
 export type ApiData = {
-  config: ApiConfig;
+  config: ProjectConfig;
   components: any[];
 };

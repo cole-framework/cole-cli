@@ -1,12 +1,21 @@
 import chalk from "chalk";
-import { Texts, CliOptionsTools } from "../../../../core";
-import { Strategy } from "../../../../core/strategy";
 import { NewRepositoryOptions, RepositoryJson } from "./types";
-import { ApiConfig, ApiGenerator, ApiJsonParser } from "../../common";
+import { ProjectConfig, ApiGenerator, ApiJsonParser } from "../../common";
+import { Strategy, Texts } from "@cole-framework/cole-cli-core";
+import { CliOptionsTools, Config } from "../../../../core";
 
 export class NewRepositoryOptionsStrategy extends Strategy {
-  public async apply(apiConfig: ApiConfig, options: NewRepositoryOptions) {
-    const { config } = this;
+  constructor(
+    private config: Config,
+    private projectConfig: ProjectConfig
+  ) {
+    super();
+  }
+  public async apply(
+    options: NewRepositoryOptions,
+    cliPluginPackageName: string
+  ) {
+    const { config, projectConfig } = this;
     const texts = await Texts.load();
 
     if (!options.endpoint && config.components.model.isEndpointRequired()) {
@@ -36,11 +45,14 @@ export class NewRepositoryOptionsStrategy extends Strategy {
       repository.contexts.push(...storages);
     }
 
-    const schema = new ApiJsonParser(apiConfig, config, texts).build({
+    const schema = new ApiJsonParser(projectConfig, config, texts).build({
       repositories: [repository],
     });
 
-    const result = await new ApiGenerator(config).generate(schema);
+    const result = await new ApiGenerator(
+      config,
+      cliPluginPackageName
+    ).generate(schema);
 
     if (result.isFailure) {
       console.log(result.failure.error);

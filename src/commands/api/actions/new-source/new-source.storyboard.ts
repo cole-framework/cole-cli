@@ -6,7 +6,7 @@ import {
   Texts,
   TimelineFrame,
 } from "../../../../core";
-import { ApiConfig } from "../../common/api.config";
+import { ProjectConfig } from "../../common/project.config";
 import { ApiJson } from "../../common/api.types";
 import { CreateSourcesFrame, SelectSourceStoragesFrame } from "./frames";
 
@@ -30,7 +30,7 @@ export class NewSourceStoryboard extends Storyboard<ApiJson> {
   constructor(
     texts: Texts,
     config: Config,
-    apiConfig: ApiConfig,
+    projectConfig: ProjectConfig,
     session?: StoryboardSession
   ) {
     super(
@@ -40,7 +40,7 @@ export class NewSourceStoryboard extends Storyboard<ApiJson> {
     );
 
     this.addFrame(new SelectSourceStoragesFrame(config, texts)).addFrame(
-      new CreateSourcesFrame(config, apiConfig, texts),
+      new CreateSourcesFrame(config, projectConfig, texts),
       (t) => ({ storages: t.prevFrame.output })
     );
   }

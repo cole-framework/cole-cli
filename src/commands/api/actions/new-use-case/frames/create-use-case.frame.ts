@@ -8,7 +8,7 @@ import {
   WriteMethod,
 } from "../../../../../core";
 import {
-  ApiConfig,
+  ProjectConfig,
   ApiJson,
   CreateParamInteraction,
   InputNameAndEndpointInteraction,
@@ -26,14 +26,14 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
+    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateUseCaseFrame.NAME);
   }
 
   public async run(context?: { name?: string; endpoint?: string }) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config, projectConfig } = this;
     const result: ApiJson = { entities: [], models: [], use_cases: [] };
     const { name, endpoint } = await new InputNameAndEndpointInteraction({
       nameMessage: texts.get("please_provide_use_case_name"),
@@ -58,7 +58,7 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
       endpoint,
     }).path;
 
-    if (apiConfig.force === false) {
+    if (projectConfig.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts
@@ -75,7 +75,7 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
         const { params, ...deps } = await new CreateParamsInteraction(
           texts,
           config,
-          apiConfig.dependencies_write_method
+          projectConfig.dependencies_write_method
         ).run(
           {
             endpoint,
@@ -93,13 +93,13 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
       );
 
       if (cat === "Entity") {
-        res = await new CreateEntityFrame(config, apiConfig, texts).run({
+        res = await new CreateEntityFrame(config, projectConfig, texts).run({
           name: pascalCase(`${name} Output`),
           endpoint,
         });
         output = `Entity<${res.entities.at(-1).name}>`;
       } else if (cat === "Model") {
-        res = await new CreateModelsFrame(config, apiConfig, texts).run({
+        res = await new CreateModelsFrame(config, projectConfig, texts).run({
           name: pascalCase(`${name} Output`),
           types: ["json"],
           endpoint,

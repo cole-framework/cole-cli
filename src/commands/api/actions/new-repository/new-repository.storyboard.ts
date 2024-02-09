@@ -6,7 +6,7 @@ import {
   Texts,
   TimelineFrame,
 } from "../../../../core";
-import { ApiConfig } from "../../common/api.config";
+import { ProjectConfig } from "../../common/project.config";
 import { ApiJson } from "../../common/api.types";
 import { CreateEntityAsDependencyFrame } from "../new-entity";
 import { CreateModelsAsDependenciesFrame } from "../new-model";
@@ -36,7 +36,7 @@ export class NewRepositoryStoryboard extends Storyboard<ApiJson> {
   constructor(
     texts: Texts,
     config: Config,
-    apiConfig: ApiConfig,
+    projectConfig: ProjectConfig,
     session?: StoryboardSession
   ) {
     super(
@@ -48,14 +48,14 @@ export class NewRepositoryStoryboard extends Storyboard<ApiJson> {
     this.addFrame(new DefineRepositoryNameAndEndpointFrame(config, texts))
       .addFrame(new DescribeRepositoryFrame(config, texts))
       .addFrame(
-        new CreateEntityAsDependencyFrame(config, apiConfig, texts),
+        new CreateEntityAsDependencyFrame(config, projectConfig, texts),
         (t) => {
           const { name, endpoint } = t.getFrame(0).output;
           return { name, endpoint, dependencyOf: "repository" };
         }
       )
       .addFrame(
-        new CreateModelsAsDependenciesFrame(config, apiConfig, texts),
+        new CreateModelsAsDependenciesFrame(config, projectConfig, texts),
         (t) => {
           const { name, endpoint } = t.getFrame(0).output;
           const { databases } = t.getFrame(1).output;
@@ -76,7 +76,7 @@ export class NewRepositoryStoryboard extends Storyboard<ApiJson> {
         }
       )
       .addFrame(
-        new CreateRepositoryFrame(config, apiConfig, texts),
+        new CreateRepositoryFrame(config, projectConfig, texts),
         (t) => {
           const { name, endpoint } = t.getFrame(0).output;
           const { entities } = t.getFrame(2).output;

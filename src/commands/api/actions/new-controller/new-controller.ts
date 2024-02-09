@@ -1,23 +1,23 @@
-import chalk from "chalk";
-import { ConfigLoader } from "../../../../core";
 import { NewControllerOptions } from "./types";
-import { ApiConfig } from "../../common";
+import { ProjectConfig } from "../../common";
 import { NewControllerOptionsStrategy } from "./new-controller.options-strategy";
 import { NewControllerInteractiveStrategy } from "./new-controller.interactive-strategy";
+import { Config } from "../../../../core";
 
-export const newController = async (options: NewControllerOptions) => {
-  const { content: config, failure } = ConfigLoader.load("controller");
-
-  if (failure) {
-    console.log(chalk.red(failure.error.message));
-    process.exit(1);
-  }
-
-  const apiConfig = ApiConfig.create(options, config);
-
+export const newController = async (
+  options: NewControllerOptions,
+  config: Config,
+  projectConfig: ProjectConfig,
+  cliPluginPackageName: string
+) => {
   if (Object.keys(options).includes("name")) {
-    new NewControllerOptionsStrategy(config).apply(apiConfig, options);
+    new NewControllerOptionsStrategy(config, projectConfig).apply(
+      options,
+      cliPluginPackageName
+    );
   } else {
-    new NewControllerInteractiveStrategy(config).apply(apiConfig);
+    new NewControllerInteractiveStrategy(config, projectConfig).apply(
+      cliPluginPackageName
+    );
   }
 };

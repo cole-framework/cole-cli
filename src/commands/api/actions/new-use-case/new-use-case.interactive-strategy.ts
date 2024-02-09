@@ -1,18 +1,26 @@
-import { Texts } from "../../../../core";
-import { Strategy } from "../../../../core/strategy";
-import { ApiConfig, ApiGenerator, ApiJsonParser } from "../../common";
+import { Strategy, Texts } from "@cole-framework/cole-cli-core";
+import { ProjectConfig, ApiGenerator, ApiJsonParser } from "../../common";
 import { NewUseCaseStoryboard } from "./new-use-case.storyboard";
+import { Config } from "../../../../core";
 
 export class NewUseCaseInteractiveStrategy extends Strategy {
   public readonly name = "new_use_case_interactive_strategy";
-  public async apply(apiConfig: ApiConfig, ...args: unknown[]) {
-    const { config } = this;
+
+  constructor(
+    private config: Config,
+    private projectConfig: ProjectConfig
+  ) {
+    super();
+  }
+
+  public async apply(cliPluginPackageName: string) {
+    const { config, projectConfig } = this;
     const texts = Texts.load();
 
     const newUseCaseStoryboard = new NewUseCaseStoryboard(
       texts,
       config,
-      apiConfig
+      projectConfig
     );
     const { content: json, failure } = await newUseCaseStoryboard.run();
 
@@ -21,8 +29,11 @@ export class NewUseCaseInteractiveStrategy extends Strategy {
       process.exit(1);
     }
 
-    const schema = new ApiJsonParser(apiConfig, config, texts).build(json);
-    const result = await new ApiGenerator(config).generate(schema);
+    const schema = new ApiJsonParser(projectConfig, config, texts).build(json);
+    const result = await new ApiGenerator(
+      config,
+      cliPluginPackageName
+    ).generate(schema);
 
     if (result.isFailure) {
       console.log(result.failure.error);

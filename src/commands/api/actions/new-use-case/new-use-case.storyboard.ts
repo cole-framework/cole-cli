@@ -6,7 +6,7 @@ import {
   Texts,
   TimelineFrame,
 } from "../../../../core";
-import { ApiConfig } from "../../common";
+import { ProjectConfig } from "../../common";
 import { ApiJson } from "../../common/api.types";
 import { CreateUseCaseFrame } from "./frames";
 
@@ -30,7 +30,7 @@ export class NewUseCaseStoryboard extends Storyboard<ApiJson> {
   constructor(
     texts: Texts,
     config: Config,
-    apiConfig: ApiConfig,
+    projectConfig: ProjectConfig,
     session?: StoryboardSession
   ) {
     super(
@@ -39,6 +39,6 @@ export class NewUseCaseStoryboard extends Storyboard<ApiJson> {
       new NewUseCaseStoryResolver()
     );
 
-    this.addFrame(new CreateUseCaseFrame(config, apiConfig, texts));
+    this.addFrame(new CreateUseCaseFrame(config, projectConfig, texts));
   }
 }

@@ -13,7 +13,7 @@ import {
   InteractionPrompts,
   SelectComponentWriteMethodInteraction,
 } from "../../../common";
-import { ApiConfig } from "../../../common/api.config";
+import { ProjectConfig } from "../../../common/project.config";
 import chalk from "chalk";
 
 export class CreateEntityFrame extends Frame<ApiJson> {
@@ -21,7 +21,7 @@ export class CreateEntityFrame extends Frame<ApiJson> {
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
+    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateEntityFrame.NAME);
@@ -32,7 +32,7 @@ export class CreateEntityFrame extends Frame<ApiJson> {
     endpoint?: string;
     props?: PropJson[];
   }) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config, projectConfig } = this;
     const result: ApiJson = { entities: [], models: [] };
     const passedProps = context.props || [];
     let name: string;
@@ -57,7 +57,7 @@ export class CreateEntityFrame extends Frame<ApiJson> {
 
     let writeMethod = WriteMethod.Write;
 
-    if (apiConfig.force === false) {
+    if (projectConfig.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts
@@ -69,7 +69,7 @@ export class CreateEntityFrame extends Frame<ApiJson> {
       const { props, ...deps } = await new CreatePropsInteraction(
         texts,
         config,
-        apiConfig.dependencies_write_method
+        projectConfig.dependencies_write_method
       ).run({
         endpoint,
         target: "entity",
@@ -80,7 +80,7 @@ export class CreateEntityFrame extends Frame<ApiJson> {
       result.models.push(...deps.models);
       let has_model = false;
 
-      if (apiConfig.dependencies_write_method !== WriteMethod.Skip) {
+      if (projectConfig.dependencies_write_method !== WriteMethod.Skip) {
         has_model = await InteractionPrompts.confirm(
           texts.get("do_you_want_to_create_entity_json_model")
         );

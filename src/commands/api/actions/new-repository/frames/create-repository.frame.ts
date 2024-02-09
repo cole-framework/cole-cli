@@ -1,7 +1,7 @@
 import { existsSync } from "fs";
 import { Config, Frame, Texts, WriteMethod } from "../../../../../core";
 import {
-  ApiConfig,
+  ProjectConfig,
   ApiJson,
   DefineMethodsInteraction,
   SelectComponentWriteMethodInteraction,
@@ -16,7 +16,7 @@ export class CreateRepositoryFrame extends Frame<ApiJson> {
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
+    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateRepositoryFrame.NAME);
@@ -26,7 +26,7 @@ export class CreateRepositoryFrame extends Frame<ApiJson> {
     context: RepositoryDescription &
       RepositoryNameAndEndpoint & { entity: EntityJson; models: ModelJson[] }
   ) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config, projectConfig } = this;
     const {
       name,
       endpoint,
@@ -45,7 +45,7 @@ export class CreateRepositoryFrame extends Frame<ApiJson> {
     }).path;
     let writeMethod = WriteMethod.Write;
 
-    if (apiConfig.force === false) {
+    if (projectConfig.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts
@@ -65,7 +65,7 @@ export class CreateRepositoryFrame extends Frame<ApiJson> {
         defineMethodsResult = await new DefineMethodsInteraction(
           texts,
           config,
-          apiConfig.dependencies_write_method,
+          projectConfig.dependencies_write_method,
           references
         ).run({ endpoint: endpoint, component: "repository" });
 

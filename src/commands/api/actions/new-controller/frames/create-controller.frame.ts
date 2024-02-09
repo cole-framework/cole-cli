@@ -1,7 +1,7 @@
 import { existsSync } from "fs";
 import { Config, Frame, Texts, WriteMethod } from "../../../../../core";
 import {
-  ApiConfig,
+  ProjectConfig,
   ApiJson,
   DefineMethodsInteraction,
   SelectComponentWriteMethodInteraction,
@@ -16,7 +16,7 @@ export class CreateControllerFrame extends Frame<ApiJson> {
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
+    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateControllerFrame.NAME);
@@ -32,7 +32,7 @@ export class CreateControllerFrame extends Frame<ApiJson> {
       handlers: HandlerJson[];
     }
   ) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config, projectConfig } = this;
     const { name, endpoint, handlers } = context;
     const result: ApiJson = {
       models: [],
@@ -46,7 +46,7 @@ export class CreateControllerFrame extends Frame<ApiJson> {
     }).path;
     let writeMethod = WriteMethod.Write;
 
-    if (apiConfig.force === false) {
+    if (projectConfig.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts
@@ -58,7 +58,7 @@ export class CreateControllerFrame extends Frame<ApiJson> {
       const { methods, ...rest } = await new DefineMethodsInteraction(
         texts,
         config,
-        apiConfig.dependencies_write_method,
+        projectConfig.dependencies_write_method,
         result
       ).run({ endpoint: endpoint, component: "controller" });
 

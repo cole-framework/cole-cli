@@ -1,22 +1,23 @@
-import { ConfigLoader } from "../../../../core";
-import { ApiConfig } from "../../common";
+import { Config } from "../../../../core";
+import { ProjectConfig } from "../../common";
 import { NewSourceInteractiveStrategy } from "./new-source.interactive-strategy";
 import { NewSourceOptionsStrategy } from "./new-source.options-strategy";
 import { NewSourceOptions } from "./types";
 
-export const newSource = async (options: NewSourceOptions) => {
-  const { content: config, failure } = ConfigLoader.load("source");
-
-  if (failure) {
-    console.log(failure.error.message);
-    process.exit(1);
-  }
-
-  const apiConfig = ApiConfig.create(options, config);
-
+export const newSource = async (
+  options: NewSourceOptions,
+  config: Config,
+  projectConfig: ProjectConfig,
+  cliPluginPackageName: string
+) => {
   if (Object.keys(options).includes("name")) {
-    new NewSourceOptionsStrategy(config).apply(apiConfig, options);
+    new NewSourceOptionsStrategy(config, projectConfig).apply(
+      options,
+      cliPluginPackageName
+    );
   } else {
-    new NewSourceInteractiveStrategy(config).apply(apiConfig);
+    new NewSourceInteractiveStrategy(config, projectConfig).apply(
+      cliPluginPackageName
+    );
   }
 };

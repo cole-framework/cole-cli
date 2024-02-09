@@ -1,13 +1,20 @@
 import chalk from "chalk";
-import { Strategy } from "../../../../core/strategy";
 import { UseCaseJson, NewUseCaseOptions } from "./types";
 import { ApiJsonParser } from "../../common/api-json.parser";
-import { CliOptionsTools, Texts } from "../../../../core";
-import { ApiConfig, ApiGenerator } from "../../common";
+import { CliOptionsTools, Config } from "../../../../core";
+import { ProjectConfig, ApiGenerator } from "../../common";
+import { Strategy, Texts } from "@cole-framework/cole-cli-core";
 
 export class NewUseCaseOptionsStrategy extends Strategy {
-  public async apply(apiConfig: ApiConfig, options: NewUseCaseOptions) {
-    const { config } = this;
+  constructor(
+    private config: Config,
+    private projectConfig: ProjectConfig
+  ) {
+    super();
+  }
+
+  public async apply(options: NewUseCaseOptions, cliPluginPackageName: string) {
+    const { config, projectConfig } = this;
     const texts = await Texts.load();
 
     if (!options.endpoint && config.components.use_case.isEndpointRequired()) {
@@ -22,12 +29,15 @@ export class NewUseCaseOptionsStrategy extends Strategy {
       input,
       output,
     };
-    const schema = new ApiJsonParser(apiConfig, config, texts).build({
+    const schema = new ApiJsonParser(projectConfig, config, texts).build({
       models: [],
       entities: [],
       use_cases: [use_case],
     });
-    const result = await new ApiGenerator(config).generate(schema);
+    const result = await new ApiGenerator(
+      config,
+      cliPluginPackageName
+    ).generate(schema);
 
     if (result.isFailure) {
       console.log(result.failure.error);

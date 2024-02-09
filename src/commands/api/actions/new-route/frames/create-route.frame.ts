@@ -1,7 +1,7 @@
 import { existsSync } from "fs";
 import { Config, Frame, Texts, WriteMethod } from "../../../../../core";
 import {
-  ApiConfig,
+  ProjectConfig,
   ApiJson,
   SelectComponentWriteMethodInteraction,
 } from "../../../common";
@@ -15,7 +15,7 @@ export class CreateRouteFrame extends Frame<ApiJson> {
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
+    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateRouteFrame.NAME);
@@ -27,7 +27,7 @@ export class CreateRouteFrame extends Frame<ApiJson> {
       RequestBodyType &
       ResponseBodyType
   ) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config, projectConfig } = this;
     const {
       name,
       endpoint,
@@ -50,7 +50,7 @@ export class CreateRouteFrame extends Frame<ApiJson> {
     }).path;
     let writeMethod = WriteMethod.Write;
 
-    if (apiConfig.force === false) {
+    if (projectConfig.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts

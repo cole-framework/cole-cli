@@ -7,7 +7,7 @@ import {
   WriteMethod,
 } from "../../../../../core";
 import {
-  ApiConfig,
+  ProjectConfig,
   ApiJson,
   InputNameAndEndpointInteraction,
   InputTextInteraction,
@@ -21,7 +21,7 @@ export class CreateSourcesFrame extends Frame<ApiJson> {
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
+    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateSourcesFrame.NAME);
@@ -33,8 +33,12 @@ export class CreateSourcesFrame extends Frame<ApiJson> {
     endpoint?: string;
     props?: PropJson[];
   }) {
-    const { texts, config, apiConfig } = this;
-    const createModelsFrame = new CreateModelsFrame(config, apiConfig, texts);
+    const { texts, config, projectConfig } = this;
+    const createModelsFrame = new CreateModelsFrame(
+      config,
+      projectConfig,
+      texts
+    );
     const result: ApiJson = { models: [], entities: [], sources: [] };
     const storages = context.storages ? [...context.storages] : [];
     const { name, endpoint } = await new InputNameAndEndpointInteraction({
@@ -54,7 +58,7 @@ export class CreateSourcesFrame extends Frame<ApiJson> {
         endpoint,
       }).path;
 
-      if (apiConfig.force === false) {
+      if (projectConfig.force === false) {
         if (existsSync(componentPath)) {
           writeMethod = await new SelectComponentWriteMethodInteraction(
             texts
@@ -73,7 +77,7 @@ export class CreateSourcesFrame extends Frame<ApiJson> {
         hint: texts.get("hint___please_enter_storage_model_name"),
       });
 
-      if (apiConfig.dependencies_write_method !== WriteMethod.Skip) {
+      if (projectConfig.dependencies_write_method !== WriteMethod.Skip) {
         if (
           await InteractionPrompts.confirm(
             texts

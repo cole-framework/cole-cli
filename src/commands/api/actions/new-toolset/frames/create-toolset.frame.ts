@@ -9,7 +9,7 @@ import {
   WriteMethod,
 } from "../../../../../core";
 import {
-  ApiConfig,
+  ProjectConfig,
   ApiJson,
   DefineMethodInteraction,
   InputNameAndEndpointInteraction,
@@ -25,7 +25,7 @@ export class CreateToolsetFrame extends Frame<ApiJson> {
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
+    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateToolsetFrame.NAME);
@@ -36,7 +36,7 @@ export class CreateToolsetFrame extends Frame<ApiJson> {
     endpoint?: string;
     layer?: string;
   }) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config, projectConfig } = this;
     const result: ApiJson = { toolsets: [], entities: [], models: [] };
     const layer = context.layer || "domain";
     const methods = new Set<MethodJson>();
@@ -58,7 +58,7 @@ export class CreateToolsetFrame extends Frame<ApiJson> {
 
     let writeMethod = WriteMethod.Write;
 
-    if (apiConfig.force === false) {
+    if (projectConfig.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts
@@ -78,7 +78,7 @@ export class CreateToolsetFrame extends Frame<ApiJson> {
         do {
           method = await new DefineMethodInteraction(texts).run();
           methods.add(method);
-          if (apiConfig.dependencies_write_method !== WriteMethod.Skip) {
+          if (projectConfig.dependencies_write_method !== WriteMethod.Skip) {
             const componentTypes: TypeInfo[] = [];
             if (Array.isArray(method.params)) {
               method.params.forEach((param) => {
@@ -112,7 +112,7 @@ export class CreateToolsetFrame extends Frame<ApiJson> {
                 if (componentType.isModel) {
                   res = await new CreateModelsFrame(
                     config,
-                    apiConfig,
+                    projectConfig,
                     texts
                   ).run({
                     endpoint,
@@ -122,7 +122,7 @@ export class CreateToolsetFrame extends Frame<ApiJson> {
                 } else if (componentType.isEntity) {
                   res = await new CreateEntityFrame(
                     config,
-                    apiConfig,
+                    projectConfig,
                     texts
                   ).run({
                     endpoint,

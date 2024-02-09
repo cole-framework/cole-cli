@@ -6,7 +6,7 @@ import {
   Texts,
   TimelineFrame,
 } from "../../../../core";
-import { ApiConfig } from "../../common";
+import { ProjectConfig } from "../../common";
 import { ApiJson } from "../../common/api.types";
 import { CreateToolsetFrame, SelectToolsetlayerFrame } from "./frames";
 
@@ -30,7 +30,7 @@ export class NewToolsetStoryboard extends Storyboard<ApiJson> {
   constructor(
     texts: Texts,
     config: Config,
-    apiConfig: ApiConfig,
+    projectConfig: ProjectConfig,
     session?: StoryboardSession
   ) {
     super(
@@ -40,7 +40,7 @@ export class NewToolsetStoryboard extends Storyboard<ApiJson> {
     );
 
     this.addFrame(new SelectToolsetlayerFrame(config, texts)).addFrame(
-      new CreateToolsetFrame(config, apiConfig, texts),
+      new CreateToolsetFrame(config, projectConfig, texts),
       (t) => ({ layer: t.prevFrame.output })
     );
   }

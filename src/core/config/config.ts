@@ -1,25 +1,40 @@
-import { CodeConfig } from "./code-config";
+import { LanguagePluginConfig } from "@cole-framework/cole-cli-core";
+import { CliConfig } from "../config.types";
+import { LanguageConfig } from "./language-config";
 import { CompilationConfig } from "./compilation-config";
 import { ComponentsConfig } from "./components-config";
 import { ComponentsConfigTools } from "./components-config.tools";
-import { ConfigData, ReservedType } from "./config.types";
+import { ReservedType } from "./config.types";
 import { DatabaseConfig } from "./database-config";
 import { GeneralConfig } from "./general-config";
 import { WebConfig } from "./web-config";
 
 export class Config {
-  public static create(data: ConfigData): Config {
-    const general = GeneralConfig.create(data.general);
-    const compilation = CompilationConfig.create(data.compilation);
-    const databases = data.databases.map(DatabaseConfig.create);
-    const web = WebConfig.create(data.web);
-    const code = CodeConfig.create(data.code);
+  public static create(
+    cliConfig: CliConfig,
+    pluginConfig: LanguagePluginConfig
+  ): Config {
+    const general = GeneralConfig.create(cliConfig);
+    const compilation = CompilationConfig.create(
+      cliConfig,
+      pluginConfig.language
+    );
+    const databases = pluginConfig.databases.map(DatabaseConfig.create);
+    const web = pluginConfig.web_frameworks.map(WebConfig.create);
+    const language = LanguageConfig.create(pluginConfig.language);
     const components = ComponentsConfig.create(
-      data.compilation.source_dirname,
-      data.components
+      pluginConfig.language.source_path,
+      pluginConfig.architecture.components
     );
 
-    return new Config(general, compilation, databases, code, web, components);
+    return new Config(
+      general,
+      compilation,
+      databases,
+      language,
+      web,
+      components
+    );
   }
 
   private __allReservedTypes: ReservedType[] = [];
@@ -28,8 +43,8 @@ export class Config {
     public readonly general: GeneralConfig,
     public readonly compilation: CompilationConfig,
     public readonly databases: DatabaseConfig[],
-    public readonly code: CodeConfig,
-    public readonly web: WebConfig,
+    public readonly code: LanguageConfig,
+    public readonly web: WebConfig[],
     public readonly components: ComponentsConfig
   ) {
     if (Array.isArray(databases)) {

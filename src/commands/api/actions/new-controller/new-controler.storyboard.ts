@@ -1,12 +1,12 @@
+import { Texts } from "@cole-framework/cole-cli-core";
 import {
   Config,
   StoryResolver,
   Storyboard,
   StoryboardSession,
-  Texts,
   TimelineFrame,
 } from "../../../../core";
-import { ApiConfig } from "../../common/api.config";
+import { ProjectConfig } from "../../common/project.config";
 import { ApiJson } from "../../common/api.types";
 import {
   CreateControllerFrame,
@@ -47,7 +47,7 @@ export class NewControllerStoryboard extends Storyboard<ApiJson> {
   constructor(
     texts: Texts,
     config: Config,
-    apiConfig: ApiConfig,
+    projectConfig: ProjectConfig,
     session?: StoryboardSession
   ) {
     super(
@@ -58,14 +58,14 @@ export class NewControllerStoryboard extends Storyboard<ApiJson> {
 
     this.addFrame(new DefineControllerNameAndEndpointFrame(config, texts))
       .addFrame(
-        new DefineControllerHandlersFrame(config, apiConfig, texts),
+        new DefineControllerHandlersFrame(config, projectConfig, texts),
         (t) => {
           const { name, endpoint } = t.getFrame(0).output;
           return { name, endpoint };
         }
       )
       .addFrame(
-        new CreateRoutesForHandlersFrame(config, apiConfig, texts),
+        new CreateRoutesForHandlersFrame(config, projectConfig, texts),
         (t) => {
           const { name, endpoint } = t.getFrame(0).output;
           const { handlers, models, entities } = t.getFrame(1).output;
@@ -83,17 +83,20 @@ export class NewControllerStoryboard extends Storyboard<ApiJson> {
           return handlers.length > 0;
         }
       )
-      .addFrame(new CreateControllerFrame(config, apiConfig, texts), (t) => {
-        const { name, endpoint } = t.getFrame(0).output;
-        const { handlers, models, entities } = t.getFrame(1).output;
+      .addFrame(
+        new CreateControllerFrame(config, projectConfig, texts),
+        (t) => {
+          const { name, endpoint } = t.getFrame(0).output;
+          const { handlers, models, entities } = t.getFrame(1).output;
 
-        return {
-          name,
-          endpoint,
-          handlers,
-          entities,
-          models,
-        };
-      });
+          return {
+            name,
+            endpoint,
+            handlers,
+            entities,
+            models,
+          };
+        }
+      );
   }
 }

@@ -11,12 +11,12 @@
     "thread_count": -1,
     "transport": "file"
   },
-  "web": {
+  "web": [{
     "name": "Express.js",
     "alias": "express",
     "package": "express",
     "module": "@cole-framework/cole-express"
-  },
+  }],
   "databases": [
     {
       "name": "Cache",
@@ -25,7 +25,7 @@
       "mappings": []
     },
     {
-      "package": "mongo",
+      "package": "mongodb",
       "module": "@cole-framework/cole-storage-mongo",
       "name": "MongoDB",
       "alias": "mongo",
@@ -56,6 +56,14 @@
           "code_type": "Buffer"
         }
       ]
+    },
+    {
+      "package": "redis",
+      "module": "@cole-framework/cole-storage-redis",
+      "name": "Redis",
+      "alias": "redis",
+      "case_style": "snake",
+      "mappings": []
     },
     {
       "package": "mysql",

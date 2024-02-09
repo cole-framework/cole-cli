@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { Config, Frame, PropJson, Texts } from "../../../../../core";
 import { ApiJson, InputNameAndEndpointInteraction } from "../../../common";
-import { ApiConfig } from "../../../common/api.config";
+import { ProjectConfig } from "../../../common/project.config";
 import { CreateModelsFrame } from "./create-models.frame";
 
 export class CreateModelsAsDependenciesFrame extends Frame<ApiJson> {
@@ -9,7 +9,7 @@ export class CreateModelsAsDependenciesFrame extends Frame<ApiJson> {
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
+    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateModelsAsDependenciesFrame.NAME);
@@ -22,7 +22,7 @@ export class CreateModelsAsDependenciesFrame extends Frame<ApiJson> {
     endpoint?: string;
     props?: PropJson[];
   }) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config, projectConfig } = this;
     const { dependencyOf, ...rest } = context;
 
     console.log(
@@ -33,8 +33,8 @@ export class CreateModelsAsDependenciesFrame extends Frame<ApiJson> {
       )
     );
 
-    if (apiConfig.with_dependencies) {
-      return new CreateModelsFrame(config, apiConfig, texts).run(rest);
+    if (projectConfig.with_dependencies) {
+      return new CreateModelsFrame(config, projectConfig, texts).run(rest);
     }
 
     const { name, endpoint } = await new InputNameAndEndpointInteraction({

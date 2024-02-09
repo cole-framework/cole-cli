@@ -6,7 +6,7 @@ import {
   Texts,
   TimelineFrame,
 } from "../../../../core";
-import { ApiConfig } from "../../common/api.config";
+import { ProjectConfig } from "../../common/project.config";
 import { ApiJson } from "../../common/api.types";
 import { CreateEntityFrame } from "./frames";
 
@@ -29,7 +29,7 @@ export class NewEntityStoryboard extends Storyboard<ApiJson> {
   constructor(
     texts: Texts,
     config: Config,
-    apiConfig: ApiConfig,
+    projectConfig: ProjectConfig,
     session?: StoryboardSession
   ) {
     super(
@@ -38,6 +38,6 @@ export class NewEntityStoryboard extends Storyboard<ApiJson> {
       new NewEntityStoryResolver()
     );
 
-    this.addFrame(new CreateEntityFrame(config, apiConfig, texts));
+    this.addFrame(new CreateEntityFrame(config, projectConfig, texts));
   }
 }

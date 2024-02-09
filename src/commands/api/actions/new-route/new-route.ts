@@ -1,23 +1,23 @@
-import chalk from "chalk";
-import { ConfigLoader } from "../../../../core";
 import { NewRouteOptions } from "./types";
-import { ApiConfig } from "../../common";
+import { ProjectConfig } from "../../common";
 import { NewRouteOptionsStrategy } from "./new-route.options-strategy";
 import { NewRouteInteractiveStrategy } from "./new-route.interactive-strategy";
+import { Config } from "../../../../core";
 
-export const newRoute = async (options: NewRouteOptions) => {
-  const { content: config, failure } = ConfigLoader.load("route");
-
-  if (failure) {
-    console.log(chalk.red(failure.error.message));
-    process.exit(1);
-  }
-
-  const apiConfig = ApiConfig.create(options, config);
-
+export const newRoute = async (
+  options: NewRouteOptions,
+  config: Config,
+  projectConfig: ProjectConfig,
+  cliPluginPackageName: string
+) => {
   if (Object.keys(options).includes("name")) {
-    new NewRouteOptionsStrategy(config).apply(apiConfig, options);
+    new NewRouteOptionsStrategy(config, projectConfig).apply(
+      options,
+      cliPluginPackageName
+    );
   } else {
-    new NewRouteInteractiveStrategy(config).apply(apiConfig);
+    new NewRouteInteractiveStrategy(config, projectConfig).apply(
+      cliPluginPackageName
+    );
   }
 };

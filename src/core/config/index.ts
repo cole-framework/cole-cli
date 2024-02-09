@@ -1,4 +1,4 @@
-export * from "./code-config";
+export * from "./language-config";
 export * from "./code-config.types";
 export * from "./components-config";
 export * from "./components-config.tools";

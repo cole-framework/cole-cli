@@ -22,7 +22,7 @@ import { PathParamsJsonParser } from "./path-params.json-parser";
 import { QueryParamsJsonParser } from "./query-params.json-parser";
 import { RequestBodyJsonParser } from "./request-body.json-parser";
 import { ResponseBodyJsonParser } from "./response-body.json-parser";
-import { ApiConfig } from "../../../common";
+import { ProjectConfig } from "../../../common";
 import { TestSuite, TestSuiteFactory } from "../../new-test-suite";
 
 export class RouteJsonParser {
@@ -39,7 +39,7 @@ export class RouteJsonParser {
 
   constructor(
     private config: Config,
-    private apiConfig: ApiConfig,
+    private projectConfig: ProjectConfig,
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {
@@ -243,7 +243,7 @@ export class RouteJsonParser {
       entities,
       routes,
       route_ios,
-      apiConfig,
+      projectConfig,
     } = this;
     const test_suites: TestSuite[] = [];
 
@@ -344,7 +344,7 @@ export class RouteJsonParser {
         );
         route_ios.push(io);
 
-        if (!apiConfig.skip_tests && io.element.methods.length > 0) {
+        if (!projectConfig.skip_tests && io.element.methods.length > 0) {
           //
           const suite = TestSuiteFactory.create(
             { name, endpoint, type: "unit_tests" },

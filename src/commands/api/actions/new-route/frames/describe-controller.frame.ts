@@ -6,7 +6,7 @@ import {
   Texts,
   WriteMethod,
 } from "../../../../../core";
-import { ApiConfig, ApiJson, InteractionPrompts } from "../../../common";
+import { ProjectConfig, ApiJson, InteractionPrompts } from "../../../common";
 import { ControllerJson, HandlerJson } from "../../new-controller";
 import { EntityJson } from "../../new-entity";
 import { PathParamsTools, QueryParamsTools } from "../parsers";
@@ -15,7 +15,7 @@ export class DescribeControllerFrame extends Frame<ApiJson> {
   public static NAME = "describe_controller_frame";
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
+    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(DescribeControllerFrame.NAME);
@@ -29,7 +29,7 @@ export class DescribeControllerFrame extends Frame<ApiJson> {
     response_body: any;
     path: string;
   }) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config, projectConfig } = this;
     const { endpoint, controller, handler, request_body, response_body, path } =
       context;
     const controllers: ControllerJson[] = [];
@@ -42,7 +42,7 @@ export class DescribeControllerFrame extends Frame<ApiJson> {
     let input: EntityJson = { name: `${handler}Input`, props: [] };
     let output: EntityJson = { name: `${handler}Output`, props: [] };
     let h: HandlerJson = { name: handler };
-    let writeMethod = apiConfig.dependencies_write_method;
+    let writeMethod = projectConfig.dependencies_write_method;
 
     if (writeMethod !== WriteMethod.Skip) {
       const message = existsSync(cPath)

@@ -6,7 +6,7 @@ import {
   TypeInfo,
   WriteMethod,
 } from "../../../../../core";
-import { ApiConfig, InteractionPrompts } from "../../../common";
+import { ProjectConfig, InteractionPrompts } from "../../../common";
 import { EntityJson } from "../../new-entity";
 import { ModelJson } from "../../new-model";
 import { HandlerJson } from "../types";
@@ -23,14 +23,14 @@ export class DefineControllerHandlersFrame extends Frame<ControllerHandlers> {
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
+    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(DefineControllerHandlersFrame.NAME);
   }
 
   public async run(context: { endpoint: string; name: string }) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config, projectConfig } = this;
     const result = { handlers: [], models: [], entities: [] };
 
     if (
@@ -45,7 +45,7 @@ export class DefineControllerHandlersFrame extends Frame<ControllerHandlers> {
         handler = await new DefineHandlerInteraction(texts).run();
         result.handlers.push(handler);
 
-        if (apiConfig.dependencies_write_method !== WriteMethod.Skip) {
+        if (projectConfig.dependencies_write_method !== WriteMethod.Skip) {
           let hasComponentType = false;
 
           const types = [];

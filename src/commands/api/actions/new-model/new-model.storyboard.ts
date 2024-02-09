@@ -6,7 +6,7 @@ import {
   Texts,
   TimelineFrame,
 } from "../../../../core";
-import { ApiConfig } from "../../common";
+import { ProjectConfig } from "../../common";
 import { ApiJson } from "../../common/api.types";
 import { CreateModelsFrame } from "./frames";
 import { SelectModelTypesFrame } from "./frames/select-model-types.frame";
@@ -29,7 +29,7 @@ export class NewModelStoryboard extends Storyboard<ApiJson> {
   constructor(
     texts: Texts,
     config: Config,
-    apiConfig: ApiConfig,
+    projectConfig: ProjectConfig,
     session?: StoryboardSession
   ) {
     super(
@@ -39,7 +39,7 @@ export class NewModelStoryboard extends Storyboard<ApiJson> {
     );
 
     this.addFrame(new SelectModelTypesFrame(config, texts)).addFrame(
-      new CreateModelsFrame(config, apiConfig, texts),
+      new CreateModelsFrame(config, projectConfig, texts),
       (t) => ({ types: t.prevFrame.output })
     );
   }

@@ -4,7 +4,7 @@ import { DefaultCliOptions } from "../../common/api.types";
 import { existsSync, readFileSync } from "fs";
 import { ApiJsonParser } from "../../common/api-json.parser";
 import { ApiGenerator } from "../../common/api-generator";
-import { ApiConfig } from "../../common/api.config";
+import { ProjectConfig } from "../../common/project.config";
 
 export const fromJson = async (options: DefaultCliOptions) => {
   const { content: config, failure } = ConfigLoader.load();
@@ -14,7 +14,7 @@ export const fromJson = async (options: DefaultCliOptions) => {
     process.exit(1);
   }
 
-  const apiConfig = ApiConfig.create(options, config);
+  const projectConfig = ProjectConfig.create(options, config);
   const texts = await Texts.load();
 
   if (existsSync(options.json) === false) {
@@ -29,7 +29,7 @@ export const fromJson = async (options: DefaultCliOptions) => {
   try {
     const data = readFileSync(options.json, "utf-8");
     const json = JSON.parse(data);
-    const schema = new ApiJsonParser(apiConfig, config, texts).build(json);
+    const schema = new ApiJsonParser(projectConfig, config, texts).build(json);
     const apiGenerator = new ApiGenerator(config);
     const result = await apiGenerator.generate(schema);
 

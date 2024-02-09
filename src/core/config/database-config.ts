@@ -1,7 +1,8 @@
-import { DatabaseConfigData, DatabaseMapping } from "./database-config.types";
+import { DatabaseConfigJson } from "@cole-framework/cole-cli-core";
+import { DatabaseMapping } from "./database-config.types";
 
 export class DatabaseConfig {
-  public static create(data: DatabaseConfigData): DatabaseConfig {
+  public static create(data: DatabaseConfigJson): DatabaseConfig {
     const mappings: DatabaseMapping[] = [];
 
     if (data.mappings) {
@@ -10,22 +11,13 @@ export class DatabaseConfig {
       });
     }
 
-    return new DatabaseConfig(
-      data.name,
-      data.alias,
-      data.case_style,
-      mappings,
-      data.module,
-      data.package
-    );
+    return new DatabaseConfig(data.name, data.alias, data.case_style, mappings);
   }
 
   constructor(
     public readonly name: string,
     public readonly alias: string,
     public readonly caseStyle: string,
-    public readonly mappings: DatabaseMapping[],
-    public readonly module: string,
-    public readonly pckg: string
+    public readonly mappings: DatabaseMapping[]
   ) {}
 }

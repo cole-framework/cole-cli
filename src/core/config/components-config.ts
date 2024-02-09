@@ -2,17 +2,15 @@ import { basename, join, resolve } from "path";
 import { ComponentsConfigTools } from "./tools";
 import { GeneratedPath } from "./config.types";
 import {
-  ComponentConfigData,
-  ComponentsConfigData,
+  ComponentConfigJson,
   FrameworkDefaults,
-} from "./components-config.types";
-import { TypeInfo } from "../type.info";
+} from "@cole-framework/cole-cli-core";
 
 export class ComponentConfig {
   public static create(
     root: string,
     type: string,
-    data: ComponentConfigData
+    data: ComponentConfigJson
   ): ComponentConfig {
     const { name_pattern, element_type, path_pattern, defaults } = data;
 
@@ -77,7 +75,7 @@ export class ComponentConfig {
 export class ComponentsConfig {
   public static create(
     dirname: string,
-    data: ComponentsConfigData
+    data: { [key: string]: ComponentConfigJson }
   ): ComponentsConfig {
     let rootPath = resolve(process.cwd());
 
@@ -178,60 +176,4 @@ export class ComponentsConfig {
     public readonly route_io_unit_tests: ComponentConfig,
     public readonly toolset_unit_tests: ComponentConfig
   ) {}
-
-  public generatePath(type: TypeInfo): string {
-    if (type.isModel) {
-      return this.model.generatePath({ name: type.ref, type: type.type }).path;
-    }
-    if (type.isEntity) {
-      return this.entity.generatePath({ name: type.ref }).path;
-    }
-    if (type.isSource) {
-      return this.source.generatePath({ name: type.ref, type: type.type }).path;
-    }
-    if (type.isUseCase) {
-      return this.use_case.generatePath({ name: type.ref }).path;
-    }
-    if (type.isRepository) {
-      return this.repository.generatePath({ name: type.ref }).path;
-    }
-    if (type.isRepositoryFactory) {
-      return this.repository_factory.generatePath({ name: type.ref }).path;
-    }
-    if (type.isRepositoryImpl) {
-      return this.repository_impl.generatePath({ name: type.ref }).path;
-    }
-    if (type.isController) {
-      return this.controller.generatePath({ name: type.ref }).path;
-    }
-    if (type.isMapper) {
-      return this.mapper.generatePath({ name: type.ref, type: type.type }).path;
-    }
-    if (type.isRoute) {
-      return this.route.generatePath({
-        name: type.ref,
-        type: type.type,
-        method: type.type,
-      }).path;
-    }
-    if (type.isRouteModel) {
-      return this.route_model.generatePath({
-        name: type.ref,
-        type: type.type,
-        method: type.type,
-      }).path;
-    }
-    if (type.isRouteIO) {
-      return this.route_io.generatePath({
-        name: type.ref,
-        type: type.type,
-        method: type.type,
-      }).path;
-    }
-    if (type.isToolset) {
-      return this.toolset.generatePath({ name: type.ref }).path;
-    }
-
-    return "/undefined_path/";
-  }
 }

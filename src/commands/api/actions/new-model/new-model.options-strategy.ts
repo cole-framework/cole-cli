@@ -1,16 +1,23 @@
-import { Texts } from "../../../../core";
-import { Strategy } from "../../../../core/strategy";
 import { ModelJson, NewModelOptions } from "./types";
 import { CliOptionsTools } from "../../../../core/tools";
 import { ApiJsonParser } from "../../common/api-json.parser";
 import { ApiGenerator } from "../../common/api-generator";
-import { ApiConfig } from "../../common";
+import { ProjectConfig } from "../../common";
+import { Strategy, Texts } from "@cole-framework/cole-cli-core";
+import { Config } from "../../../../core";
 
 export class NewModelOptionsStrategy extends Strategy {
   public readonly name = "new_model_options_strategy";
 
-  public async apply(apiConfig: ApiConfig, options: NewModelOptions) {
-    const { config } = this;
+  constructor(
+    private config: Config,
+    private projectConfig: ProjectConfig
+  ) {
+    super();
+  }
+
+  public async apply(options: NewModelOptions, cliPluginPackageName: string) {
+    const { config, projectConfig } = this;
     const texts = await Texts.load();
 
     const { endpoint, name } = options;
@@ -26,11 +33,14 @@ export class NewModelOptionsStrategy extends Strategy {
       props,
     };
 
-    const schema = new ApiJsonParser(apiConfig, config, texts).build({
+    const schema = new ApiJsonParser(projectConfig, config, texts).build({
       models: [model],
     });
 
-    const result = await new ApiGenerator(config).generate(schema);
+    const result = await new ApiGenerator(
+      config,
+      cliPluginPackageName
+    ).generate(schema);
 
     if (result.isFailure) {
       console.log(result.failure.error);

@@ -1,19 +1,23 @@
 import os from "os";
-import { CompilationConfigData } from "./compilation-config.types";
+import { CliConfig } from "../config.types";
+import { LanguageConfigJson } from "@cole-framework/cole-cli-core";
 
 export class CompilationConfig {
-  public static create(data: CompilationConfigData): CompilationConfig {
-    const thread_count = data.thread_count
-      ? data.thread_count === -1
+  public static create(
+    cliConfig: CliConfig,
+    languageConfig: LanguageConfigJson
+  ): CompilationConfig {
+    const thread_count = cliConfig.thread_count
+      ? cliConfig.thread_count === -1
         ? os.cpus().length
-        : data.thread_count
+        : cliConfig.thread_count
       : 2;
 
     return new CompilationConfig(
-      data.source_dirname || "src",
-      data.batch_size || 10,
+      languageConfig.source_path || "src",
+      cliConfig.batch_size || 10,
       thread_count,
-      data.transport || "file"
+      cliConfig.transport || "file"
     );
   }
 

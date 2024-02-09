@@ -1,22 +1,23 @@
-import { ConfigLoader } from "../../../../core";
-import { ApiConfig } from "../../common";
+import { Config } from "../../../../core";
+import { ProjectConfig } from "../../common";
 import { NewUseCaseInteractiveStrategy } from "./new-use-case.interactive-strategy";
 import { NewUseCaseOptionsStrategy } from "./new-use-case.options-strategy";
 import { NewUseCaseOptions } from "./types";
 
-export const newUseCase = async (options: NewUseCaseOptions) => {
-  const { content: config, failure } = ConfigLoader.load("use_case");
-
-  if (failure) {
-    console.log(failure.error.message);
-    process.exit(1);
-  }
-
-  const apiConfig = ApiConfig.create(options, config);
-
+export const newUseCase = async (
+  options: NewUseCaseOptions,
+  config: Config,
+  projectConfig: ProjectConfig,
+  cliPluginPackageName: string
+) => {
   if (Object.keys(options).includes("name")) {
-    new NewUseCaseOptionsStrategy(config).apply(apiConfig, options);
+    new NewUseCaseOptionsStrategy(config, projectConfig).apply(
+      options,
+      cliPluginPackageName
+    );
   } else {
-    new NewUseCaseInteractiveStrategy(config).apply(apiConfig);
+    new NewUseCaseInteractiveStrategy(config, projectConfig).apply(
+      cliPluginPackageName
+    );
   }
 };

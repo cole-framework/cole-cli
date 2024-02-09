@@ -22,13 +22,13 @@ import {
   RepositoryFactory,
 } from "./types";
 import { RepositoryFactoryFactory } from "./repository.factory.factory";
-import { ApiConfig } from "../../common";
+import { ProjectConfig } from "../../common";
 import { TestSuite, TestSuiteFactory } from "../new-test-suite";
 
 export class RepositoryJsonParser {
   constructor(
     private config: Config,
-    private apiConfig: ApiConfig,
+    private projectConfig: ProjectConfig,
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {}
@@ -235,7 +235,7 @@ export class RepositoryJsonParser {
     sources: Source[];
     test_suites: TestSuite[];
   } {
-    const { config, writeMethod, apiConfig } = this;
+    const { config, writeMethod, projectConfig } = this;
     const repositories: Repository[] = [];
     const repository_impls: RepositoryImpl[] = [];
     const repository_factories: RepositoryFactory[] = [];
@@ -376,7 +376,7 @@ export class RepositoryJsonParser {
           impl_result.entities.forEach((e) => entities.push(e));
           repository_impls.push(impl);
 
-          if (!apiConfig.skip_tests && impl.element.methods.length > 0) {
+          if (!projectConfig.skip_tests && impl.element.methods.length > 0) {
             //
             const suite = TestSuiteFactory.create(
               { name: data.name, endpoint, type: "unit_tests" },

@@ -1,7 +1,7 @@
-import { GeneralConfigData } from "./general-config.types";
+import { CliConfig } from "../config.types";
 
 export class GeneralConfig {
-  public static create(data: GeneralConfigData): GeneralConfig {
+  public static create(data: CliConfig): GeneralConfig {
     return new GeneralConfig(
       data.headless_mode,
       data.override || false,

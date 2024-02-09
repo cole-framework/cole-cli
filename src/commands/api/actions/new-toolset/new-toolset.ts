@@ -1,23 +1,18 @@
-import chalk from "chalk";
-import { ConfigLoader } from "../../../../core";
 import { NewToolsetOptions } from "./types";
-import { ApiConfig } from "../../common";
+import { ProjectConfig } from "../../common";
 import { NewToolsetOptionsStrategy } from "./new-toolset.options-strategy";
 import { NewToolsetInteractiveStrategy } from "./new-toolset.interactive-strategy";
+import { Config } from "../../../../core";
 
-export const newToolset = async (options: NewToolsetOptions) => {
-  const { content: config, failure } = ConfigLoader.load("toolset");
-
-  if (failure) {
-    console.log(chalk.red(failure.error));
-    process.exit(1);
-  }
-
-  const apiConfig = ApiConfig.create(options, config);
-
+export const newToolset = async (
+  options: NewToolsetOptions,
+  config: Config,
+  projectConfig: ProjectConfig,
+  cliPluginPackageName: string
+) => {
   if (Object.keys(options).includes("name")) {
-    new NewToolsetOptionsStrategy(config).apply(apiConfig, options);
+    new NewToolsetOptionsStrategy(config, projectConfig).apply(options, cliPluginPackageName);
   } else {
-    new NewToolsetInteractiveStrategy(config).apply(apiConfig);
+    new NewToolsetInteractiveStrategy(config, projectConfig).apply(cliPluginPackageName);
   }
 };

@@ -1,9 +1,11 @@
-import { isMainThread, parentPort, threadId } from "worker_threads";
-import { FileTemplateModel, SourceCodeWriter } from "./";
+import { isMainThread, parentPort } from "worker_threads";
+import { SourceCodeWriter } from "./";
 import { FileTransport } from "./transport/file.transport";
 import { ConsoleTransport } from "./transport/console.transport";
-import { TypeScriptFileTemplate } from "../defaults/typescript.file-template";
-import { TypeScriptFileOutputStrategy } from "../defaults/typescript.strategy";
+import {
+  FileTemplateModel,
+  LanguageStrategyProvider,
+} from "@cole-framework/cole-cli-core";
 
 export const COMPILER_WORKER_PATH = __filename;
 
@@ -19,9 +21,11 @@ const writeFiles = async (payload: Payload) => {
     payload.transport === "file" ? new FileTransport() : new ConsoleTransport();
 
   const codeWriter = new SourceCodeWriter(transport);
-  // const codeModule = require(code_module);
-  const strategy = new TypeScriptFileOutputStrategy(null);
-  const { content: outputs, failure } = await strategy.apply(models);
+  const languageModule: LanguageStrategyProvider = require(code_module);
+
+  const { content: outputs, failure } = await languageModule
+    .createFileOutputStrategy()
+    .apply(models);
 
   if (failure) {
     parentPort.postMessage({ status: "error", error: failure.error });

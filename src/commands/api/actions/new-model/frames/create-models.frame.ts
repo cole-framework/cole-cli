@@ -7,7 +7,7 @@ import {
   WriteMethod,
 } from "../../../../../core";
 import {
-  ApiConfig,
+  ProjectConfig,
   ApiJson,
   CreatePropsInteraction,
   InputNameAndEndpointInteraction,
@@ -20,7 +20,7 @@ export class CreateModelsFrame extends Frame<ApiJson> {
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
+    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateModelsFrame.NAME);
@@ -32,7 +32,7 @@ export class CreateModelsFrame extends Frame<ApiJson> {
     endpoint?: string;
     props?: PropJson[];
   }) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config, projectConfig } = this;
     const result: ApiJson = { models: [], entities: [] };
     const types = context.types ? [...context.types] : [];
     const passedProps = context?.props || [];
@@ -55,7 +55,7 @@ export class CreateModelsFrame extends Frame<ApiJson> {
     const newPropsResult = await new CreatePropsInteraction(
       texts,
       config,
-      apiConfig.dependencies_write_method
+      projectConfig.dependencies_write_method
     ).run({
       endpoint,
       target: "model",
@@ -73,7 +73,7 @@ export class CreateModelsFrame extends Frame<ApiJson> {
         endpoint,
       }).path;
 
-      if (apiConfig.force === false) {
+      if (projectConfig.force === false) {
         if (existsSync(componentPath)) {
           writeMethod = await new SelectComponentWriteMethodInteraction(
             texts

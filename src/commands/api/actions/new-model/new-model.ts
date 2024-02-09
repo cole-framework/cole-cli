@@ -1,23 +1,23 @@
-import chalk from "chalk";
 import { NewModelOptions } from "./types";
-import { ConfigLoader } from "../../../../core";
 import { NewModelInteractiveStrategy } from "./new-model.interactive-strategy";
 import { NewModelOptionsStrategy } from "./new-model.options-strategy";
-import { ApiConfig } from "../../common";
+import { ProjectConfig } from "../../common";
+import { Config } from "../../../../core";
 
-export const newModel = async (options: NewModelOptions) => {
-  const { content: config, failure } = ConfigLoader.load("model");
-
-  if (failure) {
-    console.log(chalk.red(failure.error));
-    process.exit(1);
-  }
-
-  const apiConfig = ApiConfig.create(options, config);
-
+export const newModel = async (
+  options: NewModelOptions,
+  config: Config,
+  projectConfig: ProjectConfig,
+  cliPluginPackageName: string
+) => {
   if (Object.keys(options).includes("name")) {
-    new NewModelOptionsStrategy(config).apply(apiConfig, options);
+    new NewModelOptionsStrategy(config, projectConfig).apply(
+      options,
+      cliPluginPackageName
+    );
   } else {
-    new NewModelInteractiveStrategy(config).apply(apiConfig);
+    new NewModelInteractiveStrategy(config, projectConfig).apply(
+      cliPluginPackageName
+    );
   }
 };

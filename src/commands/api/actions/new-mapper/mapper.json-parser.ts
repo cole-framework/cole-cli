@@ -6,7 +6,7 @@ import {
   TestCaseSchema,
 } from "../../../../core";
 import { WriteMethod } from "../../../../core/enums";
-import { ApiConfig } from "../../common";
+import { ProjectConfig } from "../../common";
 import { Entity, EntityFactory } from "../new-entity";
 import { Model, ModelFactory } from "../new-model";
 import { TestSuite, TestSuiteFactory } from "../new-test-suite";
@@ -17,7 +17,7 @@ import chalk from "chalk";
 export class MapperJsonParser {
   constructor(
     private config: Config,
-    private apiConfig: ApiConfig,
+    private projectConfig: ProjectConfig,
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {}
@@ -32,7 +32,7 @@ export class MapperJsonParser {
     entities: Entity[];
     test_suites: TestSuite[];
   } {
-    const { config, texts, writeMethod, apiConfig } = this;
+    const { config, texts, writeMethod, projectConfig } = this;
     const mappers: Mapper[] = [];
     const models: Model[] = [];
     const entities: Entity[] = [];
@@ -118,7 +118,7 @@ export class MapperJsonParser {
           config
         );
 
-        if (!apiConfig.skip_tests && mapper.element.methods.length > 0) {
+        if (!projectConfig.skip_tests && mapper.element.methods.length > 0) {
           //
           const suite = TestSuiteFactory.create(
             { name, endpoint, type: "unit_tests" },

@@ -7,7 +7,7 @@ import {
   WriteMethod,
 } from "../../../../../core";
 import {
-  ApiConfig,
+  ProjectConfig,
   ApiJson,
   InputNameAndEndpointInteraction,
   InputTextInteraction,
@@ -22,7 +22,7 @@ export class CreateMappersFrame extends Frame<ApiJson> {
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
+    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateMappersFrame.NAME);
@@ -34,10 +34,10 @@ export class CreateMappersFrame extends Frame<ApiJson> {
     endpoint?: string;
     props?: PropJson[];
   }) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config, projectConfig } = this;
     const createModelDependenciesFrame = new CreateModelsAsDependenciesFrame(
       config,
-      apiConfig,
+      projectConfig,
       texts
     );
     const result: ApiJson = { models: [], entities: [], mappers: [] };
@@ -63,7 +63,7 @@ export class CreateMappersFrame extends Frame<ApiJson> {
         endpoint,
       }).path;
 
-      if (apiConfig.force === false) {
+      if (projectConfig.force === false) {
         if (existsSync(componentPath)) {
           writeMethod = await new SelectComponentWriteMethodInteraction(
             texts
@@ -72,11 +72,11 @@ export class CreateMappersFrame extends Frame<ApiJson> {
       }
 
       if (writeMethod !== WriteMethod.Skip) {
-        if (apiConfig.dependencies_write_method !== WriteMethod.Skip) {
+        if (projectConfig.dependencies_write_method !== WriteMethod.Skip) {
           if (!entityName) {
             const createEntityResult = await new CreateEntityAsDependencyFrame(
               config,
-              apiConfig,
+              projectConfig,
               texts
             ).run({
               dependencyOf: "mapper",

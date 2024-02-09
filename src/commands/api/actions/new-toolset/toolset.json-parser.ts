@@ -5,13 +5,13 @@ import chalk from "chalk";
 import { Config, Texts, TestCaseSchema } from "../../../../core";
 import { ToolsetFactory } from "./toolset.factory";
 import { Entity, EntityFactory } from "../new-entity";
-import { ApiConfig } from "../../common";
+import { ProjectConfig } from "../../common";
 import { TestSuite, TestSuiteFactory } from "../new-test-suite";
 
 export class ToolsetJsonParser {
   constructor(
     private config: Config,
-    private apiConfig: ApiConfig,
+    private projectConfig: ProjectConfig,
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {}
@@ -26,7 +26,7 @@ export class ToolsetJsonParser {
     toolsets: Toolset[];
     test_suites: TestSuite[];
   } {
-    const { config, apiConfig, texts, writeMethod } = this;
+    const { config, projectConfig, texts, writeMethod } = this;
     const models: Model[] = [];
     const entities: Entity[] = [];
     const toolsets: Toolset[] = [];
@@ -54,7 +54,7 @@ export class ToolsetJsonParser {
         []
       );
 
-      if (!apiConfig.skip_tests && toolset.element.methods.length > 0) {
+      if (!projectConfig.skip_tests && toolset.element.methods.length > 0) {
         //
         const suite = TestSuiteFactory.create(
           { name, endpoint, type: "unit_tests" },

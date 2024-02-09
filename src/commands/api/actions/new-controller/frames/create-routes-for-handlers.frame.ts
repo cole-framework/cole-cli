@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { Config, Frame, Texts } from "../../../../../core";
-import { ApiConfig, InteractionPrompts } from "../../../common";
+import { ProjectConfig, InteractionPrompts } from "../../../common";
 import { EntityJson } from "../../new-entity";
 import { ModelJson } from "../../new-model";
 import {
@@ -26,7 +26,7 @@ export class CreateRoutesForHandlersFrame extends Frame<HandlerRoutes> {
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
+    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateRoutesForHandlersFrame.NAME);
@@ -43,7 +43,7 @@ export class CreateRoutesForHandlersFrame extends Frame<HandlerRoutes> {
     entities: EntityJson[];
     models: ModelJson[];
   }) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config, projectConfig } = this;
     const { handlers, name, endpoint } = context;
     const result = { routes: [], models: [], entities: [] };
     let i = 0;
