@@ -1,6 +1,6 @@
 import chalk from "chalk";
-import { Config, Frame, Texts } from "../../../../../core";
-import { ProjectConfig, InteractionPrompts } from "../../../common";
+import { Config, Frame } from "../../../../../core";
+import { InteractionPrompts } from "../../../common";
 import { EntityJson } from "../../new-entity";
 import { ModelJson } from "../../new-model";
 import {
@@ -10,6 +10,7 @@ import {
   SelectResponseBodyTypeFrame,
 } from "../../new-route";
 import { HandlerJson } from "../types";
+import { Texts } from "@cole-framework/cole-cli-core";
 
 export type HandlerRoutes = {
   routes: RouteJson[];
@@ -26,7 +27,6 @@ export class CreateRoutesForHandlersFrame extends Frame<HandlerRoutes> {
 
   constructor(
     protected config: Config,
-    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateRoutesForHandlersFrame.NAME);
@@ -43,7 +43,7 @@ export class CreateRoutesForHandlersFrame extends Frame<HandlerRoutes> {
     entities: EntityJson[];
     models: ModelJson[];
   }) {
-    const { texts, config, projectConfig } = this;
+    const { texts } = this;
     const { handlers, name, endpoint } = context;
     const result = { routes: [], models: [], entities: [] };
     let i = 0;

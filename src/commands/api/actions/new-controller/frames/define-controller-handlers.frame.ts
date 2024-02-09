@@ -1,12 +1,6 @@
-import {
-  Config,
-  Frame,
-  ParamSchema,
-  Texts,
-  TypeInfo,
-  WriteMethod,
-} from "../../../../../core";
-import { ProjectConfig, InteractionPrompts } from "../../../common";
+import { Texts } from "@cole-framework/cole-cli-core";
+import { Config, Frame, TypeInfo, WriteMethod } from "../../../../../core";
+import { InteractionPrompts } from "../../../common";
 import { EntityJson } from "../../new-entity";
 import { ModelJson } from "../../new-model";
 import { HandlerJson } from "../types";
@@ -23,14 +17,13 @@ export class DefineControllerHandlersFrame extends Frame<ControllerHandlers> {
 
   constructor(
     protected config: Config,
-    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(DefineControllerHandlersFrame.NAME);
   }
 
   public async run(context: { endpoint: string; name: string }) {
-    const { texts, config, projectConfig } = this;
+    const { texts, config } = this;
     const result = { handlers: [], models: [], entities: [] };
 
     if (
@@ -45,7 +38,7 @@ export class DefineControllerHandlersFrame extends Frame<ControllerHandlers> {
         handler = await new DefineHandlerInteraction(texts).run();
         result.handlers.push(handler);
 
-        if (projectConfig.dependencies_write_method !== WriteMethod.Skip) {
+        if (config.project.dependencies_write_method !== WriteMethod.Skip) {
           let hasComponentType = false;
 
           const types = [];

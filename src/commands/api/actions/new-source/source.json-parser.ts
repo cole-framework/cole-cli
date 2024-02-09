@@ -3,7 +3,6 @@ import {
   Config,
   MethodTools,
   PropTools,
-  Texts,
   TestCaseSchema,
   WriteMethod,
 } from "../../../../core";
@@ -11,13 +10,13 @@ import { Entity, EntityFactory } from "../new-entity";
 import { Model, ModelFactory } from "../new-model";
 import { SourceFactory } from "./source.factory";
 import { SourceJson, Source } from "./types";
-import { ProjectConfig } from "../../common";
 import { TestSuite, TestSuiteFactory } from "../new-test-suite";
+import { Texts } from "@cole-framework/cole-cli-core";
 
 export class SourceJsonParser {
   constructor(
     private config: Config,
-    private projectConfig: ProjectConfig,
+
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {}
@@ -31,7 +30,7 @@ export class SourceJsonParser {
     entities: Entity[];
     test_suites: TestSuite[];
   } {
-    const { config, projectConfig, texts, writeMethod } = this;
+    const { config, texts, writeMethod } = this;
     const sources: Source[] = [];
     const models: Model[] = [];
     const entities: Entity[] = [];
@@ -96,7 +95,7 @@ export class SourceJsonParser {
           config
         );
 
-        if (!projectConfig.skip_tests && source.element.methods.length > 0) {
+        if (!config.project.skip_tests && source.element.methods.length > 0) {
           //
           const suite = TestSuiteFactory.create(
             { name, endpoint, type: "unit_tests" },

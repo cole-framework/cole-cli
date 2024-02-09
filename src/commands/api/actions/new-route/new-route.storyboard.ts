@@ -1,11 +1,11 @@
 import { existsSync } from "fs";
-import { Config, ModelType, Texts } from "../../../../core";
+import { Config, ModelType } from "../../../../core";
 import { StoryResolver, Storyboard } from "../../../../core/storyboard";
 import {
   StoryboardSession,
   TimelineFrame,
 } from "../../../../core/storyboard-session";
-import { ProjectConfig, ApiJson } from "../../common";
+import { ApiJson } from "../../common";
 import {
   CreateRouteFrame,
   DefineRouteNameAndEndpointFrame,
@@ -14,6 +14,7 @@ import {
   SelectResponseBodyTypeFrame,
 } from "./frames";
 import { DescribeControllerFrame } from "./frames/describe-controller.frame";
+import { Texts } from "@cole-framework/cole-cli-core";
 
 export class NewRouteStoryResolver extends StoryResolver<ApiJson> {
   resolve(timeline: TimelineFrame[]): ApiJson {
@@ -38,12 +39,7 @@ export class NewRouteStoryResolver extends StoryResolver<ApiJson> {
 }
 
 export class NewRouteStoryboard extends Storyboard<any> {
-  constructor(
-    texts: Texts,
-    config: Config,
-    projectConfig: ProjectConfig,
-    session?: StoryboardSession
-  ) {
+  constructor(texts: Texts, config: Config, session?: StoryboardSession) {
     super(
       "new_route_storyboard",
       session || new StoryboardSession("new_route_storyboard"),
@@ -57,25 +53,22 @@ export class NewRouteStoryboard extends Storyboard<any> {
       })
       .addFrame(new SelectRequestBodyTypeFrame(texts))
       .addFrame(new SelectResponseBodyTypeFrame(texts))
-      .addFrame(
-        new DescribeControllerFrame(config, projectConfig, texts),
-        (t) => {
-          const { name, endpoint } = t.getFrame(0).output;
-          const { controller, handler, path } = t.getFrame(1).output;
-          const { request_body } = t.getFrame(2).output;
-          const { response_body } = t.getFrame(3).output;
-          return {
-            name,
-            endpoint,
-            controller,
-            handler,
-            path,
-            request_body,
-            response_body,
-          };
-        }
-      )
-      .addFrame(new CreateRouteFrame(config, projectConfig, texts), (t) => {
+      .addFrame(new DescribeControllerFrame(config, texts), (t) => {
+        const { name, endpoint } = t.getFrame(0).output;
+        const { controller, handler, path } = t.getFrame(1).output;
+        const { request_body } = t.getFrame(2).output;
+        const { response_body } = t.getFrame(3).output;
+        return {
+          name,
+          endpoint,
+          controller,
+          handler,
+          path,
+          request_body,
+          response_body,
+        };
+      })
+      .addFrame(new CreateRouteFrame(config, texts), (t) => {
         const { name, endpoint } = t.getFrame(0).output;
         const { path, http_method, controller, handler, auth, validate } =
           t.getFrame(1).output;

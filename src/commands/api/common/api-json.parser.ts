@@ -14,7 +14,6 @@ import { RepositoryJsonParser } from "../actions/new-repository/repository.json-
 import { ApiJson } from "./api.types";
 import { ControllerJson } from "../actions/new-controller/types";
 import { EntityJson } from "../actions/new-entity/types";
-import { ProjectConfig } from "./project.config";
 import { ToolsetJson, ToolsetJsonParser } from "../actions/new-toolset";
 import { Texts } from "@cole-framework/cole-cli-core";
 
@@ -23,13 +22,12 @@ export class ApiJsonParser {
   private writeMethod: { component: WriteMethod; dependency: WriteMethod };
 
   constructor(
-    private projectConfig: ProjectConfig,
     private config: Config,
     private texts: Texts
   ) {
     this.writeMethod = {
-      component: projectConfig.write_method,
-      dependency: projectConfig.dependencies_write_method,
+      component: config.project.write_method,
+      dependency: config.project.dependencies_write_method,
     };
   }
 
@@ -43,13 +41,11 @@ export class ApiJsonParser {
   }
 
   parseEntities(list: EntityJson[]) {
-    const { apiSchema, projectConfig, config, texts, writeMethod } = this;
-    const result = new EntityJsonParser(
-      config,
-      projectConfig,
-      texts,
-      writeMethod
-    ).build(list, apiSchema.models.toArray());
+    const { apiSchema, config, texts, writeMethod } = this;
+    const result = new EntityJsonParser(config, texts, writeMethod).build(
+      list,
+      apiSchema.models.toArray()
+    );
 
     result.entities.forEach((e) => {
       apiSchema.entities.add(e);
@@ -66,12 +62,11 @@ export class ApiJsonParser {
 
   parseTools(list: ToolsetJson[]) {
     const { apiSchema, config, texts, writeMethod } = this;
-    const result = new ToolsetJsonParser(
-      config,
-      this.projectConfig,
-      texts,
-      writeMethod
-    ).build(list, apiSchema.models.toArray(), apiSchema.entities.toArray());
+    const result = new ToolsetJsonParser(config, texts, writeMethod).build(
+      list,
+      apiSchema.models.toArray(),
+      apiSchema.entities.toArray()
+    );
 
     result.toolsets.forEach((t) => {
       apiSchema.toolsets.add(t);
@@ -91,13 +86,12 @@ export class ApiJsonParser {
   }
 
   parseMappers(list: MapperJson[]) {
-    const { apiSchema, projectConfig, config, texts, writeMethod } = this;
-    const result = new MapperJsonParser(
-      config,
-      projectConfig,
-      texts,
-      writeMethod
-    ).build(list, apiSchema.entities.toArray(), apiSchema.models.toArray());
+    const { apiSchema, config, texts, writeMethod } = this;
+    const result = new MapperJsonParser(config, texts, writeMethod).build(
+      list,
+      apiSchema.entities.toArray(),
+      apiSchema.models.toArray()
+    );
 
     result.mappers.forEach((m) => {
       apiSchema.mappers.add(m);
@@ -117,13 +111,11 @@ export class ApiJsonParser {
   }
 
   parseSources(list: SourceJson[]) {
-    const { apiSchema, projectConfig, config, texts, writeMethod } = this;
-    const result = new SourceJsonParser(
-      config,
-      projectConfig,
-      texts,
-      writeMethod
-    ).build(list, apiSchema.models.toArray());
+    const { apiSchema, config, texts, writeMethod } = this;
+    const result = new SourceJsonParser(config, texts, writeMethod).build(
+      list,
+      apiSchema.models.toArray()
+    );
 
     result.sources.forEach((s) => {
       apiSchema.sources.add(s);
@@ -143,13 +135,12 @@ export class ApiJsonParser {
   }
 
   parseUseCases(list: UseCaseJson[]) {
-    const { apiSchema, projectConfig, config, texts, writeMethod } = this;
-    const result = new UseCaseJsonParse(
-      config,
-      projectConfig,
-      texts,
-      writeMethod
-    ).build(list, apiSchema.models.toArray(), apiSchema.entities.toArray());
+    const { apiSchema, config, texts, writeMethod } = this;
+    const result = new UseCaseJsonParse(config, texts, writeMethod).build(
+      list,
+      apiSchema.models.toArray(),
+      apiSchema.entities.toArray()
+    );
 
     result.use_cases.forEach((u) => {
       apiSchema.use_cases.add(u);
@@ -169,13 +160,8 @@ export class ApiJsonParser {
   }
 
   parseRepositories(list: RepositoryJson[]) {
-    const { apiSchema, config, projectConfig, texts, writeMethod } = this;
-    const result = new RepositoryJsonParser(
-      config,
-      projectConfig,
-      texts,
-      writeMethod
-    ).build(
+    const { apiSchema, config, texts, writeMethod } = this;
+    const result = new RepositoryJsonParser(config, texts, writeMethod).build(
       list,
       apiSchema.entities.toArray(),
       apiSchema.models.toArray(),
@@ -217,13 +203,12 @@ export class ApiJsonParser {
   }
 
   parseControllers(list: ControllerJson[]) {
-    const { apiSchema, config, projectConfig, texts, writeMethod } = this;
-    const result = new ControllerJsonParser(
-      config,
-      projectConfig,
-      texts,
-      writeMethod
-    ).build(list, apiSchema.models.toArray(), apiSchema.entities.toArray());
+    const { apiSchema, config, texts, writeMethod } = this;
+    const result = new ControllerJsonParser(config, texts, writeMethod).build(
+      list,
+      apiSchema.models.toArray(),
+      apiSchema.entities.toArray()
+    );
 
     result.controllers.forEach((c) => {
       apiSchema.controllers.add(c);
@@ -243,13 +228,8 @@ export class ApiJsonParser {
   }
 
   parseRoutes(list: RouteJson[]) {
-    const { apiSchema, config, projectConfig, texts, writeMethod } = this;
-    const result = new RouteJsonParser(
-      config,
-      projectConfig,
-      texts,
-      writeMethod
-    ).build(
+    const { apiSchema, config, texts, writeMethod } = this;
+    const result = new RouteJsonParser(config, texts, writeMethod).build(
       list,
       apiSchema.models.toArray(),
       apiSchema.entities.toArray(),

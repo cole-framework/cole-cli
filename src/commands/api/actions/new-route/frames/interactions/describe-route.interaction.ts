@@ -1,6 +1,6 @@
 import { camelCase, paramCase } from "change-case";
-import { Texts } from "../../../../../../core";
 import { Interaction, InteractionPrompts } from "../../../../common";
+import { Texts } from "@cole-framework/cole-cli-core";
 
 export type RouteDescription = {
   name?: string;

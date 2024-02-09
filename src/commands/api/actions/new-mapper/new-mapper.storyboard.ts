@@ -3,12 +3,12 @@ import {
   StoryResolver,
   Storyboard,
   StoryboardSession,
-  Texts,
   TimelineFrame,
 } from "../../../../core";
 import { ProjectConfig } from "../../common/project.config";
 import { ApiJson } from "../../common/api.types";
 import { CreateMappersFrame, SelectMapperStoragesFrame } from "./frames";
+import { Texts } from "@cole-framework/cole-cli-core";
 
 export class NewMapperStoryResolver extends StoryResolver<ApiJson> {
   resolve(timeline: TimelineFrame[]): ApiJson {
@@ -27,12 +27,7 @@ export class NewMapperStoryResolver extends StoryResolver<ApiJson> {
 }
 
 export class NewMapperStoryboard extends Storyboard<ApiJson> {
-  constructor(
-    texts: Texts,
-    config: Config,
-    projectConfig: ProjectConfig,
-    session?: StoryboardSession
-  ) {
+  constructor(texts: Texts, config: Config, session?: StoryboardSession) {
     super(
       "new_mapper_storyboard",
       session || new StoryboardSession("new_mapper_storyboard"),
@@ -40,7 +35,7 @@ export class NewMapperStoryboard extends Storyboard<ApiJson> {
     );
 
     this.addFrame(new SelectMapperStoragesFrame(config, texts)).addFrame(
-      new CreateMappersFrame(config, projectConfig, texts),
+      new CreateMappersFrame(config, texts),
       (t) => ({ storages: t.prevFrame.output })
     );
   }

@@ -1,7 +1,6 @@
 import { existsSync } from "fs";
-import { Config, Frame, Texts, WriteMethod } from "../../../../../core";
+import { Config, Frame, WriteMethod } from "../../../../../core";
 import {
-  ProjectConfig,
   ApiJson,
   DefineMethodsInteraction,
   SelectComponentWriteMethodInteraction,
@@ -10,13 +9,13 @@ import { EntityJson } from "../../new-entity";
 import { RepositoryDescription } from "./describe-repository.frame";
 import { RepositoryNameAndEndpoint } from "./define-repository-name-and-endpoint.frame";
 import { ModelJson } from "../../new-model";
+import { Texts } from "@cole-framework/cole-cli-core";
 
 export class CreateRepositoryFrame extends Frame<ApiJson> {
   public static NAME = "create_repository_frame";
 
   constructor(
     protected config: Config,
-    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateRepositoryFrame.NAME);
@@ -26,7 +25,7 @@ export class CreateRepositoryFrame extends Frame<ApiJson> {
     context: RepositoryDescription &
       RepositoryNameAndEndpoint & { entity: EntityJson; models: ModelJson[] }
   ) {
-    const { texts, config, projectConfig } = this;
+    const { texts, config } = this;
     const {
       name,
       endpoint,
@@ -45,7 +44,7 @@ export class CreateRepositoryFrame extends Frame<ApiJson> {
     }).path;
     let writeMethod = WriteMethod.Write;
 
-    if (projectConfig.force === false) {
+    if (config.project.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts
@@ -65,7 +64,7 @@ export class CreateRepositoryFrame extends Frame<ApiJson> {
         defineMethodsResult = await new DefineMethodsInteraction(
           texts,
           config,
-          projectConfig.dependencies_write_method,
+          config.project.dependencies_write_method,
           references
         ).run({ endpoint: endpoint, component: "repository" });
 

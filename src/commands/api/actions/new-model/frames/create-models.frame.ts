@@ -1,26 +1,18 @@
 import { existsSync } from "fs";
+import { Config, Frame, PropJson, WriteMethod } from "../../../../../core";
 import {
-  Config,
-  Frame,
-  PropJson,
-  Texts,
-  WriteMethod,
-} from "../../../../../core";
-import {
-  ProjectConfig,
   ApiJson,
   CreatePropsInteraction,
   InputNameAndEndpointInteraction,
   SelectComponentWriteMethodInteraction,
 } from "../../../common";
-import chalk from "chalk";
+import { Texts } from "@cole-framework/cole-cli-core";
 
 export class CreateModelsFrame extends Frame<ApiJson> {
   public static NAME = "create_models_frame";
 
   constructor(
     protected config: Config,
-    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateModelsFrame.NAME);
@@ -32,7 +24,7 @@ export class CreateModelsFrame extends Frame<ApiJson> {
     endpoint?: string;
     props?: PropJson[];
   }) {
-    const { texts, config, projectConfig } = this;
+    const { texts, config } = this;
     const result: ApiJson = { models: [], entities: [] };
     const types = context.types ? [...context.types] : [];
     const passedProps = context?.props || [];
@@ -55,7 +47,7 @@ export class CreateModelsFrame extends Frame<ApiJson> {
     const newPropsResult = await new CreatePropsInteraction(
       texts,
       config,
-      projectConfig.dependencies_write_method
+      config.project.dependencies_write_method
     ).run({
       endpoint,
       target: "model",
@@ -73,7 +65,7 @@ export class CreateModelsFrame extends Frame<ApiJson> {
         endpoint,
       }).path;
 
-      if (projectConfig.force === false) {
+      if (config.project.force === false) {
         if (existsSync(componentPath)) {
           writeMethod = await new SelectComponentWriteMethodInteraction(
             texts

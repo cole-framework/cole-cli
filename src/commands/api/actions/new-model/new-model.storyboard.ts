@@ -1,12 +1,11 @@
+import { Texts } from "@cole-framework/cole-cli-core";
 import {
   Config,
   StoryResolver,
   Storyboard,
   StoryboardSession,
-  Texts,
   TimelineFrame,
 } from "../../../../core";
-import { ProjectConfig } from "../../common";
 import { ApiJson } from "../../common/api.types";
 import { CreateModelsFrame } from "./frames";
 import { SelectModelTypesFrame } from "./frames/select-model-types.frame";
@@ -26,12 +25,7 @@ export class NewModelStoryResolver extends StoryResolver<ApiJson> {
 }
 
 export class NewModelStoryboard extends Storyboard<ApiJson> {
-  constructor(
-    texts: Texts,
-    config: Config,
-    projectConfig: ProjectConfig,
-    session?: StoryboardSession
-  ) {
+  constructor(texts: Texts, config: Config, session?: StoryboardSession) {
     super(
       "new_model_storyboard",
       session || new StoryboardSession("new_model_storyboard"),
@@ -39,7 +33,7 @@ export class NewModelStoryboard extends Storyboard<ApiJson> {
     );
 
     this.addFrame(new SelectModelTypesFrame(config, texts)).addFrame(
-      new CreateModelsFrame(config, projectConfig, texts),
+      new CreateModelsFrame(config, texts),
       (t) => ({ types: t.prevFrame.output })
     );
   }

@@ -11,7 +11,6 @@ import { newUseCase } from "./new-use-case";
 import { Texts } from "@cole-framework/cole-cli-core";
 import chalk from "chalk";
 import { CliConfigService } from "../../../core/cli-config.service";
-import { ProjectConfig } from "../common";
 
 export * from "./new-controller";
 export * from "./new-entity";
@@ -48,41 +47,30 @@ export const newComponent = async (type: string, options: any) => {
 
   const pluginMap = await pluginMapService.sync();
 
-  const config = Config.create(cliConfig, pluginConfig);
-  const projectConfig = ProjectConfig.create(options, config);
+  const config = Config.create(cliConfig, pluginConfig, options);
   const cliPluginPackageName = pluginMap.getLanguage(
     config.code.alias
   ).cli_plugin;
 
   switch (type) {
     case "controller":
-      return newController(
-        options,
-        config,
-        projectConfig,
-        cliPluginPackageName
-      );
+      return newController(options, config, cliPluginPackageName);
     case "entity":
-      return newEntity(options, config, projectConfig, cliPluginPackageName);
+      return newEntity(options, config, cliPluginPackageName);
     case "mapper":
-      return newMapper(options, config, projectConfig, cliPluginPackageName);
+      return newMapper(options, config, cliPluginPackageName);
     case "model":
-      return newModel(options, config, projectConfig, cliPluginPackageName);
+      return newModel(options, config, cliPluginPackageName);
     case "repository":
-      return newRepository(
-        options,
-        config,
-        projectConfig,
-        cliPluginPackageName
-      );
+      return newRepository(options, config, cliPluginPackageName);
     case "route":
-      return newRoute(options, config, projectConfig, cliPluginPackageName);
+      return newRoute(options, config, cliPluginPackageName);
     case "source":
-      return newSource(options, config, projectConfig, cliPluginPackageName);
+      return newSource(options, config, cliPluginPackageName);
     case "toolset":
-      return newToolset(options, config, projectConfig, cliPluginPackageName);
+      return newToolset(options, config, cliPluginPackageName);
     case "use-case":
-      return newUseCase(options, config, projectConfig, cliPluginPackageName);
+      return newUseCase(options, config, cliPluginPackageName);
     default:
       throw Error(`Unknown component type: ${type}`);
   }

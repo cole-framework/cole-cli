@@ -1,7 +1,6 @@
 import { existsSync } from "fs";
-import { Config, Frame, Texts, WriteMethod } from "../../../../../core";
+import { Config, Frame, WriteMethod } from "../../../../../core";
 import {
-  ProjectConfig,
   ApiJson,
   DefineMethodsInteraction,
   SelectComponentWriteMethodInteraction,
@@ -10,13 +9,13 @@ import { EntityJson } from "../../new-entity";
 import { ControllerNameAndEndpoint } from "./define-controller-name-and-endpoint.frame";
 import { ModelJson } from "../../new-model";
 import { HandlerJson } from "../types";
+import { Texts } from "@cole-framework/cole-cli-core";
 
 export class CreateControllerFrame extends Frame<ApiJson> {
   public static NAME = "create_controller_frame";
 
   constructor(
     protected config: Config,
-    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateControllerFrame.NAME);
@@ -32,7 +31,7 @@ export class CreateControllerFrame extends Frame<ApiJson> {
       handlers: HandlerJson[];
     }
   ) {
-    const { texts, config, projectConfig } = this;
+    const { texts, config } = this;
     const { name, endpoint, handlers } = context;
     const result: ApiJson = {
       models: [],
@@ -46,7 +45,7 @@ export class CreateControllerFrame extends Frame<ApiJson> {
     }).path;
     let writeMethod = WriteMethod.Write;
 
-    if (projectConfig.force === false) {
+    if (config.project.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts
@@ -58,7 +57,7 @@ export class CreateControllerFrame extends Frame<ApiJson> {
       const { methods, ...rest } = await new DefineMethodsInteraction(
         texts,
         config,
-        projectConfig.dependencies_write_method,
+        config.project.dependencies_write_method,
         result
       ).run({ endpoint: endpoint, component: "controller" });
 

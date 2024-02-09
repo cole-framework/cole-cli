@@ -1,12 +1,11 @@
+import { Texts } from "@cole-framework/cole-cli-core";
 import {
   Config,
   StoryResolver,
   Storyboard,
   StoryboardSession,
-  Texts,
   TimelineFrame,
 } from "../../../../core";
-import { ProjectConfig } from "../../common";
 import { ApiJson } from "../../common/api.types";
 import { CreateToolsetFrame, SelectToolsetlayerFrame } from "./frames";
 
@@ -27,12 +26,7 @@ export class NewToolsetStoryResolver extends StoryResolver<ApiJson> {
 }
 
 export class NewToolsetStoryboard extends Storyboard<ApiJson> {
-  constructor(
-    texts: Texts,
-    config: Config,
-    projectConfig: ProjectConfig,
-    session?: StoryboardSession
-  ) {
+  constructor(texts: Texts, config: Config, session?: StoryboardSession) {
     super(
       "new_toolset_storyboard",
       session || new StoryboardSession("new_toolset_storyboard"),
@@ -40,7 +34,7 @@ export class NewToolsetStoryboard extends Storyboard<ApiJson> {
     );
 
     this.addFrame(new SelectToolsetlayerFrame(config, texts)).addFrame(
-      new CreateToolsetFrame(config, projectConfig, texts),
+      new CreateToolsetFrame(config, texts),
       (t) => ({ layer: t.prevFrame.output })
     );
   }

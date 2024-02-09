@@ -8,11 +8,13 @@ import { ReservedType } from "./config.types";
 import { DatabaseConfig } from "./database-config";
 import { GeneralConfig } from "./general-config";
 import { WebConfig } from "./web-config";
+import { ProjectConfig } from "../../commands/api/common/project.config";
 
 export class Config {
   public static create(
     cliConfig: CliConfig,
-    pluginConfig: LanguagePluginConfig
+    pluginConfig: LanguagePluginConfig,
+    options: any
   ): Config {
     const general = GeneralConfig.create(cliConfig);
     const compilation = CompilationConfig.create(
@@ -26,6 +28,7 @@ export class Config {
       pluginConfig.language.source_path,
       pluginConfig.architecture.components
     );
+    const project = ProjectConfig.create(options, cliConfig);
 
     return new Config(
       general,
@@ -33,7 +36,8 @@ export class Config {
       databases,
       language,
       web,
-      components
+      components,
+      project
     );
   }
 
@@ -45,7 +49,8 @@ export class Config {
     public readonly databases: DatabaseConfig[],
     public readonly code: LanguageConfig,
     public readonly web: WebConfig[],
-    public readonly components: ComponentsConfig
+    public readonly components: ComponentsConfig,
+    public readonly project: ProjectConfig
   ) {
     if (Array.isArray(databases)) {
       databases.forEach((db) => {

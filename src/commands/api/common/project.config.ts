@@ -1,19 +1,19 @@
 import { WriteMethod } from "../../../core";
-import { Config } from "../../../core";
+import { CliConfig } from "../../../core/config.types";
 import { DefaultCliOptions } from "./api.types";
 
 export class ProjectConfig {
-  static create(options: DefaultCliOptions, config: Config) {
+  static create(options: DefaultCliOptions, cliConfig: CliConfig) {
     const with_dependencies =
       options.withDeps === undefined
-        ? config.general.withDependencies
+        ? cliConfig.with_dependencies
         : options.withDeps;
     const write_method = options.force
       ? WriteMethod.Overwrite
       : WriteMethod.Write;
     const skip_tests =
       options.skipTests === undefined
-        ? config.general.skipTests
+        ? cliConfig.skip_tests
         : options.skipTests;
     const dependencies_write_method = with_dependencies
       ? write_method

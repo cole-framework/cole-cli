@@ -6,7 +6,6 @@ import {
   StoryboardSession,
   TimelineFrame,
 } from "../../../../core";
-import { ProjectConfig } from "../../common/project.config";
 import { ApiJson } from "../../common/api.types";
 import {
   CreateControllerFrame,
@@ -44,12 +43,7 @@ export class NewControllerResolver extends StoryResolver<ApiJson> {
 }
 
 export class NewControllerStoryboard extends Storyboard<ApiJson> {
-  constructor(
-    texts: Texts,
-    config: Config,
-    projectConfig: ProjectConfig,
-    session?: StoryboardSession
-  ) {
+  constructor(texts: Texts, config: Config, session?: StoryboardSession) {
     super(
       "new_controller_storyboard",
       session || new StoryboardSession("new_controller_storyboard"),
@@ -57,15 +51,12 @@ export class NewControllerStoryboard extends Storyboard<ApiJson> {
     );
 
     this.addFrame(new DefineControllerNameAndEndpointFrame(config, texts))
+      .addFrame(new DefineControllerHandlersFrame(config, texts), (t) => {
+        const { name, endpoint } = t.getFrame(0).output;
+        return { name, endpoint };
+      })
       .addFrame(
-        new DefineControllerHandlersFrame(config, projectConfig, texts),
-        (t) => {
-          const { name, endpoint } = t.getFrame(0).output;
-          return { name, endpoint };
-        }
-      )
-      .addFrame(
-        new CreateRoutesForHandlersFrame(config, projectConfig, texts),
+        new CreateRoutesForHandlersFrame(config, texts),
         (t) => {
           const { name, endpoint } = t.getFrame(0).output;
           const { handlers, models, entities } = t.getFrame(1).output;
@@ -83,20 +74,17 @@ export class NewControllerStoryboard extends Storyboard<ApiJson> {
           return handlers.length > 0;
         }
       )
-      .addFrame(
-        new CreateControllerFrame(config, projectConfig, texts),
-        (t) => {
-          const { name, endpoint } = t.getFrame(0).output;
-          const { handlers, models, entities } = t.getFrame(1).output;
+      .addFrame(new CreateControllerFrame(config, texts), (t) => {
+        const { name, endpoint } = t.getFrame(0).output;
+        const { handlers, models, entities } = t.getFrame(1).output;
 
-          return {
-            name,
-            endpoint,
-            handlers,
-            entities,
-            models,
-          };
-        }
-      );
+        return {
+          name,
+          endpoint,
+          handlers,
+          entities,
+          models,
+        };
+      });
   }
 }

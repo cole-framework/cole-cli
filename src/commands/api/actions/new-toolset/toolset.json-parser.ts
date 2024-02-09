@@ -2,16 +2,15 @@ import { WriteMethod } from "../../../../core/enums";
 import { Model, ModelFactory } from "../new-model";
 import { Toolset, ToolsetJson } from "./types";
 import chalk from "chalk";
-import { Config, Texts, TestCaseSchema } from "../../../../core";
+import { Config, TestCaseSchema } from "../../../../core";
 import { ToolsetFactory } from "./toolset.factory";
 import { Entity, EntityFactory } from "../new-entity";
-import { ProjectConfig } from "../../common";
 import { TestSuite, TestSuiteFactory } from "../new-test-suite";
+import { Texts } from "@cole-framework/cole-cli-core";
 
 export class ToolsetJsonParser {
   constructor(
     private config: Config,
-    private projectConfig: ProjectConfig,
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {}
@@ -26,7 +25,7 @@ export class ToolsetJsonParser {
     toolsets: Toolset[];
     test_suites: TestSuite[];
   } {
-    const { config, projectConfig, texts, writeMethod } = this;
+    const { config, texts, writeMethod } = this;
     const models: Model[] = [];
     const entities: Entity[] = [];
     const toolsets: Toolset[] = [];
@@ -54,7 +53,7 @@ export class ToolsetJsonParser {
         []
       );
 
-      if (!projectConfig.skip_tests && toolset.element.methods.length > 0) {
+      if (!config.project.skip_tests && toolset.element.methods.length > 0) {
         //
         const suite = TestSuiteFactory.create(
           { name, endpoint, type: "unit_tests" },

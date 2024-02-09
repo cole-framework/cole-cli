@@ -29,7 +29,7 @@ export const fromJson = async (options: DefaultCliOptions) => {
   try {
     const data = readFileSync(options.json, "utf-8");
     const json = JSON.parse(data);
-    const schema = new ApiJsonParser(projectConfig, config, texts).build(json);
+    const schema = new ApiJsonParser(config, texts).build(json);
     const apiGenerator = new ApiGenerator(config);
     const result = await apiGenerator.generate(schema);
 

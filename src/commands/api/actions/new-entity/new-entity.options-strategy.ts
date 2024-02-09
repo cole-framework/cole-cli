@@ -2,19 +2,15 @@ import chalk from "chalk";
 import { EntityJson, NewEntityOptions } from "./types";
 import { ApiJsonParser } from "../../common/api-json.parser";
 import { ApiGenerator } from "../../common";
-import { ProjectConfig } from "../../common/project.config";
 import { Strategy, Texts } from "@cole-framework/cole-cli-core";
 import { Config } from "../../../../core";
 
 export class NewEntityOptionsStrategy extends Strategy {
-  constructor(
-    private config: Config,
-    private projectConfig: ProjectConfig
-  ) {
+  constructor(private config: Config) {
     super();
   }
   public async apply(options: NewEntityOptions, cliPluginPackageName: string) {
-    const { config, projectConfig } = this;
+    const { config } = this;
     const texts = await Texts.load();
 
     if (!options.endpoint && config.components.model.isEndpointRequired()) {
@@ -29,7 +25,7 @@ export class NewEntityOptionsStrategy extends Strategy {
       has_model,
       props,
     };
-    const schema = new ApiJsonParser(projectConfig, config, texts).build({
+    const schema = new ApiJsonParser(config, texts).build({
       models: [],
       entities: [entity],
     });

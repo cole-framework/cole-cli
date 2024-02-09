@@ -1,4 +1,4 @@
-import { SchemaTools, Texts } from "../../../../../../core";
+import { Texts } from "@cole-framework/cole-cli-core";
 import { Interaction, InteractionPrompts } from "../../../../common";
 import { HandlerJson } from "../../types";
 

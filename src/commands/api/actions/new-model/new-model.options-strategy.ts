@@ -2,22 +2,18 @@ import { ModelJson, NewModelOptions } from "./types";
 import { CliOptionsTools } from "../../../../core/tools";
 import { ApiJsonParser } from "../../common/api-json.parser";
 import { ApiGenerator } from "../../common/api-generator";
-import { ProjectConfig } from "../../common";
 import { Strategy, Texts } from "@cole-framework/cole-cli-core";
 import { Config } from "../../../../core";
 
 export class NewModelOptionsStrategy extends Strategy {
   public readonly name = "new_model_options_strategy";
 
-  constructor(
-    private config: Config,
-    private projectConfig: ProjectConfig
-  ) {
+  constructor(private config: Config) {
     super();
   }
 
   public async apply(options: NewModelOptions, cliPluginPackageName: string) {
-    const { config, projectConfig } = this;
+    const { config } = this;
     const texts = await Texts.load();
 
     const { endpoint, name } = options;
@@ -33,7 +29,7 @@ export class NewModelOptionsStrategy extends Strategy {
       props,
     };
 
-    const schema = new ApiJsonParser(projectConfig, config, texts).build({
+    const schema = new ApiJsonParser(config, texts).build({
       models: [model],
     });
 

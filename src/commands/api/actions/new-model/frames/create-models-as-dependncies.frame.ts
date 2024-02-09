@@ -1,15 +1,14 @@
 import chalk from "chalk";
-import { Config, Frame, PropJson, Texts } from "../../../../../core";
+import { Config, Frame, PropJson } from "../../../../../core";
 import { ApiJson, InputNameAndEndpointInteraction } from "../../../common";
-import { ProjectConfig } from "../../../common/project.config";
 import { CreateModelsFrame } from "./create-models.frame";
+import { Texts } from "@cole-framework/cole-cli-core";
 
 export class CreateModelsAsDependenciesFrame extends Frame<ApiJson> {
   public static NAME = "create_models_as_dependencies_frame";
 
   constructor(
     protected config: Config,
-    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateModelsAsDependenciesFrame.NAME);
@@ -22,7 +21,7 @@ export class CreateModelsAsDependenciesFrame extends Frame<ApiJson> {
     endpoint?: string;
     props?: PropJson[];
   }) {
-    const { texts, config, projectConfig } = this;
+    const { texts, config } = this;
     const { dependencyOf, ...rest } = context;
 
     console.log(
@@ -33,8 +32,8 @@ export class CreateModelsAsDependenciesFrame extends Frame<ApiJson> {
       )
     );
 
-    if (projectConfig.with_dependencies) {
-      return new CreateModelsFrame(config, projectConfig, texts).run(rest);
+    if (config.project.with_dependencies) {
+      return new CreateModelsFrame(config, texts).run(rest);
     }
 
     const { name, endpoint } = await new InputNameAndEndpointInteraction({

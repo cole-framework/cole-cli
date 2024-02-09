@@ -1,21 +1,18 @@
 import chalk from "chalk";
 import { NewRepositoryOptions, RepositoryJson } from "./types";
-import { ProjectConfig, ApiGenerator, ApiJsonParser } from "../../common";
+import { ApiGenerator, ApiJsonParser } from "../../common";
 import { Strategy, Texts } from "@cole-framework/cole-cli-core";
 import { CliOptionsTools, Config } from "../../../../core";
 
 export class NewRepositoryOptionsStrategy extends Strategy {
-  constructor(
-    private config: Config,
-    private projectConfig: ProjectConfig
-  ) {
+  constructor(private config: Config) {
     super();
   }
   public async apply(
     options: NewRepositoryOptions,
     cliPluginPackageName: string
   ) {
-    const { config, projectConfig } = this;
+    const { config } = this;
     const texts = await Texts.load();
 
     if (!options.endpoint && config.components.model.isEndpointRequired()) {
@@ -45,7 +42,7 @@ export class NewRepositoryOptionsStrategy extends Strategy {
       repository.contexts.push(...storages);
     }
 
-    const schema = new ApiJsonParser(projectConfig, config, texts).build({
+    const schema = new ApiJsonParser(config, texts).build({
       repositories: [repository],
     });
 

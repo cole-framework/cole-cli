@@ -1,19 +1,16 @@
 import chalk from "chalk";
 import { SourceJson, NewSourceOptions } from "./types";
 import { ApiJsonParser } from "../../common/api-json.parser";
-import { ProjectConfig, ApiGenerator } from "../../common";
+import { ApiGenerator } from "../../common";
 import { CliOptionsTools, Config } from "../../../../core";
 import { Strategy, Texts } from "@cole-framework/cole-cli-core";
 
 export class NewSourceOptionsStrategy extends Strategy {
-  constructor(
-    private config: Config,
-    private projectConfig: ProjectConfig
-  ) {
+  constructor(private config: Config) {
     super();
   }
   public async apply(options: NewSourceOptions, cliPluginPackageName: string) {
-    const { config, projectConfig } = this;
+    const { config } = this;
     const texts = await Texts.load();
 
     if (!options.endpoint && config.components.source.isEndpointRequired()) {
@@ -30,7 +27,7 @@ export class NewSourceOptionsStrategy extends Strategy {
       storages,
       model,
     };
-    const schema = new ApiJsonParser(projectConfig, config, texts).build({
+    const schema = new ApiJsonParser(config, texts).build({
       models: [],
       entities: [],
       sources: [source],

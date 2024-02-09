@@ -2,7 +2,8 @@ import { WriteMethod } from "../../../../core/enums";
 import { Model, ModelFactory } from ".";
 import { ModelJson } from "./types";
 import chalk from "chalk";
-import { Config, Texts } from "../../../../core";
+import { Config } from "../../../../core";
+import { Texts } from "@cole-framework/cole-cli-core";
 
 export class ModelJsonParser {
   constructor(

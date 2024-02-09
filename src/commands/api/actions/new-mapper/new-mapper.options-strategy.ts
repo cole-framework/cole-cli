@@ -2,18 +2,15 @@ import chalk from "chalk";
 import { MapperJson, NewMapperOptions } from "./types";
 import { CliOptionsTools, Config } from "../../../../core";
 import { ApiJsonParser } from "../../common/api-json.parser";
-import { ProjectConfig, ApiGenerator } from "../../common";
+import { ApiGenerator } from "../../common";
 import { Strategy, Texts } from "@cole-framework/cole-cli-core";
 
 export class NewMapperOptionsStrategy extends Strategy {
-  constructor(
-    private config: Config,
-    private projectConfig: ProjectConfig
-  ) {
+  constructor(private config: Config) {
     super();
   }
   public async apply(options: NewMapperOptions, cliPluginPackageName: string) {
-    const { config, projectConfig } = this;
+    const { config } = this;
     const texts = await Texts.load();
 
     if (!options.endpoint && config.components.model.isEndpointRequired()) {
@@ -31,7 +28,7 @@ export class NewMapperOptionsStrategy extends Strategy {
       entity,
     };
 
-    const schema = new ApiJsonParser(projectConfig, config, texts).build({
+    const schema = new ApiJsonParser(config, texts).build({
       entities: [],
       models: [],
       mappers: [mapper],

@@ -11,9 +11,9 @@ import { readdir, unlink } from "fs/promises";
 
 export const init = async (options: InitOptions) => {
   const texts = Texts.load();
-  const exists = existsSync(Config.local_plugin_config_path);
+  const pluginConfigExists = existsSync(Config.local_plugin_config_path);
 
-  if (!options.force && exists) {
+  if (!options.force && pluginConfigExists) {
     const shouldContinue = await InteractionPrompts.continue(
       texts.get("configuration_file_detected_do_you_want_to_overwrite_it")
     );
@@ -21,7 +21,7 @@ export const init = async (options: InitOptions) => {
     if (shouldContinue === false) {
       process.exit(0);
     }
-  } else if (exists === false) {
+  } else if (pluginConfigExists === false) {
     mkdirSync(dirname(Config.local_plugin_config_path), { recursive: true });
   } else {
     try {

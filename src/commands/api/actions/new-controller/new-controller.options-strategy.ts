@@ -2,21 +2,18 @@ import chalk from "chalk";
 import { NewControllerOptions, ControllerJson, HandlerJson } from "./types";
 import { ApiJsonParser } from "../../common/api-json.parser";
 import { CliOptionsTools, Config } from "../../../../core";
-import { ApiGenerator, ProjectConfig } from "../../common";
+import { ApiGenerator } from "../../common";
 import { Strategy, Texts } from "@cole-framework/cole-cli-core";
 
 export class NewControllerOptionsStrategy extends Strategy {
-  constructor(
-    private config: Config,
-    private projectConfig: ProjectConfig
-  ) {
+  constructor(private config: Config) {
     super();
   }
   public async apply(
     options: NewControllerOptions,
     cliPluginPackageName: string
   ) {
-    const { config, projectConfig } = this;
+    const { config } = this;
     const texts = await Texts.load();
 
     if (
@@ -44,7 +41,7 @@ export class NewControllerOptionsStrategy extends Strategy {
       handlers,
     };
 
-    const schema = new ApiJsonParser(projectConfig, config, texts).build({
+    const schema = new ApiJsonParser(config, texts).build({
       controllers: [controller],
     });
     const result = await new ApiGenerator(

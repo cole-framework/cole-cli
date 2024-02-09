@@ -1,12 +1,11 @@
+import { Texts } from "@cole-framework/cole-cli-core";
 import {
   Config,
   StoryResolver,
   Storyboard,
   StoryboardSession,
-  Texts,
   TimelineFrame,
 } from "../../../../core";
-import { ProjectConfig } from "../../common";
 import { ApiJson } from "../../common/api.types";
 import { CreateUseCaseFrame } from "./frames";
 
@@ -27,18 +26,13 @@ export class NewUseCaseStoryResolver extends StoryResolver<ApiJson> {
 }
 
 export class NewUseCaseStoryboard extends Storyboard<ApiJson> {
-  constructor(
-    texts: Texts,
-    config: Config,
-    projectConfig: ProjectConfig,
-    session?: StoryboardSession
-  ) {
+  constructor(texts: Texts, config: Config, session?: StoryboardSession) {
     super(
       "new_use_case_storyboard",
       session || new StoryboardSession("new_use_case_storyboard"),
       new NewUseCaseStoryResolver()
     );
 
-    this.addFrame(new CreateUseCaseFrame(config, projectConfig, texts));
+    this.addFrame(new CreateUseCaseFrame(config, texts));
   }
 }

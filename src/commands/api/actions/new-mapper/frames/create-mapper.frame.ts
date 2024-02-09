@@ -1,13 +1,6 @@
 import { existsSync } from "fs";
+import { Config, Frame, PropJson, WriteMethod } from "../../../../../core";
 import {
-  Config,
-  Frame,
-  PropJson,
-  Texts,
-  WriteMethod,
-} from "../../../../../core";
-import {
-  ProjectConfig,
   ApiJson,
   InputNameAndEndpointInteraction,
   InputTextInteraction,
@@ -16,13 +9,13 @@ import {
 } from "../../../common";
 import { CreateModelsAsDependenciesFrame } from "../../new-model";
 import { CreateEntityAsDependencyFrame, EntityJson } from "../../new-entity";
+import { Texts } from "@cole-framework/cole-cli-core";
 
 export class CreateMappersFrame extends Frame<ApiJson> {
   public static NAME = "create_mappers_frame";
 
   constructor(
     protected config: Config,
-    protected projectConfig: ProjectConfig,
     protected texts: Texts
   ) {
     super(CreateMappersFrame.NAME);
@@ -34,10 +27,9 @@ export class CreateMappersFrame extends Frame<ApiJson> {
     endpoint?: string;
     props?: PropJson[];
   }) {
-    const { texts, config, projectConfig } = this;
+    const { texts, config } = this;
     const createModelDependenciesFrame = new CreateModelsAsDependenciesFrame(
       config,
-      projectConfig,
       texts
     );
     const result: ApiJson = { models: [], entities: [], mappers: [] };
@@ -63,7 +55,7 @@ export class CreateMappersFrame extends Frame<ApiJson> {
         endpoint,
       }).path;
 
-      if (projectConfig.force === false) {
+      if (config.project.force === false) {
         if (existsSync(componentPath)) {
           writeMethod = await new SelectComponentWriteMethodInteraction(
             texts
@@ -72,11 +64,10 @@ export class CreateMappersFrame extends Frame<ApiJson> {
       }
 
       if (writeMethod !== WriteMethod.Skip) {
-        if (projectConfig.dependencies_write_method !== WriteMethod.Skip) {
+        if (config.project.dependencies_write_method !== WriteMethod.Skip) {
           if (!entityName) {
             const createEntityResult = await new CreateEntityAsDependencyFrame(
               config,
-              projectConfig,
               texts
             ).run({
               dependencyOf: "mapper",
