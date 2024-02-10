@@ -1,48 +1,16 @@
 import { nanoid } from "nanoid";
-import { Config, ConfigTools, ReservedType } from "../../config";
-import { TypeInfo } from "../../type.info";
+import { Config, ConfigInstructionParser } from "../../config";
 import { SchemaTools } from "../schema.tools";
+import { ExportData, ExportSchema } from "./export.schema";
+import { GenericData, GenericSchema } from "./generic.schema";
+import { MethodData, MethodSchema } from "./method.schema";
+import { PropData, PropSchema } from "./prop.schema";
+import { ImportData, ImportSchema } from "./import.schema";
+import { InheritanceData, InheritanceSchema } from "./inheritance.schema";
 import {
-  ExportData,
-  ExportJson,
-  ExportObject,
-  ExportSchema,
-} from "./export.schema";
-import {
-  GenericData,
-  GenericJson,
-  GenericObject,
-  GenericSchema,
-} from "./generic.schema";
-import {
-  MethodData,
-  MethodJson,
-  MethodObject,
-  MethodSchema,
-} from "./method.schema";
-import { PropData, PropJson, PropObject, PropSchema } from "./prop.schema";
-import {
-  ImportData,
-  ImportJson,
-  ImportObject,
-  ImportSchema,
-} from "./import.schema";
-import {
-  InheritanceData,
-  InheritanceJson,
-  InheritanceObject,
-  InheritanceSchema,
-} from "./inheritance.schema";
-
-export type InterfaceObject = {
-  exp?: ExportObject;
-  inheritance?: InheritanceObject[];
-  props?: PropObject[];
-  methods?: MethodObject[];
-  generics?: GenericObject[];
-  imports?: ImportObject[];
-  name: string;
-};
+  InterfaceJson,
+  InterfaceSchemaObject,
+} from "@cole-framework/cole-cli-core";
 
 export type InterfaceData = {
   exp?: ExportData;
@@ -54,19 +22,6 @@ export type InterfaceData = {
   name: string;
   id?: string;
 };
-
-export type InterfaceJson = {
-  exp?: string | boolean | ExportJson;
-  inheritance?: (string | InheritanceJson)[];
-  props?: (PropJson | string)[];
-  methods?: (MethodJson | string)[];
-  generics?: (GenericJson | string)[];
-  imports?: (ImportJson | string)[];
-  name?: string;
-  id?: string;
-};
-
-export type InterfaceConfig = InterfaceJson;
 
 export class InterfaceSchema {
   public static create(
@@ -100,8 +55,12 @@ export class InterfaceSchema {
     }
 
     let name;
-    if (ConfigTools.hasInstructions(data.name)) {
-      name = ConfigTools.executeInstructions(data.name, references, config);
+    if (ConfigInstructionParser.hasInstructions(data.name)) {
+      name = ConfigInstructionParser.executeInstructions(
+        data.name,
+        references,
+        config
+      );
     } else {
       name = data.name;
     }
@@ -259,7 +218,7 @@ export class InterfaceSchema {
     return [...this.__methods];
   }
 
-  toObject(): InterfaceObject {
+  toObject(): InterfaceSchemaObject {
     const {
       id,
       name,
@@ -270,7 +229,7 @@ export class InterfaceSchema {
       __inheritance,
       exp,
     } = this;
-    const intf: InterfaceObject = {
+    const intf: InterfaceSchemaObject = {
       name,
       inheritance: __inheritance?.map((i) => i.toObject()),
       exp: exp?.toObject(),

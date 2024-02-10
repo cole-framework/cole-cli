@@ -1,10 +1,5 @@
-import {
-  Config,
-  PropSchema,
-  RouteModelLabel,
-  TypeInfo,
-  WriteMethod,
-} from "../../../../../core";
+import { RouteModelLabel, WriteMethod } from "@cole-framework/cole-cli-core";
+import { Config, PropSchema, TypeInfo } from "../../../../../core";
 import { Entity, EntityFactory } from "../../new-entity";
 import { Model, ModelFactory } from "../../new-model";
 import { RouteModelFactory } from "../route-model.factory";

@@ -1,13 +1,7 @@
 import { nanoid } from "nanoid";
-import {
-  Config,
-  WriteMethod,
-  Component,
-  ClassSchema,
-  ClassJson,
-  ToolsetType,
-} from "../../../../core";
+import { Config, Component, ClassSchema, ToolsetType } from "../../../../core";
 import { ToolsetData, Toolset, ToolsetElement } from "./types";
+import { ClassJson, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class ToolsetFactory {
   static create(

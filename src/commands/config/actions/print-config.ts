@@ -1,14 +1,14 @@
 import { existsSync, readFileSync } from "fs";
 import { PrintConfigOptions } from "./print-config.types";
 import { getConfigValue } from "../common/config.tools";
-import { globalConfigPath, localConfigPath } from "../../../core";
+
+import Config from "../../../defaults/root.config.json";
 
 export const printConfig = (options: PrintConfigOptions) => {
-  const { key, global } = options;
-  const targetPath = global ? globalConfigPath : localConfigPath;
+  const { key } = options;
 
-  const storedConfig = existsSync(targetPath)
-    ? readFileSync(targetPath, "utf-8")
+  const storedConfig = existsSync(Config.local_plugin_config_path)
+    ? readFileSync(Config.local_plugin_config_path, "utf-8")
     : null;
 
   if (storedConfig && key) {

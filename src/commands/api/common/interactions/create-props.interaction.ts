@@ -1,10 +1,10 @@
-import { Texts, TypeInfo, WriteMethod } from "../../../../core";
-import { PropJson } from "../../../../core/components";
+import { TypeInfo } from "../../../../core";
 import { Config } from "../../../../core/config";
 import { EntityJson, ModelJson } from "../../actions";
 import { CreatePropInteraction } from "./create-prop.interaction";
-import { Interaction } from "./interaction";
-import { InteractionPrompts } from "./interaction-prompts";
+import { Interaction } from "../../../../core";
+import { InteractionPrompts } from "../../../../core";
+import { PropJson, Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 type InteractionResult = {
   props: PropJson[];

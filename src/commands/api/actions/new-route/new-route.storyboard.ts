@@ -1,10 +1,13 @@
 import { existsSync } from "fs";
 import { Config, ModelType } from "../../../../core";
-import { StoryResolver, Storyboard } from "../../../../core/storyboard";
+import {
+  StoryResolver,
+  Storyboard,
+} from "../../../../core/interactive/storyboard";
 import {
   StoryboardSession,
   TimelineFrame,
-} from "../../../../core/storyboard-session";
+} from "../../../../core/interactive/storyboard-session";
 import { ApiJson } from "../../common";
 import {
   CreateRouteFrame,

@@ -1,11 +1,5 @@
 import { existsSync } from "fs";
-import {
-  Config,
-  Frame,
-  ParamJson,
-  TypeInfo,
-  WriteMethod,
-} from "../../../../../core";
+import { Config, Frame, TypeInfo } from "../../../../../core";
 import {
   ApiJson,
   InputNameAndEndpointInteraction,
@@ -17,7 +11,7 @@ import { CreateEntityFrame } from "../../new-entity";
 import { CreateModelsFrame } from "../../new-model";
 import { pascalCase } from "change-case";
 import { CreateParamsInteraction } from "../../../common/interactions/create-params.interaction";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { ParamJson, Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class CreateUseCaseFrame extends Frame<ApiJson> {
   public static NAME = "create_use_case_frame";

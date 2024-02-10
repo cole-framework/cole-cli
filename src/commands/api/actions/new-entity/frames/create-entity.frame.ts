@@ -1,5 +1,5 @@
 import { existsSync } from "fs";
-import { Config, Frame, PropJson, WriteMethod } from "../../../../../core";
+import { Config, Frame } from "../../../../../core";
 import {
   ApiJson,
   CreatePropsInteraction,
@@ -7,7 +7,7 @@ import {
   InteractionPrompts,
   SelectComponentWriteMethodInteraction,
 } from "../../../common";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { PropJson, Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class CreateEntityFrame extends Frame<ApiJson> {
   public static NAME = "create_entity_frame";

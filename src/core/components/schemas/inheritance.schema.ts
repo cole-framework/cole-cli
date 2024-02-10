@@ -1,28 +1,15 @@
-import { Config, ConfigAddons, ConfigTools, ReservedType } from "../../config";
-import { SchemaTools } from "../schema.tools";
 import {
-  GenericData,
-  GenericJson,
-  GenericObject,
-  GenericSchema,
-} from "./generic.schema";
-
-export type InheritanceObject = {
-  generics: GenericObject[];
-  name: string;
-};
+  InheritanceJson,
+  InheritanceSchemaObject,
+} from "@cole-framework/cole-cli-core";
+import { Config, ConfigInstructionParser } from "../../config";
+import { SchemaTools } from "../schema.tools";
+import { GenericData, GenericSchema } from "./generic.schema";
 
 export type InheritanceData = {
   generics?: GenericData[];
   name?: string;
 };
-
-export type InheritanceJson = {
-  generics?: (GenericJson | string)[];
-  name?: string;
-};
-
-export type InheritanceConfig = InheritanceJson & ConfigAddons;
 
 export class InheritanceSchema {
   public static create(
@@ -41,16 +28,24 @@ export class InheritanceSchema {
     if (typeof data === "string") {
       const temp = data.trim();
 
-      if (ConfigTools.hasInstructions(temp)) {
-        name = ConfigTools.executeInstructions(temp, references, config);
+      if (ConfigInstructionParser.hasInstructions(temp)) {
+        name = ConfigInstructionParser.executeInstructions(
+          temp,
+          references,
+          config
+        );
       } else {
         name = temp;
       }
     } else {
       const temp = data.name.trim();
 
-      if (ConfigTools.hasInstructions(temp)) {
-        name = ConfigTools.executeInstructions(temp, references, config);
+      if (ConfigInstructionParser.hasInstructions(temp)) {
+        name = ConfigInstructionParser.executeInstructions(
+          temp,
+          references,
+          config
+        );
       } else {
         name = temp;
       }
@@ -100,9 +95,9 @@ export class InheritanceSchema {
     return [...this.__generics];
   }
 
-  toObject(): InheritanceObject {
+  toObject(): InheritanceSchemaObject {
     const { name, __generics } = this;
-    const intf: InheritanceObject = {
+    const intf: InheritanceSchemaObject = {
       name,
       generics: __generics.map((g) => g.toObject()),
     };

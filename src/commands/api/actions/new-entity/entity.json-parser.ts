@@ -1,11 +1,10 @@
 import chalk from "chalk";
-import { WriteMethod } from "../../../../core/enums";
 import { Model, ModelFactory } from "../new-model";
 import { Entity, EntityJson } from "./types";
 import { Config, TestCaseSchema } from "../../../../core";
 import { EntityFactory } from "./entity.factory";
 import { TestSuite, TestSuiteFactory } from "../new-test-suite";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class EntityJsonParser {
   constructor(

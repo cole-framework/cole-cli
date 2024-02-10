@@ -4,14 +4,13 @@ import {
   MethodTools,
   PropTools,
   TestCaseSchema,
-  WriteMethod,
 } from "../../../../core";
 import { Entity, EntityFactory } from "../new-entity";
 import { Model, ModelFactory } from "../new-model";
 import { SourceFactory } from "./source.factory";
 import { SourceJson, Source } from "./types";
 import { TestSuite, TestSuiteFactory } from "../new-test-suite";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class SourceJsonParser {
   constructor(

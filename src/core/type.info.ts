@@ -1,4 +1,4 @@
-import { BasicType } from "./enums";
+import { BasicType } from "@cole-framework/cole-cli-core";
 import { Config } from "./config";
 
 export type ComponentLabel =

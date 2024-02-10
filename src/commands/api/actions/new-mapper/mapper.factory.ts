@@ -2,7 +2,6 @@ import { MapperAddons, MapperData, MapperElement } from "./types";
 import { Entity } from "../new-entity";
 import { Model } from "../new-model";
 import {
-  WriteMethod,
   Component,
   ClassData,
   ClassSchema,
@@ -10,6 +9,7 @@ import {
   MapperType,
 } from "../../../../core";
 import { nanoid } from "nanoid";
+import { WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class MapperFactory {
   static create(

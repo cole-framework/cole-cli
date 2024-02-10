@@ -5,15 +5,9 @@ import {
   RepositoryElement,
 } from "./types";
 import { Entity } from "../new-entity";
-import { RepositoryImplType, TypeInfo } from "../../../../core/type.info";
-import {
-  AccessType,
-  ClassData,
-  ClassSchema,
-  Component,
-  Config,
-  WriteMethod,
-} from "../../../../core";
+import { RepositoryImplType } from "../../../../core/type.info";
+import { ClassData, ClassSchema, Component, Config } from "../../../../core";
+import { WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class RepositoryImplFactory {
   static create(

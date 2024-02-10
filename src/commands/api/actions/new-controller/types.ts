@@ -1,5 +1,5 @@
+import { ClassJson } from "@cole-framework/cole-cli-core";
 import {
-  ClassJson,
   Component,
   ComponentElement,
   ElementWithImports,

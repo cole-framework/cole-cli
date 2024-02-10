@@ -1,27 +1,14 @@
 import { TypeInfo, UnknownType } from "../../type.info";
-import {
-  ParamData,
-  ParamJson,
-  ParamObject,
-  ParamSchema,
-  ParamTools,
-} from "./param.schema";
+import { ParamData, ParamSchema, ParamTools } from "./param.schema";
 
-import {
-  GenericData,
-  GenericJson,
-  GenericObject,
-  GenericSchema,
-  GenericTools,
-} from "./generic.schema";
-import { Config, ConfigTools, ReservedType } from "../../config";
+import { GenericData, GenericSchema, GenericTools } from "./generic.schema";
+import { Config, ConfigInstructionParser } from "../../config";
 import { SchemaTools } from "../schema.tools";
+import { ExportData, ExportSchema } from "./export.schema";
 import {
-  ExportData,
-  ExportJson,
-  ExportObject,
-  ExportSchema,
-} from "./export.schema";
+  FunctionJson,
+  FunctionSchemaObject,
+} from "@cole-framework/cole-cli-core";
 
 export const foo = <T extends string | number>(foo: T) => {
   foo;
@@ -29,17 +16,6 @@ export const foo = <T extends string | number>(foo: T) => {
 
 export const FUNCTION_REGEX =
   /^(async)?\s*([a-zA-Z0-9_]+)(\s*\<(.+)\>\s*)?(\((.*)\))?(\s*:\s*([a-zA-Z0-9\[\]\<\>\{\\}]+))?(\s*=>\s*(.*))?$/;
-
-export type FunctionObject = {
-  exp: ExportObject;
-  name: string;
-  return_type: TypeInfo;
-  is_async: boolean;
-  params: ParamObject[];
-  body: string;
-  template: string;
-  generics: GenericObject[];
-};
 
 export type FunctionData = {
   exp?: ExportData;
@@ -50,16 +26,6 @@ export type FunctionData = {
   body?: string;
   template?: string;
   generics?: GenericData[];
-};
-
-export type FunctionJson = {
-  exp?: string | boolean | ExportJson;
-  name?: string;
-  return_type?: string;
-  is_async?: boolean;
-  params?: (ParamJson | string)[];
-  body?: string;
-  generics?: (GenericJson | string)[];
 };
 
 export class FunctionTools {
@@ -82,8 +48,12 @@ export class FunctionTools {
 
       if (match[2]) {
         let temp = match[2].trim();
-        if (ConfigTools.hasInstructions(temp)) {
-          name = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          name = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         } else {
           name = temp;
         }
@@ -93,8 +63,12 @@ export class FunctionTools {
 
       if (match[8]) {
         let temp = match[8].trim();
-        if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          temp = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         }
         returnType = TypeInfo.isType(temp)
           ? temp
@@ -165,8 +139,12 @@ export class FunctionSchema {
       }
 
       const tempName = data.name.trim();
-      if (ConfigTools.hasInstructions(tempName)) {
-        name = ConfigTools.executeInstructions(tempName, references, config);
+      if (ConfigInstructionParser.hasInstructions(tempName)) {
+        name = ConfigInstructionParser.executeInstructions(
+          tempName,
+          references,
+          config
+        );
       } else {
         name = tempName;
       }
@@ -175,8 +153,12 @@ export class FunctionSchema {
         returnType = data.return_type;
       } else if (typeof data.return_type === "string") {
         let temp = data.return_type.trim();
-        if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          temp = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         }
         returnType = TypeInfo.isType(temp)
           ? temp
@@ -186,8 +168,8 @@ export class FunctionSchema {
       if (Array.isArray(data.params)) {
         data.params.forEach((param) => {
           if (typeof param === "string") {
-            if (ConfigTools.hasInstructions(param)) {
-              const p = ConfigTools.executeInstructions(
+            if (ConfigInstructionParser.hasInstructions(param)) {
+              const p = ConfigInstructionParser.executeInstructions(
                 param,
                 references,
                 config
@@ -205,8 +187,8 @@ export class FunctionSchema {
           }
         });
       } else if (typeof data.params === "string") {
-        if (ConfigTools.hasInstructions(data.params)) {
-          params = ConfigTools.executeInstructions(
+        if (ConfigInstructionParser.hasInstructions(data.params)) {
+          params = ConfigInstructionParser.executeInstructions(
             data.params,
             references,
             config
@@ -295,7 +277,7 @@ export class FunctionSchema {
     return [...this.__generics];
   }
 
-  toObject(): FunctionObject {
+  toObject(): FunctionSchemaObject {
     const {
       __params,
       __generics,
@@ -306,7 +288,7 @@ export class FunctionSchema {
       exp,
       template,
     } = this;
-    const fn: FunctionObject = {
+    const fn: FunctionSchemaObject = {
       exp: exp?.toObject(),
       params: __params.map((p) => p.toObject()),
       generics: __generics.map((g) => g.toObject()),

@@ -1,5 +1,5 @@
-import { Config, ConfigTools, InstructionData, ReservedType } from "../config";
-import { AccessType } from "../enums";
+import { AccessType } from "@cole-framework/cole-cli-core";
+import { Config, ConfigInstructionParser, InstructionData } from "../config";
 
 export class SchemaTools {
   static splitIgnoringBrackets(str, delimiter) {
@@ -134,7 +134,11 @@ export class SchemaTools {
 
   static executeMeta(item: any, data: InstructionData, config: Config) {
     if (item["meta"]) {
-      return ConfigTools.executeInstructions(item["meta"], data, config);
+      return ConfigInstructionParser.executeInstructions(
+        item["meta"],
+        data,
+        config
+      );
     }
 
     return true;

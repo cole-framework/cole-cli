@@ -1,8 +1,8 @@
 import chalk from "chalk";
-import { Config, Frame, PropJson } from "../../../../../core";
+import { Config, Frame } from "../../../../../core";
 import { ApiJson, InputNameAndEndpointInteraction } from "../../../common";
 import { CreateModelsFrame } from "./create-models.frame";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { PropJson, Texts } from "@cole-framework/cole-cli-core";
 
 export class CreateModelsAsDependenciesFrame extends Frame<ApiJson> {
   public static NAME = "create_models_as_dependencies_frame";

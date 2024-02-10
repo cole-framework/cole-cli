@@ -1,63 +1,15 @@
-import {
-  ExportData,
-  ExportJson,
-  ExportObject,
-  ExportSchema,
-} from "./export.schema";
-import {
-  GenericData,
-  GenericJson,
-  GenericObject,
-  GenericSchema,
-} from "./generic.schema";
-import {
-  MethodData,
-  MethodJson,
-  MethodObject,
-  MethodSchema,
-} from "./method.schema";
-import { PropData, PropJson, PropObject, PropSchema } from "./prop.schema";
-import {
-  ConstructorData,
-  ConstructorJson,
-  ConstructorObject,
-  ConstructorSchema,
-} from "./constructor.schema";
-import {
-  InterfaceData,
-  InterfaceJson,
-  InterfaceObject,
-  InterfaceSchema,
-} from "./interface.schema";
-import {
-  InheritanceData,
-  InheritanceJson,
-  InheritanceObject,
-  InheritanceSchema,
-} from "./inheritance.schema";
-import {
-  ImportData,
-  ImportJson,
-  ImportObject,
-  ImportSchema,
-} from "./import.schema";
-import { Config, ReservedType } from "../../config";
+import { ExportData, ExportSchema } from "./export.schema";
+import { GenericData, GenericSchema } from "./generic.schema";
+import { MethodData, MethodSchema } from "./method.schema";
+import { PropData, PropSchema } from "./prop.schema";
+import { ConstructorData, ConstructorSchema } from "./constructor.schema";
+import { InterfaceData, InterfaceSchema } from "./interface.schema";
+import { InheritanceData, InheritanceSchema } from "./inheritance.schema";
+import { ImportData, ImportSchema } from "./import.schema";
+import { Config } from "../../config";
 import { SchemaTools } from "../schema.tools";
 import { TypeInfo } from "../../type.info";
-
-export type ClassObject = {
-  is_abstract?: boolean;
-  exp?: ExportObject;
-  ctor?: ConstructorObject;
-  interfaces?: InterfaceObject[];
-  inheritance?: InheritanceObject[];
-  props?: PropObject[];
-  methods?: MethodObject[];
-  generics?: GenericObject[];
-  imports?: ImportObject[];
-  name: string;
-  template?: string;
-};
+import { ClassJson, ClassSchemaObject } from "@cole-framework/cole-cli-core";
 
 export type ClassData = {
   is_abstract?: boolean;
@@ -72,20 +24,6 @@ export type ClassData = {
   name: string;
   id?: string;
   template?: string;
-};
-
-export type ClassJson = {
-  is_abstract?: boolean;
-  exp?: string | boolean | ExportJson;
-  ctor?: string | ConstructorJson;
-  interfaces?: (string | InterfaceJson)[];
-  inheritance?: (string | InheritanceJson)[];
-  props?: (PropJson | string)[];
-  methods?: (MethodJson | string)[];
-  generics?: (GenericJson | string)[];
-  imports?: (ImportJson | string)[];
-  name?: string;
-  id?: string;
 };
 
 export class ClassSchema {
@@ -318,7 +256,7 @@ export class ClassSchema {
     return [...this.__interfaces];
   }
 
-  toObject(): ClassObject {
+  toObject(): ClassSchemaObject {
     const {
       name,
       ctor,
@@ -330,10 +268,10 @@ export class ClassSchema {
       __generics,
       __interfaces,
       __imports,
-      template
+      template,
     } = this;
 
-    const cls: ClassObject = {
+    const cls: ClassSchemaObject = {
       is_abstract: isAbstract,
       name,
       inheritance: __inheritance?.map((i) => i.toObject()),
@@ -344,7 +282,7 @@ export class ClassSchema {
       generics: __generics.map((g) => g.toObject()),
       interfaces: __interfaces.map((i) => i.toObject()),
       imports: __imports.map((i) => i.toObject()),
-      template
+      template,
     };
 
     return cls;

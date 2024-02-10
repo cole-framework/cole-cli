@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import { WriteMethod } from "../../../../core/enums";
 import { Model, ModelFactory } from "../new-model";
 import { Controller, ControllerJson, HandlerJson } from "./types";
 import {
@@ -13,7 +12,7 @@ import { Entity } from "../new-entity/types";
 import { EntityFactory } from "../new-entity";
 import { pascalCase } from "change-case";
 import { TestSuite, TestSuiteFactory } from "../new-test-suite";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class ControllerInputJsonParser {
   constructor(

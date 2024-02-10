@@ -1,6 +1,6 @@
-import { Texts } from "../../../../core";
-import { Interaction } from "./interaction";
-import { InteractionPrompts } from "./interaction-prompts";
+import { Texts } from "@cole-framework/cole-cli-core";
+import { Interaction } from "../../../../core";
+import { InteractionPrompts } from "../../../../core";
 
 type InputAndName = { name: string; endpoint: string };
 

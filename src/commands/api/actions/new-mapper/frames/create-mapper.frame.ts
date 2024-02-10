@@ -1,5 +1,5 @@
 import { existsSync } from "fs";
-import { Config, Frame, PropJson, WriteMethod } from "../../../../../core";
+import { Config, Frame } from "../../../../../core";
 import {
   ApiJson,
   InputNameAndEndpointInteraction,
@@ -9,7 +9,7 @@ import {
 } from "../../../common";
 import { CreateModelsAsDependenciesFrame } from "../../new-model";
 import { CreateEntityAsDependencyFrame, EntityJson } from "../../new-entity";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { PropJson, Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class CreateMappersFrame extends Frame<ApiJson> {
   public static NAME = "create_mappers_frame";

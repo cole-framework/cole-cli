@@ -1,7 +1,5 @@
+import { ClassJson, GenericJson, PropJson } from "@cole-framework/cole-cli-core";
 import {
-  ClassJson,
-  PropJson,
-  GenericJson,
   ElementWithProps,
   ElementWithMethods,
   ElementWithGenerics,

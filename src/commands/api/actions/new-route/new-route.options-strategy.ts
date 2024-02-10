@@ -1,9 +1,13 @@
 import chalk from "chalk";
 import { NewRouteOptions, RouteJson } from "./types";
-import { Config, RouteMethodType } from "../../../../core";
+import { Config } from "../../../../core";
 import { ApiJsonParser } from "../../common/api-json.parser";
 import { ApiGenerator } from "../../common";
-import { Strategy, Texts } from "@cole-framework/cole-cli-core";
+import {
+  RouteMethodType,
+  Strategy,
+  Texts,
+} from "@cole-framework/cole-cli-core";
 
 export class NewRouteOptionsStrategy extends Strategy {
   constructor(private config: Config) {

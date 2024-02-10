@@ -5,8 +5,8 @@ import { InitOptions } from "./types";
 import { InitInteractiveStrategy } from "./init.interactive-strategy";
 import { InitOptionsStrategy } from "./init.options-strategy";
 import { InteractionPrompts } from "../../../api";
-import { PluginMapService } from "../../../../core/plugin-map.service";
-import Config from "../../../../defaults/config.json";
+import { PluginMapService } from "../../../../core/config/tools/plugin-map.service";
+import Config from "../../../../defaults/root.config.json";
 import { readdir, unlink } from "fs/promises";
 
 export const init = async (options: InitOptions) => {

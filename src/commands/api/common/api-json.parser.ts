@@ -4,7 +4,7 @@ import { RouteJsonParser, RouteJson } from "../actions/new-route";
 import { ModelJson } from "../actions/new-model";
 import { SourceJsonParser, SourceJson } from "../actions/new-source";
 import { UseCaseJsonParse, UseCaseJson } from "../actions/new-use-case";
-import { Config, WriteMethod } from "../../../core";
+import { Config } from "../../../core";
 import { ApiSchema } from "./api.schema";
 import { ControllerJsonParser } from "../actions/new-controller/controller.json-parser";
 import { EntityJsonParser } from "../actions/new-entity/entity.json-parser";
@@ -15,7 +15,7 @@ import { ApiJson } from "./api.types";
 import { ControllerJson } from "../actions/new-controller/types";
 import { EntityJson } from "../actions/new-entity/types";
 import { ToolsetJson, ToolsetJsonParser } from "../actions/new-toolset";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class ApiJsonParser {
   private apiSchema = new ApiSchema();

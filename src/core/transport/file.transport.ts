@@ -1,7 +1,7 @@
 import { Transport, TransportOptions, TransportStatus } from "./transport";
 import fs from "fs";
 import { ensurePathExists, fileOrDirExists } from "../tools/files.tools";
-import { WriteMethod } from "../enums";
+import { WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class FileTransport implements Transport {
   writeOutput(data: string, options: FileTransportOptions): TransportStatus {

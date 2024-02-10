@@ -1,13 +1,13 @@
 import { nanoid } from "nanoid";
 import {
   Config,
-  WriteMethod,
   Component,
   TestSuiteSchema,
   TestSuiteType,
   TestSuiteData,
 } from "../../../../core";
 import { TestSuite, TestSuiteElement } from "./types";
+import { WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class TestSuiteFactory {
   static create(

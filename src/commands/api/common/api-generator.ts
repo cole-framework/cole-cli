@@ -4,7 +4,7 @@ import {
   Result,
 } from "@cole-framework/cole-cli-core";
 import { ApiSchema } from "./api.schema";
-import { COMPILER_WORKER_PATH } from "../../../core/worker";
+import { COMPILER_WORKER_PATH } from "../../../core/workers/worker";
 import { Config, WorkerPool } from "../../../core";
 
 export class ApiGenerator {

@@ -1,4 +1,4 @@
-import { PluginConfigService } from "./../../../../core/plugin-config.service";
+import { PluginConfigService } from "../../../../core/config/tools/plugin.config.service";
 import { InitStoryboard } from "./init.storyboard";
 import {
   LanguageStrategyProvider,
@@ -6,7 +6,7 @@ import {
   Strategy,
   Texts,
 } from "@cole-framework/cole-cli-core";
-import Config from "../../../../defaults/config.json";
+import Config from "../../../../defaults/root.config.json";
 
 export class InitInteractiveStrategy extends Strategy {
   constructor(private pluginMap: PluginMap) {

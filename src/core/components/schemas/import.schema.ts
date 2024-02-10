@@ -1,6 +1,6 @@
 import path from "path";
-import { Config, ConfigAddons, ConfigTools, ReservedType } from "../../config";
-import { SchemaTools } from "../schema.tools";
+import { Config, ConfigInstructionParser } from "../../config";
+import { ImportJson, ImportSchemaObject } from "@cole-framework/cole-cli-core";
 
 export type ImportData = {
   dflt?: string;
@@ -9,23 +9,6 @@ export type ImportData = {
   list?: string[];
   alias?: string;
 };
-
-export type ImportObject = {
-  dflt: string;
-  path: string;
-  list: string[];
-  alias: string;
-};
-
-export type ImportJson = {
-  dflt?: string;
-  path?: string;
-  list?: string[];
-  alias?: string;
-  ref_path?: string;
-};
-
-export type ImportConfig = ImportJson & ConfigAddons;
 
 export const IMPORT_REGEX =
   /^(import)?\s*(\w+)?(\s*[,]?\s*\{\s*([a-zA-Z, ]+)\s*\})?(\s*\*\s+as\s+(\w+))?\s+from\s+["']([a-zA-Z0-9\/\\\._]+)["'];?$/;
@@ -86,8 +69,8 @@ export class ImportSchema {
     if (typeof data === "string") {
       const match = ImportTools.stringToData(data);
 
-      if (ConfigTools.hasInstructions(match.dflt)) {
-        dflt = ConfigTools.executeInstructions(
+      if (ConfigInstructionParser.hasInstructions(match.dflt)) {
+        dflt = ConfigInstructionParser.executeInstructions(
           match.dflt,
           references,
           config
@@ -96,8 +79,8 @@ export class ImportSchema {
         dflt = match.dflt;
       }
 
-      if (ConfigTools.hasInstructions(match.alias)) {
-        alias = ConfigTools.executeInstructions(
+      if (ConfigInstructionParser.hasInstructions(match.alias)) {
+        alias = ConfigInstructionParser.executeInstructions(
           match.alias,
           references,
           config
@@ -106,8 +89,8 @@ export class ImportSchema {
         alias = match.alias;
       }
 
-      if (ConfigTools.hasInstructions(match.path)) {
-        path = ConfigTools.executeInstructions(
+      if (ConfigInstructionParser.hasInstructions(match.path)) {
+        path = ConfigInstructionParser.executeInstructions(
           match.path,
           references,
           config
@@ -117,22 +100,28 @@ export class ImportSchema {
       }
       if (Array.isArray(match.list)) {
         match.list.forEach((l) => {
-          if (ConfigTools.hasInstructions(l)) {
-            list.push(ConfigTools.executeInstructions(l, references, config));
+          if (ConfigInstructionParser.hasInstructions(l)) {
+            list.push(
+              ConfigInstructionParser.executeInstructions(l, references, config)
+            );
           } else {
             list.push(l);
           }
         });
       }
     } else {
-      if (ConfigTools.hasInstructions(data.dflt)) {
-        dflt = ConfigTools.executeInstructions(data.dflt, references, config);
+      if (ConfigInstructionParser.hasInstructions(data.dflt)) {
+        dflt = ConfigInstructionParser.executeInstructions(
+          data.dflt,
+          references,
+          config
+        );
       } else {
         dflt = data.dflt;
       }
 
-      if (ConfigTools.hasInstructions(data.alias)) {
-        alias = ConfigTools.executeInstructions(
+      if (ConfigInstructionParser.hasInstructions(data.alias)) {
+        alias = ConfigInstructionParser.executeInstructions(
           data.alias,
           references,
           config
@@ -143,8 +132,8 @@ export class ImportSchema {
 
       let tempPath: string;
 
-      if (ConfigTools.hasInstructions(data.path)) {
-        tempPath = ConfigTools.executeInstructions(
+      if (ConfigInstructionParser.hasInstructions(data.path)) {
+        tempPath = ConfigInstructionParser.executeInstructions(
           data.path,
           references,
           config
@@ -160,8 +149,10 @@ export class ImportSchema {
       }
       if (Array.isArray(data.list)) {
         data.list.forEach((l) => {
-          if (ConfigTools.hasInstructions(l)) {
-            list.push(ConfigTools.executeInstructions(l, references, config));
+          if (ConfigInstructionParser.hasInstructions(l)) {
+            list.push(
+              ConfigInstructionParser.executeInstructions(l, references, config)
+            );
           } else {
             list.push(l);
           }
@@ -179,7 +170,7 @@ export class ImportSchema {
     public readonly alias: string
   ) {}
 
-  toObject(): ImportObject {
+  toObject(): ImportSchemaObject {
     const { dflt, path, list, alias } = this;
 
     return {

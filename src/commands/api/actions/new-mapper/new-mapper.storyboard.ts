@@ -5,7 +5,7 @@ import {
   StoryboardSession,
   TimelineFrame,
 } from "../../../../core";
-import { ProjectConfig } from "../../common/project.config";
+import { ProjectConfig } from "../../../../core/config/project.config";
 import { ApiJson } from "../../common/api.types";
 import { CreateMappersFrame, SelectMapperStoragesFrame } from "./frames";
 import { Texts } from "@cole-framework/cole-cli-core";

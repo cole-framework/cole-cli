@@ -1,6 +1,5 @@
 import { nanoid } from "nanoid";
 import {
-  WriteMethod,
   Config,
   Component,
   ClassData,
@@ -8,6 +7,7 @@ import {
   RouteType,
 } from "../../../../core";
 import { RouteData, RouteIO, RouteElement } from "./types";
+import { WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class RouteFactory {
   public static create(

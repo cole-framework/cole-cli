@@ -1,30 +1,13 @@
-import {
-  ParamData,
-  ParamJson,
-  ParamObject,
-  ParamSchema,
-  ParamTools,
-} from "./param.schema";
-import { Config, ConfigAddons, ConfigTools, ReservedType } from "../../config";
-import { AccessType } from "../../enums";
+import { ParamData, ParamSchema, ParamTools } from "./param.schema";
+import { Config, ConfigInstructionParser } from "../../config";
 import { SchemaTools } from "../schema.tools";
+import {
+  AccessType,
+  ConstructorJson,
+  ConstructorSchemaObject,
+} from "@cole-framework/cole-cli-core";
 
 export const CTOR_REGEX = /^(private|protected|public)?\s*(\((.*)\))$/;
-
-export type ConstructorJson = {
-  access?: string;
-  params?: (ParamJson | string)[];
-  body?: string;
-  supr?: ConstructorJson;
-};
-
-export type ConstructorObject = {
-  access: string;
-  params: ParamObject[];
-  body: string;
-  template: string;
-  supr: ConstructorObject;
-};
 
 export type ConstructorData = {
   access?: string;
@@ -33,8 +16,6 @@ export type ConstructorData = {
   template?: string;
   supr?: ConstructorData;
 };
-
-export type ConstructorConfig = ConstructorJson & ConfigAddons;
 
 export class ConstructorTools {
   static stringToData(
@@ -95,8 +76,8 @@ export class ConstructorSchema {
       if (Array.isArray(data.params)) {
         data.params.forEach((param) => {
           if (typeof param === "string") {
-            if (ConfigTools.hasInstructions(param)) {
-              const p = ConfigTools.executeInstructions(
+            if (ConfigInstructionParser.hasInstructions(param)) {
+              const p = ConfigInstructionParser.executeInstructions(
                 param,
                 references,
                 config
@@ -114,8 +95,8 @@ export class ConstructorSchema {
           }
         });
       } else if (typeof data.params === "string") {
-        if (ConfigTools.hasInstructions(data.params)) {
-          params = ConfigTools.executeInstructions(
+        if (ConfigInstructionParser.hasInstructions(data.params)) {
+          params = ConfigInstructionParser.executeInstructions(
             data.params,
             references,
             config
@@ -145,7 +126,7 @@ export class ConstructorSchema {
     public readonly access: string,
     public readonly body: string,
     public readonly supr: ConstructorSchema,
-    public readonly template: string,
+    public readonly template: string
   ) {}
 
   addParam(param: ParamSchema) {
@@ -166,14 +147,14 @@ export class ConstructorSchema {
     return [...this.__params];
   }
 
-  toObject(): ConstructorObject {
+  toObject(): ConstructorSchemaObject {
     const { access, __params, body, supr, template } = this;
-    const ctr: ConstructorObject = {
+    const ctr: ConstructorSchemaObject = {
       access,
       params: __params.map((p) => p.toObject()),
       body,
       supr: supr?.toObject(),
-      template
+      template,
     };
 
     if (supr) {

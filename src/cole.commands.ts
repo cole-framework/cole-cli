@@ -47,7 +47,7 @@ export const runProgram = (texts: Texts) => {
     .option("-w, --with-deps", texts.get("option_with_deps"))
     .description(texts.get("description_new_components"))
     .action((options) => {
-      Commands.Api.Actions.fromJson(options);
+      Commands.Api.Actions.newComponent(options);
     });
 
   newCommand
@@ -61,7 +61,7 @@ export const runProgram = (texts: Texts) => {
     .option("-w, --with-deps", texts.get("option_with_deps"))
     .description(texts.get("description_new_model"))
     .action((options) => {
-      Commands.Api.Actions.newComponent('model', options);
+      Commands.Api.Actions.newComponent(options, "model");
     });
 
   newCommand
@@ -75,7 +75,7 @@ export const runProgram = (texts: Texts) => {
     .option("-w, --with-deps", texts.get("option_with_deps"))
     .description(texts.get("description_new_entity"))
     .action((options) => {
-      Commands.Api.Actions.newComponent('entity', options);
+      Commands.Api.Actions.newComponent(options, "entity");
     });
 
   newCommand
@@ -89,7 +89,7 @@ export const runProgram = (texts: Texts) => {
     .option("-w, --with-deps", texts.get("option_with_deps"))
     .description(texts.get("description_new_toolset"))
     .action((options) => {
-      Commands.Api.Actions.newComponent('toolset', options);
+      Commands.Api.Actions.newComponent(options, "toolset");
     });
 
   newCommand
@@ -104,7 +104,7 @@ export const runProgram = (texts: Texts) => {
     .option("-w, --with-deps", texts.get("option_with_deps"))
     .description(texts.get("description_new_mapper"))
     .action((options) => {
-      Commands.Api.Actions.newComponent('mapper', options);
+      Commands.Api.Actions.newComponent(options, "mapper");
     });
 
   newCommand
@@ -118,7 +118,7 @@ export const runProgram = (texts: Texts) => {
     .option("-w, --with-deps", texts.get("option_with_deps"))
     .description(texts.get("description_new_use_case"))
     .action((options) => {
-      Commands.Api.Actions.newComponent('use-case', options);
+      Commands.Api.Actions.newComponent(options, "use-case");
     });
 
   newCommand
@@ -133,7 +133,7 @@ export const runProgram = (texts: Texts) => {
     .option("-w, --with-deps", texts.get("option_with_deps"))
     .description(texts.get("description_new_source"))
     .action((options) => {
-      Commands.Api.Actions.newComponent('source', options);
+      Commands.Api.Actions.newComponent(options, "source");
     });
 
   newCommand
@@ -154,7 +154,7 @@ export const runProgram = (texts: Texts) => {
     .option("--skip-tests", texts.get("option_skip_tests"))
     .description(texts.get("description_new_repository"))
     .action((options) => {
-      Commands.Api.Actions.newComponent('repository', options);
+      Commands.Api.Actions.newComponent(options, "repository");
     });
 
   newCommand
@@ -174,7 +174,7 @@ export const runProgram = (texts: Texts) => {
     .option("-w, --with-deps", texts.get("option_with_deps"))
     .description(texts.get("description_new_route"))
     .action((options) => {
-      Commands.Api.Actions.newComponent('route', options);
+      Commands.Api.Actions.newComponent(options, "route");
     });
 
   newCommand
@@ -190,7 +190,7 @@ export const runProgram = (texts: Texts) => {
     .option("-w, --with-deps", texts.get("option_with_deps"))
     .description(texts.get("description_new_controller"))
     .action((options) => {
-      Commands.Api.Actions.newComponent('controller', options);
+      Commands.Api.Actions.newComponent(options, "controller");
     });
 
   /**

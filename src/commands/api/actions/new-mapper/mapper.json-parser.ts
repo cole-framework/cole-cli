@@ -1,11 +1,10 @@
-import { Texts } from "@cole-framework/cole-cli-core";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 import {
   Config,
   MethodTools,
   PropTools,
   TestCaseSchema,
 } from "../../../../core";
-import { WriteMethod } from "../../../../core/enums";
 import { Entity, EntityFactory } from "../new-entity";
 import { Model, ModelFactory } from "../new-model";
 import { TestSuite, TestSuiteFactory } from "../new-test-suite";

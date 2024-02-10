@@ -2,13 +2,12 @@ import { nanoid } from "nanoid";
 import { RouteModelAddons, RouteModelData, RouteModelElement } from "./types";
 import {
   Config,
-  WriteMethod,
   Component,
   TypeSchema,
   TypeJson,
-  RouteModelLabel,
   RouteModelType,
 } from "../../../../core";
+import { WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class RouteModelFactory {
   static create(

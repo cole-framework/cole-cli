@@ -1,20 +1,16 @@
 import chalk from "chalk";
-import { ConfigLoader, Texts } from "../../../../core";
+import { Texts } from "@cole-framework/cole-cli-core";
 import { DefaultCliOptions } from "../../common/api.types";
 import { existsSync, readFileSync } from "fs";
 import { ApiJsonParser } from "../../common/api-json.parser";
 import { ApiGenerator } from "../../common/api-generator";
-import { ProjectConfig } from "../../common/project.config";
+import { Config } from "../../../../core";
 
-export const fromJson = async (options: DefaultCliOptions) => {
-  const { content: config, failure } = ConfigLoader.load();
-
-  if (failure) {
-    console.log(chalk.red(failure.error));
-    process.exit(1);
-  }
-
-  const projectConfig = ProjectConfig.create(options, config);
+export const fromJson = async (
+  options: DefaultCliOptions,
+  config: Config,
+  cliPluginPackageName: string
+) => {
   const texts = await Texts.load();
 
   if (existsSync(options.json) === false) {
@@ -30,7 +26,7 @@ export const fromJson = async (options: DefaultCliOptions) => {
     const data = readFileSync(options.json, "utf-8");
     const json = JSON.parse(data);
     const schema = new ApiJsonParser(config, texts).build(json);
-    const apiGenerator = new ApiGenerator(config);
+    const apiGenerator = new ApiGenerator(config, cliPluginPackageName);
     const result = await apiGenerator.generate(schema);
 
     if (result.isFailure) {

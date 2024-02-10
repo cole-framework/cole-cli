@@ -1,11 +1,6 @@
 import chalk from "chalk";
 import { pascalCase } from "change-case";
-import {
-  Config,
-  TypeInfo,
-  TestCaseSchema,
-  WriteMethod,
-} from "../../../../../core";
+import { Config, TypeInfo, TestCaseSchema } from "../../../../../core";
 import {
   Controller,
   ControllerInputJsonParser,
@@ -22,7 +17,7 @@ import { QueryParamsJsonParser } from "./query-params.json-parser";
 import { RequestBodyJsonParser } from "./request-body.json-parser";
 import { ResponseBodyJsonParser } from "./response-body.json-parser";
 import { TestSuite, TestSuiteFactory } from "../../new-test-suite";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class RouteJsonParser {
   private inputParser: ControllerInputJsonParser;

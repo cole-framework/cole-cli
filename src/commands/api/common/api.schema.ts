@@ -1,5 +1,4 @@
 import { Component, TypeInfo } from "../../../core";
-import { ApiObject } from "./api.types";
 import { Controller } from "../actions/new-controller";
 import { Entity } from "../actions/new-entity";
 import { Mapper } from "../actions/new-mapper";
@@ -14,6 +13,7 @@ import { Source } from "../actions/new-source";
 import { Toolset } from "../actions/new-toolset";
 import { UseCase } from "../actions/new-use-case";
 import { TestSuite } from "../actions/new-test-suite";
+import { ApiObject } from "@cole-framework/cole-cli-core";
 
 export class ApiSchema {
   public readonly toolsets = new ApiComponentCollection<Toolset>();

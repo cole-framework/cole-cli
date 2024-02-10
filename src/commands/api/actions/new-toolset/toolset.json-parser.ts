@@ -1,4 +1,3 @@
-import { WriteMethod } from "../../../../core/enums";
 import { Model, ModelFactory } from "../new-model";
 import { Toolset, ToolsetJson } from "./types";
 import chalk from "chalk";
@@ -6,7 +5,7 @@ import { Config, TestCaseSchema } from "../../../../core";
 import { ToolsetFactory } from "./toolset.factory";
 import { Entity, EntityFactory } from "../new-entity";
 import { TestSuite, TestSuiteFactory } from "../new-test-suite";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class ToolsetJsonParser {
   constructor(

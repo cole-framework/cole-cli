@@ -1,4 +1,5 @@
-import { Config, RouteModelLabel, WriteMethod } from "../../../../../core";
+import { RouteModelLabel, WriteMethod } from "@cole-framework/cole-cli-core";
+import { Config } from "../../../../../core";
 import { Model } from "../../new-model";
 import { RouteModelFactory } from "../route-model.factory";
 import { RouteJson } from "../types";

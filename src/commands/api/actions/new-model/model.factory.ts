@@ -1,6 +1,5 @@
 import { nanoid } from "nanoid";
 import {
-  WriteMethod,
   Component,
   TypeSchema,
   TypeJson,
@@ -8,6 +7,7 @@ import {
   ModelType,
 } from "../../../../core";
 import { ModelData, ModelElement, ModelAddons, Model } from "./types";
+import { WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class ModelFactory {
   static create(

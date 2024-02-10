@@ -1,5 +1,5 @@
-import { Texts } from "@cole-framework/cole-cli-core";
-import { Config, Frame, TypeInfo, WriteMethod } from "../../../../../core";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
+import { Config, Frame, TypeInfo } from "../../../../../core";
 import { InteractionPrompts } from "../../../common";
 import { EntityJson } from "../../new-entity";
 import { ModelJson } from "../../new-model";

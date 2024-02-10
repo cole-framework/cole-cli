@@ -1,6 +1,6 @@
-import { Texts } from "../../../../core";
-import { Frame } from "../../../../core/storyboard";
-import { InteractionPrompts } from "../interactions/interaction-prompts";
+import { Texts } from "@cole-framework/cole-cli-core";
+import { Frame } from "../../../../core/interactive/storyboard";
+import { InteractionPrompts } from "../../../../core";
 
 type FrameResult = {
   endpoint: string;

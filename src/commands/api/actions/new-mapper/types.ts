@@ -1,6 +1,6 @@
+import { ClassJson } from "@cole-framework/cole-cli-core";
 import {
   ClassData,
-  ClassJson,
   Component,
   ComponentElement,
   ElementWithGenerics,

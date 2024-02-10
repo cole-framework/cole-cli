@@ -1,5 +1,4 @@
 import { nanoid } from "nanoid";
-import { WriteMethod } from "../enums";
 import { TypeInfo } from "../type.info";
 import { SchemaTools } from "./schema.tools";
 import {
@@ -7,24 +6,19 @@ import {
   GenericSchema,
   MethodSchema,
   InterfaceSchema,
-  MethodObject,
-  PropObject,
-  GenericObject,
-  InterfaceObject,
-  ImportObject,
-  ConstructorObject,
-  InheritanceObject,
-  ExportObject,
-  FunctionObject,
   ImportSchema,
   ImportTools,
   ImportData,
   TestCaseSchema,
-  TestCaseObject,
-  TestSuiteObject,
 } from "./schemas";
 import { ComponentTools } from "./component.tools";
 import { Config } from "../config";
+import {
+  ComponentData,
+  Dependency,
+  ElementSchemaObject,
+  WriteMethod,
+} from "@cole-framework/cole-cli-core";
 
 export interface ElementWithProps {
   props: PropSchema[];
@@ -68,44 +62,11 @@ export interface ElementWithImports {
   hasImport(name: string): boolean;
 }
 
-export type ElementObject = {
-  name: string;
-  template?: string;
-  exp?: ExportObject;
-  inheritance?: InheritanceObject[];
-  ctor?: ConstructorObject;
-  methods?: MethodObject[];
-  props?: PropObject[];
-  generics?: GenericObject[];
-  interfaces?: InterfaceObject[];
-  imports?: ImportObject[];
-  functions?: FunctionObject[];
-  tests?: TestCaseObject[];
-  alias?: any;
-};
-
-export type ComponentElement = ElementObject &
+export type ComponentElement = ElementSchemaObject &
   ElementWithImports & {
-    toObject(): ElementObject;
+    toObject(): ElementSchemaObject;
     listTypes(): TypeInfo[];
   };
-
-export type Dependency = {
-  id: string;
-  name: string;
-  type: TypeInfo;
-  path: string;
-};
-
-export type ComponentData<Element = ElementObject, ElementAddons = unknown> = {
-  id: string;
-  type: TypeInfo;
-  path: string;
-  write_method: string;
-  addons: ElementAddons;
-  element: Element;
-  dependencies: Dependency[];
-};
 
 export class Component<
   Element extends ComponentElement = ComponentElement,
@@ -237,7 +198,7 @@ export class Component<
     return [...this.__dependencies];
   }
 
-  toObject(): ComponentData<ElementObject, ElementAddons> {
+  toObject(): ComponentData<ElementSchemaObject, ElementAddons> {
     const {
       type,
       id,

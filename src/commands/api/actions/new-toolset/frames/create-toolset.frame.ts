@@ -1,12 +1,5 @@
 import { existsSync } from "fs";
-import {
-  Config,
-  Frame,
-  MethodJson,
-  ParamSchema,
-  TypeInfo,
-  WriteMethod,
-} from "../../../../../core";
+import { Config, Frame, ParamSchema, TypeInfo } from "../../../../../core";
 import {
   ApiJson,
   DefineMethodInteraction,
@@ -17,7 +10,7 @@ import {
 import { ComponentTools } from "../../../../../core/components/component.tools";
 import { CreateModelsFrame } from "../../new-model";
 import { CreateEntityFrame } from "../../new-entity";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { MethodJson, Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class CreateToolsetFrame extends Frame<ApiJson> {
   public static NAME = "create_toolset_frame";

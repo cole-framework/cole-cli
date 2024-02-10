@@ -1,14 +1,24 @@
 import { LanguagePluginConfig } from "@cole-framework/cole-cli-core";
-import { CliConfig } from "../config.types";
-import { LanguageConfig } from "./language-config";
-import { CompilationConfig } from "./compilation-config";
-import { ComponentsConfig } from "./components-config";
-import { ComponentsConfigTools } from "./components-config.tools";
-import { ReservedType } from "./config.types";
-import { DatabaseConfig } from "./database-config";
-import { GeneralConfig } from "./general-config";
-import { WebConfig } from "./web-config";
-import { ProjectConfig } from "../../commands/api/common/project.config";
+import { CliConfig } from "./cli.config";
+import { LanguageConfig } from "./language.config";
+import { CompilationConfig } from "./compilation.config";
+import { ComponentsConfig } from "./components.config";
+import { ComponentsConfigTools } from "./tools/components-config.tools";
+import { DatabaseConfig } from "./database.config";
+import { GeneralConfig } from "./general.config";
+import { WebFrameworkConfig } from "./web-framework.config";
+import { ProjectConfig } from "./project.config";
+
+export type GeneratedPath = {
+  path: string;
+  marker: string;
+  hasDynamicFilename: boolean;
+};
+
+export type ReservedType = {
+  name: string;
+  category: "FrameworkDefault" | "DatabaseType" | "Primitive";
+};
 
 export class Config {
   public static create(
@@ -22,7 +32,7 @@ export class Config {
       pluginConfig.language
     );
     const databases = pluginConfig.databases.map(DatabaseConfig.create);
-    const web = pluginConfig.web_frameworks.map(WebConfig.create);
+    const web = pluginConfig.web_frameworks.map(WebFrameworkConfig.create);
     const language = LanguageConfig.create(pluginConfig.language);
     const components = ComponentsConfig.create(
       pluginConfig.language.source_path,
@@ -48,7 +58,7 @@ export class Config {
     public readonly compilation: CompilationConfig,
     public readonly databases: DatabaseConfig[],
     public readonly code: LanguageConfig,
-    public readonly web: WebConfig[],
+    public readonly web: WebFrameworkConfig[],
     public readonly components: ComponentsConfig,
     public readonly project: ProjectConfig
   ) {

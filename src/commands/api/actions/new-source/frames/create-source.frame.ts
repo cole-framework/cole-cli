@@ -1,5 +1,5 @@
 import { existsSync } from "fs";
-import { Config, Frame, PropJson, WriteMethod } from "../../../../../core";
+import { Config, Frame } from "../../../../../core";
 import {
   ApiJson,
   InputNameAndEndpointInteraction,
@@ -8,7 +8,7 @@ import {
   SelectComponentWriteMethodInteraction,
 } from "../../../common";
 import { CreateModelsFrame } from "../../new-model";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { PropJson, Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class CreateSourcesFrame extends Frame<ApiJson> {
   public static NAME = "create_sources_frame";

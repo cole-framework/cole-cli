@@ -1,10 +1,10 @@
 import { existsSync } from "fs";
-import { Config, EntityType, Frame, WriteMethod } from "../../../../../core";
+import { Config, EntityType, Frame } from "../../../../../core";
 import { ApiJson, InteractionPrompts } from "../../../common";
 import { ControllerJson, HandlerJson } from "../../new-controller";
 import { EntityJson } from "../../new-entity";
 import { PathParamsTools, QueryParamsTools } from "../parsers";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class DescribeControllerFrame extends Frame<ApiJson> {
   public static NAME = "describe_controller_frame";

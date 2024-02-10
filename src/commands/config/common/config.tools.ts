@@ -1,10 +1,4 @@
-import { ConfigData } from "../../../core";
-
-export const setConfigValue = (
-  obj: ConfigData,
-  path: string,
-  value: unknown
-) => {
+export const setConfigValue = (obj: any, path: string, value: unknown) => {
   const keys = path.split(".");
   let currentObj = obj;
 
@@ -20,7 +14,7 @@ export const setConfigValue = (
   currentObj[finalKey] = value;
 };
 
-export const isValidConfigKey = (config: ConfigData, path: string) => {
+export const isValidConfigKey = (config: any, path: string) => {
   const keys = path.split(".");
   let current = config;
 

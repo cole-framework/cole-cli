@@ -2,8 +2,8 @@
 
 import { Texts } from "@cole-framework/cole-cli-core";
 import { runProgram } from "./cole.commands";
-import { PluginMapService } from "./core/plugin-map.service";
-import * as Config from "./defaults/config.json";
+import { PluginMapService } from "./core/config/tools/plugin-map.service";
+import * as Config from "./defaults/root.config.json";
 
 const start = async () => {
   const texts = Texts.load();

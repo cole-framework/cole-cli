@@ -1,8 +1,8 @@
 import { NewProjectOptions } from "./types";
 import { NewProjectInteractiveStrategy } from "./new-project.interactive-strategy";
 import { NewProjectOptionsStrategy } from "./new-project.options-strategy";
-import { PluginMapService } from "../../../../core/plugin-map.service";
-import Config from "../../../../defaults/config.json";
+import { PluginMapService } from "../../../../core/config/tools/plugin-map.service";
+import Config from "../../../../defaults/root.config.json";
 
 export const newProject = async (options: NewProjectOptions) => {
   const pluginMapService = new PluginMapService(

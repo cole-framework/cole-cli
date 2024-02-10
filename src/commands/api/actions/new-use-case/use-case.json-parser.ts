@@ -1,16 +1,11 @@
 import chalk from "chalk";
-import {
-  Config,
-  TypeInfo,
-  TestCaseSchema,
-  WriteMethod,
-} from "../../../../core";
+import { Config, TypeInfo, TestCaseSchema } from "../../../../core";
 import { Entity, EntityFactory } from "../new-entity";
 import { Model, ModelFactory } from "../new-model";
 import { UseCaseJson, UseCase } from "./types";
 import { UseCaseFactory } from "./use-case.factory";
 import { TestSuite, TestSuiteFactory } from "../new-test-suite";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class UseCaseJsonParse {
   constructor(

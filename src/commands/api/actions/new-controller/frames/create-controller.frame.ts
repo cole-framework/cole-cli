@@ -1,5 +1,5 @@
 import { existsSync } from "fs";
-import { Config, Frame, WriteMethod } from "../../../../../core";
+import { Config, Frame } from "../../../../../core";
 import {
   ApiJson,
   DefineMethodsInteraction,
@@ -9,7 +9,7 @@ import { EntityJson } from "../../new-entity";
 import { ControllerNameAndEndpoint } from "./define-controller-name-and-endpoint.frame";
 import { ModelJson } from "../../new-model";
 import { HandlerJson } from "../types";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class CreateControllerFrame extends Frame<ApiJson> {
   public static NAME = "create_controller_frame";

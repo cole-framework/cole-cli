@@ -1,8 +1,8 @@
-import { Config, Frame, PropJson } from "../../../../../core";
+import { Config, Frame } from "../../../../../core";
 import { ApiJson, InputNameAndEndpointInteraction } from "../../../common";
 import chalk from "chalk";
 import { CreateEntityFrame } from "./create-entity.frame";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { PropJson, Texts } from "@cole-framework/cole-cli-core";
 
 export class CreateEntityAsDependencyFrame extends Frame<ApiJson> {
   public static NAME = "create_entity_as_dependency_frame";

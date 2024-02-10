@@ -1,5 +1,5 @@
-import { Strategy, Texts } from "@cole-framework/cole-cli-core";
-import { Config, WriteMethod } from "../../../../core";
+import { Strategy, Texts, WriteMethod } from "@cole-framework/cole-cli-core";
+import { Config } from "../../../../core";
 import { ApiGenerator, ApiJsonParser } from "../../common";
 import { NewRouteStoryboard } from "./new-route.storyboard";
 import { Route } from "./types";

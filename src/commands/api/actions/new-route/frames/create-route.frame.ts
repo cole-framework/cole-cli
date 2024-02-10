@@ -1,5 +1,5 @@
 import { existsSync } from "fs";
-import { Config, Frame, WriteMethod } from "../../../../../core";
+import { Config, Frame } from "../../../../../core";
 import {
   ApiJson,
   SelectComponentWriteMethodInteraction,
@@ -8,7 +8,7 @@ import { RouteNameAndEndpoint } from "./define-route-name-and-endpoint.frame";
 import { RequestBodyType } from "./select-request-body-type.frame";
 import { ResponseBodyType } from "./select-response-body-type.frame";
 import { RouteDescription } from "./interactions/describe-route.interaction";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class CreateRouteFrame extends Frame<ApiJson> {
   public static NAME = "create_route_frame";

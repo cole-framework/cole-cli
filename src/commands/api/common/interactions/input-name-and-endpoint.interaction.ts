@@ -1,5 +1,5 @@
-import { Interaction } from "./interaction";
-import { InteractionPrompts } from "./interaction-prompts";
+import { Interaction } from "../../../../core";
+import { InteractionPrompts } from "../../../../core";
 
 type InputAndName = { name: string; endpoint: string };
 

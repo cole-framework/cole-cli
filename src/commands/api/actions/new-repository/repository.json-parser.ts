@@ -4,7 +4,6 @@ import {
   MethodTools,
   PropTools,
   TestCaseSchema,
-  WriteMethod,
 } from "../../../../core";
 import chalk from "chalk";
 import { Entity, EntityFactory } from "../new-entity";
@@ -22,7 +21,7 @@ import {
 } from "./types";
 import { RepositoryFactoryFactory } from "./repository.factory.factory";
 import { TestSuite, TestSuiteFactory } from "../new-test-suite";
-import { Texts } from "@cole-framework/cole-cli-core";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class RepositoryJsonParser {
   constructor(

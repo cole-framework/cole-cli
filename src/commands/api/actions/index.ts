@@ -10,7 +10,8 @@ import { newToolset } from "./new-toolset";
 import { newUseCase } from "./new-use-case";
 import { Texts } from "@cole-framework/cole-cli-core";
 import chalk from "chalk";
-import { CliConfigService } from "../../../core/cli-config.service";
+import { CliConfigService } from "../../../core/config/tools/cli.config.service";
+import { fromJson } from "./new-from-json";
 
 export * from "./new-controller";
 export * from "./new-entity";
@@ -23,13 +24,16 @@ export * from "./new-source";
 export * from "./new-toolset";
 export * from "./new-use-case";
 
-export const newComponent = async (type: string, options: any) => {
+import DefaultConfig from "../../../defaults/root.config.json";
+
+export const newComponent = async (options: any, type?: string) => {
   const texts = Texts.load();
   const cliConfig = await new CliConfigService().sync();
 
   const pluginConfigService = new PluginConfigService(
-    cliConfig.local_plugin_config_path
+    DefaultConfig.local_plugin_config_path
   );
+
   const { content: pluginConfig, failure } =
     await pluginConfigService.getLocal();
 
@@ -41,8 +45,8 @@ export const newComponent = async (type: string, options: any) => {
   }
 
   const pluginMapService = new PluginMapService(
-    cliConfig.plugin_map_url,
-    cliConfig.local_plugin_map_path
+    DefaultConfig.plugin_map_url,
+    DefaultConfig.local_plugin_map_path
   );
 
   const pluginMap = await pluginMapService.sync();
@@ -72,6 +76,6 @@ export const newComponent = async (type: string, options: any) => {
     case "use-case":
       return newUseCase(options, config, cliPluginPackageName);
     default:
-      throw Error(`Unknown component type: ${type}`);
+      return fromJson(options, config, cliPluginPackageName);
   }
 };

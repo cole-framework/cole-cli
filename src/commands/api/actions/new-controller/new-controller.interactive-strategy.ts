@@ -1,8 +1,8 @@
-import { Config, WriteMethod } from "../../../../core";
+import { Config } from "../../../../core";
 import { Controller } from "./types";
 import { NewControllerStoryboard } from "./new-controler.storyboard";
 import { ApiGenerator, ApiJsonParser } from "../../common";
-import { Strategy, Texts } from "@cole-framework/cole-cli-core";
+import { Strategy, Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export type NewControllerStoryboardResult = {
   writeMethod: WriteMethod;
