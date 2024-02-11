@@ -30,10 +30,11 @@ export class PluginMapService {
       return latestPluginMap;
     }
 
-    if (getLocalFailure && fetchFailure) {
+    if (getLocalFailure || fetchFailure) {
       await this.setLocal(DefaultPluginMap);
       const { version, languages, databases, web_frameworks, services } =
         DefaultPluginMap;
+
       return new PluginMap(
         version,
         languages,
@@ -58,9 +59,14 @@ export class PluginMapService {
     const { url } = this;
     try {
       const response = await axios.get(url);
-
       if (response.status === 200) {
-        return Result.withContent(response.data);
+        const { version, languages, databases, web_frameworks, services } =
+          typeof response.data === "string"
+            ? JSON.parse(response.data)
+            : response.data;
+        return Result.withContent(
+          new PluginMap(version, languages, databases, web_frameworks, services)
+        );
       } else {
         return Result.withFailure(
           new Error(

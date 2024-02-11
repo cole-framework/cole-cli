@@ -6,7 +6,8 @@ import {
   Strategy,
   Texts,
 } from "@cole-framework/cole-cli-core";
-import Config from "../../../../defaults/root.config.json";
+
+import RootConfig from "../../../../defaults/root.config.json";
 
 export class InitInteractiveStrategy extends Strategy {
   constructor(private pluginMap: PluginMap) {
@@ -25,18 +26,25 @@ export class InitInteractiveStrategy extends Strategy {
       console.log(failure.error);
       process.exit(1);
     }
-    const langConfig = this.pluginMap.getLanguage(content.language);
-    const languageModule: LanguageStrategyProvider = require(
-      langConfig.cli_plugin
+    const languagePlugin = pluginMap.getLanguage(
+      content.language.toLowerCase()
     );
 
-    if (!languageModule) {
+    if (!languagePlugin) {
       throw Error(
         `not_supported_language_###`.replace("###", content.language)
       );
     }
 
-    const result = await languageModule
+    const languageStrategies: LanguageStrategyProvider = require(
+      languagePlugin.cli_plugin
+    );
+
+    await new PluginConfigService(RootConfig.local_plugin_config_path).sync(
+      languagePlugin.cli_plugin_config_url
+    );
+
+    const result = await languageStrategies
       .createProjectInitStrategy(texts, pluginMap)
       .apply(content);
 

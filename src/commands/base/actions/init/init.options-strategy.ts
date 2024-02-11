@@ -7,7 +7,9 @@ import {
   Strategy,
   Texts,
 } from "@cole-framework/cole-cli-core";
-import { CliOptionsTools } from "../../../../core";
+import { CliOptionsTools, PluginConfigService } from "../../../../core";
+
+import RootConfig from "../../../../defaults/root.config.json";
 
 export class InitOptionsStrategy extends Strategy {
   constructor(private pluginMap: PluginMap) {
@@ -22,6 +24,7 @@ export class InitOptionsStrategy extends Strategy {
       database: ["cache"],
       language: "",
       source: "",
+      dependency_injection: "",
     };
     let failed = false;
 
@@ -39,6 +42,10 @@ export class InitOptionsStrategy extends Strategy {
       description.source = options.source;
     }
 
+    if (options.di) {
+      description.dependency_injection = options.di;
+    }
+
     if (failed) {
       process.exit(1);
     }
@@ -49,17 +56,25 @@ export class InitOptionsStrategy extends Strategy {
       }
     });
 
-    const languageModule: LanguageStrategyProvider = require(
-      this.pluginMap.getLanguage(description.language.toLowerCase()).cli_plugin
+    const languagePlugin = pluginMap.getLanguage(
+      description.language.toLowerCase()
     );
 
-    if (!languageModule) {
+    if (!languagePlugin) {
       throw Error(
         `not_supported_language_###`.replace("###", description.language)
       );
     }
 
-    const result = await languageModule
+    const languageStrategies: LanguageStrategyProvider = require(
+      languagePlugin.cli_plugin
+    );
+
+    await new PluginConfigService(RootConfig.local_plugin_config_path).sync(
+      languagePlugin.cli_plugin_config_url
+    );
+
+    const result = await languageStrategies
       .createProjectInitStrategy(texts, pluginMap)
       .apply(description);
 

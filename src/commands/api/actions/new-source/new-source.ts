@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { Config } from "../../../../core";
 import { NewSourceInteractiveStrategy } from "./new-source.interactive-strategy";
 import { NewSourceOptionsStrategy } from "./new-source.options-strategy";
@@ -11,6 +12,12 @@ export const newSource = async (
   if (Object.keys(options).includes("name")) {
     new NewSourceOptionsStrategy(config).apply(options, cliPluginPackageName);
   } else {
-    new NewSourceInteractiveStrategy(config).apply(cliPluginPackageName);
+    new NewSourceInteractiveStrategy(config)
+      .apply(cliPluginPackageName)
+      .catch((error) => {
+        if (error) {
+          console.log(chalk.yellow(error.message));
+        }
+      });
   }
 };

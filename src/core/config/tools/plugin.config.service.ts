@@ -25,7 +25,9 @@ export class PluginConfigService {
     }
 
     if (getLocalFailure && fetchFailure) {
-      throw Error();
+      console.log(":::", getLocalFailure.error);
+      console.log("..", fetchFailure.error);
+      throw Error("###");
     }
 
     if (

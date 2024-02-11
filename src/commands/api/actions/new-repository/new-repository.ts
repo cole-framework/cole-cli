@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { Config } from "../../../../core";
 import { NewRepositoryInteractiveStrategy } from "./new-repository.interactive-strategy";
 import { NewRepositoryOptionsStrategy } from "./new-repository.options-strategy";
@@ -14,6 +15,12 @@ export const newRepository = async (
       cliPluginPackageName
     );
   } else {
-    new NewRepositoryInteractiveStrategy(config).apply(cliPluginPackageName);
+    new NewRepositoryInteractiveStrategy(config)
+      .apply(cliPluginPackageName)
+      .catch((error) => {
+        if (error) {
+          console.log(chalk.yellow(error.message));
+        }
+      });
   }
 };

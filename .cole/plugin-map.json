@@ -9,39 +9,13 @@
         "dev:@types/node@^18.7.14"
       ],
       "plugin": "@cole-framework/cole-ts",
-      "cli_plugin": "@cole-framework/cole-cli-typescript",
-      "cli_plugin_config_url": "https://raw.githubusercontent.com/cole-framework/cole-cli-typescript/main/src/config/config.json",
-      "dependency_injection": [
-        {
-          "name": "ColeDI (Default framework container)",
-          "alias": "cole-di",
-          "packages": []
-        },
-        {
-          "name": "Inversify",
-          "alias": "inversify",
-          "packages": ["inversify@^6.0.1", "reflect-metadata@^0.1.13"]
-        }
-      ]
+      "cli_plugin": "@cole-framework/cole-cli-typescript"
     },
     {
       "name": "JavaScript",
       "alias": "javascript",
       "plugin": "@cole-framework/cole-js",
-      "cli_plugin": "@cole-framework/cole-cli-javascript",
-      "cli_plugin_config_url": "https://raw.githubusercontent.com/cole-framework/cole-cli-javascript/main/src/config/config.json",
-      "dependency_injection": [
-        {
-          "name": "ColeDI (Default framework container)",
-          "alias": "cole-di",
-          "packages": []
-        },
-        {
-          "name": "Inversify",
-          "alias": "inversify",
-          "packages": ["inversify@^6.0.1"]
-        }
-      ]
+      "cli_plugin": "@cole-framework/cole-cli-javascript"
     }
   ],
   "databases": [
@@ -49,8 +23,12 @@
       "name": "MongoDB",
       "alias": "mongo",
       "packages": {
-        "typescript": ["mongodb"],
-        "javascript": ["mongodb"]
+        "typescript": [
+          "mongodb"
+        ],
+        "javascript": [
+          "mongodb"
+        ]
       },
       "plugins": {
         "typescript": "@cole-framework/cole-ts-mongo",
@@ -61,8 +39,12 @@
       "name": "Redis",
       "alias": "redis",
       "packages": {
-        "typescript": ["redis"],
-        "javascript": ["redis"]
+        "typescript": [
+          "redis"
+        ],
+        "javascript": [
+          "redis"
+        ]
       },
       "plugins": {
         "typescript": "@cole-framework/cole-ts-redis",
@@ -73,8 +55,12 @@
       "name": "MySql",
       "alias": "mysql",
       "packages": {
-        "typescript": ["mysql"],
-        "javascript": ["mysql"]
+        "typescript": [
+          "mysql"
+        ],
+        "javascript": [
+          "mysql"
+        ]
       },
       "plugins": {
         "typescript": "@cole-framework/cole-ts-mysql",

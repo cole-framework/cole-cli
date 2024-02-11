@@ -20,7 +20,7 @@ export class DefineProjectFrame extends Frame<ProjectDescription> {
     const { texts, pluginMap } = this;
     const languages = pluginMap.languages.reduce((acc, c) => {
       acc.push({
-        message: texts.get(c.alias),
+        message: c.name,
         name: c.alias,
       });
       return acc;
@@ -30,6 +30,7 @@ export class DefineProjectFrame extends Frame<ProjectDescription> {
     let language = "";
     let framework = "";
     let service = "";
+    let dependency_injection = "";
     let database = [];
 
     while (name.length === 0) {
@@ -46,11 +47,39 @@ export class DefineProjectFrame extends Frame<ProjectDescription> {
       );
     } while (language.length === 0);
 
+    const dependency_injections = pluginMap
+      .getLanguage(language)
+      .dependency_injection.reduce(
+        (acc, c) => {
+          acc.push({
+            message: c.name,
+            name: c.alias,
+          });
+
+          return acc;
+        },
+        [
+          {
+            message: texts.get("none"),
+            name: "none",
+          },
+        ]
+      );
+
+    do {
+      dependency_injection = await InteractionPrompts.select(
+        texts.get("please_select_dependency_injection"),
+        dependency_injections,
+        ["none"],
+        texts.get("hint___please_select_dependency_injection")
+      );
+    } while (dependency_injection.length === 0);
+
     const databases = pluginMap.databases.reduce(
       (acc, c) => {
         if (c.packages[language]) {
           acc.push({
-            message: texts.get(c.alias),
+            message: c.name,
             name: c.alias,
           });
         }
@@ -77,7 +106,7 @@ export class DefineProjectFrame extends Frame<ProjectDescription> {
       (acc, c) => {
         if (c.packages[language]) {
           acc.push({
-            message: texts.get(c.alias),
+            message: c.name,
             name: c.alias,
           });
         }
@@ -103,7 +132,7 @@ export class DefineProjectFrame extends Frame<ProjectDescription> {
       (acc, c) => {
         if (c.packages[language]) {
           acc.push({
-            message: texts.get(c.alias),
+            message: c.name,
             name: c.alias,
           });
         }
@@ -135,7 +164,7 @@ export class DefineProjectFrame extends Frame<ProjectDescription> {
             name: "source",
             message: texts.get("source_path"),
             initial: "src",
-            hint: texts.get("hint___source_path"),
+            hint: texts.get("hint___please_provide_project_source_path"),
           },
           {
             name: "author",
@@ -158,13 +187,15 @@ export class DefineProjectFrame extends Frame<ProjectDescription> {
       name,
       language,
       database,
-      framework,
-      service,
       ...description,
     };
 
     if (framework !== "none") {
       result["framework"] = framework;
+    }
+
+    if (dependency_injection !== "none") {
+      result["dependency_injection"] = dependency_injection;
     }
 
     if (service !== "none") {

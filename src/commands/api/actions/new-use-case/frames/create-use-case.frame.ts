@@ -12,6 +12,7 @@ import { CreateModelsFrame } from "../../new-model";
 import { pascalCase } from "change-case";
 import { CreateParamsInteraction } from "../../../common/interactions/create-params.interaction";
 import { ParamJson, Texts, WriteMethod } from "@cole-framework/cole-cli-core";
+import chalk from "chalk";
 
 export class CreateUseCaseFrame extends Frame<ApiJson> {
   public static NAME = "create_use_case_frame";
@@ -63,6 +64,7 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
           texts.get("does_the_use_case_have_an_input")
         )
       ) {
+        console.log(chalk.gray(texts.get("option_use_case_input")));
         const { params, ...deps } = await new CreateParamsInteraction(
           texts,
           config,
@@ -74,6 +76,8 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
           },
           { skipQuestion: true }
         );
+
+        params.forEach((p) => input.add(p));
         result.entities.push(...deps.entities);
         result.models.push(...deps.models);
       }

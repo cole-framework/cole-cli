@@ -1,5 +1,4 @@
 import { dirname } from "path";
-import { Texts } from "@cole-framework/cole-cli-core";
 import { existsSync, mkdirSync } from "fs";
 import { InitOptions } from "./types";
 import { InitInteractiveStrategy } from "./init.interactive-strategy";
@@ -8,6 +7,8 @@ import { InteractionPrompts } from "../../../api";
 import { PluginMapService } from "../../../../core/config/tools/plugin-map.service";
 import Config from "../../../../defaults/root.config.json";
 import { readdir, unlink } from "fs/promises";
+import { Texts } from "@cole-framework/cole-cli-core";
+import chalk from "chalk";
 
 export const init = async (options: InitOptions) => {
   const texts = Texts.load();
@@ -45,7 +46,11 @@ export const init = async (options: InitOptions) => {
   const pluginMap = await pluginMapService.sync();
 
   if (Object.keys(options).length === 0) {
-    new InitInteractiveStrategy(pluginMap).apply();
+    new InitInteractiveStrategy(pluginMap).apply().catch((error) => {
+      if (error) {
+        console.log(chalk.yellow(error.message));
+      }
+    });
   } else {
     new InitOptionsStrategy(pluginMap).apply(options);
   }

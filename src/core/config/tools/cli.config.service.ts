@@ -3,10 +3,13 @@ import { readFile, writeFile } from "fs/promises";
 import path from "path";
 import { CliConfig } from "../cli.config";
 import DefaultCliConfig from "../../../defaults/cli.config.json";
+import DefaultRootConfig from "../../../defaults/root.config.json";
 
 export class CliConfigService {
-  private localPath = path.join(process.cwd(), "./cole/default.json");
-  constructor() {}
+  private localPath = path.join(
+    process.cwd(),
+    DefaultRootConfig.local_cli_config_path
+  );
 
   async sync(): Promise<CliConfig> {
     const { content: currentConfig, failure: getLocalFailure } =

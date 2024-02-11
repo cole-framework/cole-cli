@@ -1,25 +1,16 @@
 #!/usr/bin/env node
 
-import { Texts } from "@cole-framework/cole-cli-core";
 import { runProgram } from "./cole.commands";
-import { PluginMapService } from "./core/config/tools/plugin-map.service";
 import * as Config from "./defaults/root.config.json";
+import { TextsService } from "./core";
 
 const start = async () => {
-  const texts = Texts.load();
-  const service: PluginMapService = new PluginMapService(
-    Config.plugin_map_url,
-    Config.local_plugin_map_path
-  );
-
-  const localPluginMap = await service.getLocal();
-
-  if (!localPluginMap) {
+  try {
+    const texts = await new TextsService(Config.local_texts_path).sync();
+    runProgram(texts);
+  } catch (error) {
+    console.log(error);
   }
-
-  const result = await service.fetch();
-
-  runProgram(texts);
 };
 
 start();

@@ -16,6 +16,7 @@ export const runProgram = (texts: Texts) => {
     .option("-f, --force", texts.get("option_force"))
     .option("-l, --lang <value>", texts.get("option_project_lang"))
     .option("-s, --source <value>", texts.get("option_project_source"))
+    .option("-i, --di <value>", texts.get("option_dependency_injection"))
     .option("-d, --database [values...]", texts.get("option_project_databases"))
     .description(texts.get("description_project_init"))
     .action((options) => {
@@ -31,6 +32,7 @@ export const runProgram = (texts: Texts) => {
     .option("-l, --lang <value>", texts.get("option_project_lang"))
     .option("-s, --source <value>", texts.get("option_project_source"))
     .option("-f, --framework <value>", texts.get("option_project_framework"))
+    .option("-i, --di <value>", texts.get("option_dependency_injection"))
     .option("-d, --database [values...]", texts.get("option_project_databases"))
     .description(texts.get("description_new_project"))
     .action((options) => {

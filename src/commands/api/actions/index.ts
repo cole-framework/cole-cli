@@ -1,4 +1,9 @@
-import { Config, PluginConfigService, PluginMapService } from "../../../core";
+import {
+  Config,
+  PluginConfigService,
+  PluginMapService,
+  TextsService,
+} from "../../../core";
 import { newController } from "./new-controller";
 import { newEntity } from "./new-entity";
 import { newMapper } from "./new-mapper";
@@ -8,7 +13,6 @@ import { newRoute } from "./new-route";
 import { newSource } from "./new-source";
 import { newToolset } from "./new-toolset";
 import { newUseCase } from "./new-use-case";
-import { Texts } from "@cole-framework/cole-cli-core";
 import chalk from "chalk";
 import { CliConfigService } from "../../../core/config/tools/cli.config.service";
 import { fromJson } from "./new-from-json";
@@ -24,14 +28,15 @@ export * from "./new-source";
 export * from "./new-toolset";
 export * from "./new-use-case";
 
-import DefaultConfig from "../../../defaults/root.config.json";
+import RootConfig from "../../../defaults/root.config.json";
+import { Texts } from "@cole-framework/cole-cli-core";
 
 export const newComponent = async (options: any, type?: string) => {
   const texts = Texts.load();
   const cliConfig = await new CliConfigService().sync();
 
   const pluginConfigService = new PluginConfigService(
-    DefaultConfig.local_plugin_config_path
+    RootConfig.local_plugin_config_path
   );
 
   const { content: pluginConfig, failure } =
@@ -45,8 +50,8 @@ export const newComponent = async (options: any, type?: string) => {
   }
 
   const pluginMapService = new PluginMapService(
-    DefaultConfig.plugin_map_url,
-    DefaultConfig.local_plugin_map_path
+    RootConfig.plugin_map_url,
+    RootConfig.local_plugin_map_path
   );
 
   const pluginMap = await pluginMapService.sync();
