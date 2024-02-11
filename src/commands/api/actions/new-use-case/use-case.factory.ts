@@ -6,8 +6,8 @@ import {
   Config,
   TypeInfo,
   UseCaseType,
-  WriteMethod,
 } from "../../../../core";
+import { WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class UseCaseFactory {
   public static create(

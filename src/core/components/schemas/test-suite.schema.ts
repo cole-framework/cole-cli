@@ -1,7 +1,11 @@
 import { ImportData, ImportSchema } from "./import.schema";
 import { TypeInfo } from "../../type.info";
-import { MethodObject, MethodSchema } from "./method.schema";
-import { PropObject, PropSchema } from "./prop.schema";
+import { MethodSchema } from "./method.schema";
+import { PropSchema } from "./prop.schema";
+import {
+  TestCaseSchemaObject,
+  TestSuiteSchemaObject,
+} from "@cole-framework/cole-cli-core";
 
 export type TestGroupData = {
   name: string;
@@ -18,16 +22,6 @@ export type TestCaseData = {
   template?: string;
 };
 
-export type TestCaseObject = {
-  group: string;
-  name: string;
-  is_async: boolean;
-  id?: string;
-  methods: MethodObject[];
-  props: PropObject[];
-  template?: string;
-};
-
 export type TestSuiteData = {
   name: string;
   is_async?: boolean;
@@ -35,14 +29,6 @@ export type TestSuiteData = {
   endpoint?: string;
   template?: string;
   id?: string;
-};
-
-export type TestSuiteObject = {
-  name: string;
-  id?: string;
-  tests?: TestCaseObject[];
-  imports?: any[];
-  template?: string;
 };
 
 export class TestSuiteSchema {
@@ -129,10 +115,10 @@ export class TestSuiteSchema {
     return [...this.__tests];
   }
 
-  toObject(): TestSuiteObject {
+  toObject(): TestSuiteSchemaObject {
     const { name, __tests, __imports, template } = this;
 
-    const cls: TestSuiteObject = {
+    const cls: TestSuiteSchemaObject = {
       name,
       tests: __tests.map((i) => i.toObject()),
       imports: __imports.map((i) => i.toObject()),
@@ -191,10 +177,10 @@ export class TestCaseSchema {
     private template: string
   ) {}
 
-  toObject(): TestCaseObject {
+  toObject(): TestCaseSchemaObject {
     const { name, methods, group, is_async, props, template } = this;
 
-    const cls: TestCaseObject = {
+    const cls: TestCaseSchemaObject = {
       group,
       name,
       is_async,

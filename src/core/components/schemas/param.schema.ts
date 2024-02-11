@@ -1,21 +1,11 @@
 import { camelCase } from "change-case";
-import { Config, ConfigTools, ReservedType } from "../../config";
-import { AccessType } from "../../enums";
+import { Config, ConfigInstructionParser } from "../../config";
 import { TypeInfo, UnknownType } from "../../type.info";
 import { SchemaTools } from "../schema.tools";
+import { ParamJson, ParamSchemaObject } from "@cole-framework/cole-cli-core";
 
 export const PARAM_REGEX =
   /^(inject)?\s*(private|protected|public)?\s*(readonly)?\s*([a-zA-Z0-9_]+)(\?)?(\s*:\s*([a-zA-Z0-9\[\]\<\>\{\}\|\& ]+))?(\s*=\s*(.+))?$/;
-
-export type ParamObject = {
-  name: string;
-  type: TypeInfo;
-  access: string;
-  is_optional: boolean;
-  is_readonly: boolean;
-  value: any;
-  template?: string;
-};
 
 export type ParamData = {
   name?: string;
@@ -25,14 +15,6 @@ export type ParamData = {
   is_readonly?: boolean;
   value?: unknown;
   template?: string;
-};
-export type ParamJson = {
-  name?: string;
-  type?: string;
-  access?: string;
-  is_optional?: boolean;
-  is_readonly?: boolean;
-  value?: unknown;
 };
 
 export class ParamTools {
@@ -53,8 +35,12 @@ export class ParamTools {
     if (Array.isArray(match)) {
       if (match[4]) {
         const temp = match[4].trim();
-        if (ConfigTools.hasInstructions(temp)) {
-          name = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          name = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         } else {
           name = temp;
         }
@@ -62,8 +48,12 @@ export class ParamTools {
 
       if (match[7]) {
         let temp = match[7].trim();
-        if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          temp = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         }
         if (TypeInfo.isType(temp)) {
           type = temp;
@@ -76,8 +66,12 @@ export class ParamTools {
 
       if (match[9]) {
         const temp = match[9].trim();
-        if (ConfigTools.hasInstructions(temp)) {
-          value = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          value = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         } else {
           value = temp;
         }
@@ -116,23 +110,35 @@ export class ParamTools {
 
         if (typeof item.value === "string") {
           const temp = item.value.trim();
-          if (ConfigTools.hasInstructions(temp)) {
-            value = ConfigTools.executeInstructions(temp, references, config);
+          if (ConfigInstructionParser.hasInstructions(temp)) {
+            value = ConfigInstructionParser.executeInstructions(
+              temp,
+              references,
+              config
+            );
           } else {
             value = temp;
           }
         } else {
           value = SchemaTools.parseValue(item.value, (value) => {
-            return ConfigTools.hasInstructions(value)
-              ? ConfigTools.executeInstructions(value, references, config)
+            return ConfigInstructionParser.hasInstructions(value)
+              ? ConfigInstructionParser.executeInstructions(
+                  value,
+                  references,
+                  config
+                )
               : value;
           });
         }
 
         if (typeof item.type === "string") {
           let temp = item.type.trim();
-          if (ConfigTools.hasInstructions(temp)) {
-            temp = ConfigTools.executeInstructions(temp, references, config);
+          if (ConfigInstructionParser.hasInstructions(temp)) {
+            temp = ConfigInstructionParser.executeInstructions(
+              temp,
+              references,
+              config
+            );
           }
           if (TypeInfo.isType(temp)) {
             type = temp;
@@ -143,8 +149,12 @@ export class ParamTools {
 
         if (typeof item.name === "string") {
           const temp = item.name.trim();
-          if (ConfigTools.hasInstructions(temp)) {
-            name = ConfigTools.executeInstructions(temp, references, config);
+          if (ConfigInstructionParser.hasInstructions(temp)) {
+            name = ConfigInstructionParser.executeInstructions(
+              temp,
+              references,
+              config
+            );
           } else {
             name = temp;
           }
@@ -200,8 +210,12 @@ export class ParamSchema {
 
       if (typeof data.type === "string") {
         let temp = data.type.trim();
-        if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          temp = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         }
 
         if (TypeInfo.isType(temp)) {
@@ -217,22 +231,34 @@ export class ParamSchema {
 
       if (typeof data.value === "string") {
         const temp = data.value.trim();
-        if (ConfigTools.hasInstructions(temp)) {
-          value = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          value = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         } else {
           value = temp;
         }
       } else {
         value = SchemaTools.parseValue(data.value, (value) => {
-          return ConfigTools.hasInstructions(value)
-            ? ConfigTools.executeInstructions(value, references, config)
+          return ConfigInstructionParser.hasInstructions(value)
+            ? ConfigInstructionParser.executeInstructions(
+                value,
+                references,
+                config
+              )
             : value;
         });
       }
 
       const tempName = data.name.trim();
-      if (ConfigTools.hasInstructions(tempName)) {
-        name = ConfigTools.executeInstructions(tempName, references, config);
+      if (ConfigInstructionParser.hasInstructions(tempName)) {
+        name = ConfigInstructionParser.executeInstructions(
+          tempName,
+          references,
+          config
+        );
       } else {
         name = tempName;
       }
@@ -261,7 +287,7 @@ export class ParamSchema {
     public readonly template: string
   ) {}
 
-  toObject(): ParamObject {
+  toObject(): ParamSchemaObject {
     const {
       name,
       type,

@@ -1,7 +1,6 @@
-import { Texts } from "../../../../core";
-import { WriteMethod } from "../../../../core/enums";
-import { Interaction } from "./interaction";
-import { InteractionPrompts } from "./interaction-prompts";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
+import { Interaction } from "../../../../core";
+import { InteractionPrompts } from "../../../../core";
 
 export class SelectComponentWriteMethodInteraction extends Interaction<WriteMethod> {
   constructor(private texts: Texts) {

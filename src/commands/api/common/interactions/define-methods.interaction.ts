@@ -1,13 +1,10 @@
-import { Config, Texts, TypeInfo, WriteMethod } from "../../../../core";
-import {
-  MethodJson,
-  ParamSchema,
-  SchemaTools,
-} from "../../../../core/components";
+import { MethodJson, Texts, WriteMethod } from "@cole-framework/cole-cli-core";
+import { Config, TypeInfo } from "../../../../core";
+import { ParamSchema } from "../../../../core/components";
 import { EntityJson, ModelJson } from "../../actions";
 import { DefineMethodInteraction } from "./define-method.interaction";
-import { Interaction } from "./interaction";
-import { InteractionPrompts } from "./interaction-prompts";
+import { Interaction } from "../../../../core";
+import { InteractionPrompts } from "../../../../core";
 
 type InteractionResult = {
   methods: MethodJson[];
@@ -68,10 +65,7 @@ export class DefineMethodsInteraction extends Interaction<InteractionResult> {
         if (dependencies_write_method !== WriteMethod.Skip) {
           const types = [];
           if (method.return_type) {
-            const rt = TypeInfo.create(
-              method.return_type,
-              config
-            );
+            const rt = TypeInfo.create(method.return_type, config);
             if (rt.isComponentType && this.isUnique(references, rt)) {
               types.push(rt);
             }

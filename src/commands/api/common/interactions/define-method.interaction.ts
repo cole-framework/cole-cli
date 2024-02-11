@@ -1,7 +1,7 @@
-import { Texts } from "../../../../core";
-import { MethodJson, SchemaTools } from "../../../../core/components";
-import { Interaction } from "./interaction";
-import { InteractionPrompts } from "./interaction-prompts";
+import { MethodJson, Texts } from "@cole-framework/cole-cli-core";
+import { SchemaTools } from "../../../../core/components";
+import { Interaction } from "../../../../core";
+import { InteractionPrompts } from "../../../../core";
 
 export class DefineMethodInteraction extends Interaction<MethodJson> {
   constructor(private texts: Texts) {

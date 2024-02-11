@@ -1,21 +1,6 @@
+import { ExportJson } from "@cole-framework/cole-cli-core";
+
 export type ExportData = {
-  is_default?: boolean;
-  use_wildcard?: boolean;
-  path?: string;
-  list?: string[];
-  alias?: string;
-};
-
-export type ExportConfig =
-  | boolean
-  | string
-  | {
-      is_default?: boolean;
-    };
-
-export type ExportObject = ExportData;
-
-export type ExportJson = {
   is_default?: boolean;
   use_wildcard?: boolean;
   path?: string;

@@ -1,11 +1,14 @@
 import { existsSync } from "fs";
-import { Config, ModelType, Texts } from "../../../../core";
-import { StoryResolver, Storyboard } from "../../../../core/storyboard";
+import { Config, ModelType } from "../../../../core";
+import {
+  StoryResolver,
+  Storyboard,
+} from "../../../../core/interactive/storyboard";
 import {
   StoryboardSession,
   TimelineFrame,
-} from "../../../../core/storyboard-session";
-import { ApiConfig, ApiJson } from "../../common";
+} from "../../../../core/interactive/storyboard-session";
+import { ApiJson } from "../../common";
 import {
   CreateRouteFrame,
   DefineRouteNameAndEndpointFrame,
@@ -14,6 +17,7 @@ import {
   SelectResponseBodyTypeFrame,
 } from "./frames";
 import { DescribeControllerFrame } from "./frames/describe-controller.frame";
+import { Texts } from "@cole-framework/cole-cli-core";
 
 export class NewRouteStoryResolver extends StoryResolver<ApiJson> {
   resolve(timeline: TimelineFrame[]): ApiJson {
@@ -38,12 +42,7 @@ export class NewRouteStoryResolver extends StoryResolver<ApiJson> {
 }
 
 export class NewRouteStoryboard extends Storyboard<any> {
-  constructor(
-    texts: Texts,
-    config: Config,
-    apiConfig: ApiConfig,
-    session?: StoryboardSession
-  ) {
+  constructor(texts: Texts, config: Config, session?: StoryboardSession) {
     super(
       "new_route_storyboard",
       session || new StoryboardSession("new_route_storyboard"),
@@ -57,7 +56,7 @@ export class NewRouteStoryboard extends Storyboard<any> {
       })
       .addFrame(new SelectRequestBodyTypeFrame(texts))
       .addFrame(new SelectResponseBodyTypeFrame(texts))
-      .addFrame(new DescribeControllerFrame(config, apiConfig, texts), (t) => {
+      .addFrame(new DescribeControllerFrame(config, texts), (t) => {
         const { name, endpoint } = t.getFrame(0).output;
         const { controller, handler, path } = t.getFrame(1).output;
         const { request_body } = t.getFrame(2).output;
@@ -72,7 +71,7 @@ export class NewRouteStoryboard extends Storyboard<any> {
           response_body,
         };
       })
-      .addFrame(new CreateRouteFrame(config, apiConfig, texts), (t) => {
+      .addFrame(new CreateRouteFrame(config, texts), (t) => {
         const { name, endpoint } = t.getFrame(0).output;
         const { path, http_method, controller, handler, auth, validate } =
           t.getFrame(1).output;

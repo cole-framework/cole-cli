@@ -1,22 +1,23 @@
-import { ConfigLoader } from "../../../../core";
-import { ApiConfig } from "../../common";
+import chalk from "chalk";
+import { Config } from "../../../../core";
 import { NewMapperInteractiveStrategy } from "./new-mapper.interactive-strategy";
 import { NewMapperOptionsStrategy } from "./new-mapper.options-strategy";
 import { NewMapperOptions } from "./types";
 
-export const newMapper = async (options: NewMapperOptions) => {
-  const { content: config, failure } = ConfigLoader.load("mapper");
-
-  if (failure) {
-    console.log(failure.error);
-    process.exit(1);
-  }
-
-  const apiConfig = ApiConfig.create(options, config);
-
+export const newMapper = async (
+  options: NewMapperOptions,
+  config: Config,
+  cliPluginPackageName: string
+) => {
   if (Object.keys(options).includes("name")) {
-    new NewMapperOptionsStrategy(config).apply(apiConfig, options);
+    new NewMapperOptionsStrategy(config).apply(options, cliPluginPackageName);
   } else {
-    new NewMapperInteractiveStrategy(config).apply(apiConfig);
+    new NewMapperInteractiveStrategy(config)
+      .apply(cliPluginPackageName)
+      .catch((error) => {
+        if (error) {
+          console.log(chalk.yellow(error.message));
+        }
+      });
   }
 };

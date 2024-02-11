@@ -1,12 +1,11 @@
+import { Texts } from "@cole-framework/cole-cli-core";
 import {
   Config,
   StoryResolver,
   Storyboard,
   StoryboardSession,
-  Texts,
   TimelineFrame,
 } from "../../../../core";
-import { ApiConfig } from "../../common/api.config";
 import { ApiJson } from "../../common/api.types";
 import {
   CreateControllerFrame,
@@ -44,12 +43,7 @@ export class NewControllerResolver extends StoryResolver<ApiJson> {
 }
 
 export class NewControllerStoryboard extends Storyboard<ApiJson> {
-  constructor(
-    texts: Texts,
-    config: Config,
-    apiConfig: ApiConfig,
-    session?: StoryboardSession
-  ) {
+  constructor(texts: Texts, config: Config, session?: StoryboardSession) {
     super(
       "new_controller_storyboard",
       session || new StoryboardSession("new_controller_storyboard"),
@@ -57,15 +51,12 @@ export class NewControllerStoryboard extends Storyboard<ApiJson> {
     );
 
     this.addFrame(new DefineControllerNameAndEndpointFrame(config, texts))
+      .addFrame(new DefineControllerHandlersFrame(config, texts), (t) => {
+        const { name, endpoint } = t.getFrame(0).output;
+        return { name, endpoint };
+      })
       .addFrame(
-        new DefineControllerHandlersFrame(config, apiConfig, texts),
-        (t) => {
-          const { name, endpoint } = t.getFrame(0).output;
-          return { name, endpoint };
-        }
-      )
-      .addFrame(
-        new CreateRoutesForHandlersFrame(config, apiConfig, texts),
+        new CreateRoutesForHandlersFrame(config, texts),
         (t) => {
           const { name, endpoint } = t.getFrame(0).output;
           const { handlers, models, entities } = t.getFrame(1).output;
@@ -83,7 +74,7 @@ export class NewControllerStoryboard extends Storyboard<ApiJson> {
           return handlers.length > 0;
         }
       )
-      .addFrame(new CreateControllerFrame(config, apiConfig, texts), (t) => {
+      .addFrame(new CreateControllerFrame(config, texts), (t) => {
         const { name, endpoint } = t.getFrame(0).output;
         const { handlers, models, entities } = t.getFrame(1).output;
 

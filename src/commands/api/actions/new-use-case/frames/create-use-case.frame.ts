@@ -1,16 +1,7 @@
 import { existsSync } from "fs";
+import { Config, Frame, TypeInfo } from "../../../../../core";
 import {
-  Config,
-  Frame,
-  ParamJson,
-  Texts,
-  TypeInfo,
-  WriteMethod,
-} from "../../../../../core";
-import {
-  ApiConfig,
   ApiJson,
-  CreateParamInteraction,
   InputNameAndEndpointInteraction,
   InputTextInteraction,
   InteractionPrompts,
@@ -20,20 +11,21 @@ import { CreateEntityFrame } from "../../new-entity";
 import { CreateModelsFrame } from "../../new-model";
 import { pascalCase } from "change-case";
 import { CreateParamsInteraction } from "../../../common/interactions/create-params.interaction";
+import { ParamJson, Texts, WriteMethod } from "@cole-framework/cole-cli-core";
+import chalk from "chalk";
 
 export class CreateUseCaseFrame extends Frame<ApiJson> {
   public static NAME = "create_use_case_frame";
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
     protected texts: Texts
   ) {
     super(CreateUseCaseFrame.NAME);
   }
 
   public async run(context?: { name?: string; endpoint?: string }) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config } = this;
     const result: ApiJson = { entities: [], models: [], use_cases: [] };
     const { name, endpoint } = await new InputNameAndEndpointInteraction({
       nameMessage: texts.get("please_provide_use_case_name"),
@@ -58,7 +50,7 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
       endpoint,
     }).path;
 
-    if (apiConfig.force === false) {
+    if (config.project.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts
@@ -72,10 +64,11 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
           texts.get("does_the_use_case_have_an_input")
         )
       ) {
+        console.log(chalk.gray(texts.get("option_use_case_input")));
         const { params, ...deps } = await new CreateParamsInteraction(
           texts,
           config,
-          apiConfig.dependencies_write_method
+          config.project.dependencies_write_method
         ).run(
           {
             endpoint,
@@ -83,6 +76,8 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
           },
           { skipQuestion: true }
         );
+
+        params.forEach((p) => input.add(p));
         result.entities.push(...deps.entities);
         result.models.push(...deps.models);
       }
@@ -93,13 +88,13 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
       );
 
       if (cat === "Entity") {
-        res = await new CreateEntityFrame(config, apiConfig, texts).run({
+        res = await new CreateEntityFrame(config, texts).run({
           name: pascalCase(`${name} Output`),
           endpoint,
         });
         output = `Entity<${res.entities.at(-1).name}>`;
       } else if (cat === "Model") {
-        res = await new CreateModelsFrame(config, apiConfig, texts).run({
+        res = await new CreateModelsFrame(config, texts).run({
           name: pascalCase(`${name} Output`),
           types: ["json"],
           endpoint,

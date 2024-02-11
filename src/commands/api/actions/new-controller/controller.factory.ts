@@ -1,5 +1,5 @@
+import { WriteMethod } from "@cole-framework/cole-cli-core";
 import {
-  WriteMethod,
   Component,
   ClassData,
   ClassSchema,

@@ -6,8 +6,8 @@ import {
   Component,
   Config,
   RepositoryType,
-  WriteMethod,
 } from "../../../../core";
+import { WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class RepositoryComponentFactory {
   static create(

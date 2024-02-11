@@ -1,7 +1,6 @@
-import { Texts } from "../../../../core";
-import { ParamJson } from "../../../../core/components";
-import { Interaction } from "./interaction";
-import { InteractionPrompts } from "./interaction-prompts";
+import { ParamJson, Texts } from "@cole-framework/cole-cli-core";
+import { Interaction } from "../../../../core";
+import { InteractionPrompts } from "../../../../core";
 
 export class CreateParamInteraction extends Interaction<ParamJson> {
   constructor(private texts: Texts) {

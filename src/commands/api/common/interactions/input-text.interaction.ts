@@ -1,5 +1,5 @@
-import { Interaction } from "./interaction";
-import { InteractionPrompts } from "./interaction-prompts";
+import { Interaction } from "../../../../core";
+import { InteractionPrompts } from "../../../../core";
 
 export class InputTextInteraction extends Interaction<string> {
   constructor(protected inputTextMessage) {

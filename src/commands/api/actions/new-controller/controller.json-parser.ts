@@ -1,12 +1,9 @@
 import chalk from "chalk";
-import { WriteMethod } from "../../../../core/enums";
 import { Model, ModelFactory } from "../new-model";
 import { Controller, ControllerJson, HandlerJson } from "./types";
 import {
   Config,
-  EntityType,
   PrimitiveType,
-  Texts,
   TypeInfo,
   TestCaseSchema,
 } from "../../../../core";
@@ -14,8 +11,8 @@ import { ControllerFactory } from "./controller.factory";
 import { Entity } from "../new-entity/types";
 import { EntityFactory } from "../new-entity";
 import { pascalCase } from "change-case";
-import { ApiConfig } from "../../common";
 import { TestSuite, TestSuiteFactory } from "../new-test-suite";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class ControllerInputJsonParser {
   constructor(
@@ -102,7 +99,7 @@ export class ControllerJsonParser {
 
   constructor(
     private config: Config,
-    private apiConfig: ApiConfig,
+
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {
@@ -120,7 +117,7 @@ export class ControllerJsonParser {
     controllers: Controller[];
     test_suites: TestSuite[];
   } {
-    const { config, texts, writeMethod, apiConfig } = this;
+    const { config, texts, writeMethod } = this;
     const models: Model[] = [];
     const entities: Entity[] = [];
     const controllers: Controller[] = [];
@@ -170,7 +167,7 @@ export class ControllerJsonParser {
         []
       );
 
-      if (!apiConfig.skip_tests && controller.element.methods.length > 0) {
+      if (!config.project.skip_tests && controller.element.methods.length > 0) {
         //
         const suite = TestSuiteFactory.create(
           { name, endpoint, type: "unit_tests" },

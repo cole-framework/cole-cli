@@ -1,30 +1,16 @@
-import { Config, ConfigAddons, ConfigTools, ReservedType } from "../../config";
-import { TypeInfo } from "../../type.info";
 import {
-  InheritanceData,
-  InheritanceObject,
-  InheritanceSchema,
-} from "./inheritance.schema";
-
-export type GenericJson = {
-  name?: string;
-  inheritance?: string; // extends types, may use multiple with & or |
-  dflt?: string; // default type, may use multiple with & or |
-};
-
-export type GenericObject = {
-  name: string;
-  inheritance: InheritanceObject;
-  dflt: string;
-};
+  GenericJson,
+  GenericSchemaObject,
+} from "@cole-framework/cole-cli-core";
+import { Config, ConfigInstructionParser } from "../../config";
+import { TypeInfo } from "../../type.info";
+import { InheritanceData, InheritanceSchema } from "./inheritance.schema";
 
 export type GenericData = {
   name?: string;
   inheritance?: InheritanceData; // extends types, may use multiple with & or |
   dflt?: string; // default type, may use multiple with & or |
 };
-
-export type GenericConfig = GenericJson & ConfigAddons;
 
 export class GenericTools {
   static stringToData(
@@ -41,8 +27,12 @@ export class GenericTools {
     );
     if (match[1]) {
       let temp = match[1].trim();
-      if (ConfigTools.hasInstructions(temp)) {
-        name = ConfigTools.executeInstructions(temp, references, config);
+      if (ConfigInstructionParser.hasInstructions(temp)) {
+        name = ConfigInstructionParser.executeInstructions(
+          temp,
+          references,
+          config
+        );
       } else {
         name = temp;
       }
@@ -51,8 +41,12 @@ export class GenericTools {
     if (match[3]) {
       let temp = match[3].trim();
 
-      if (ConfigTools.hasInstructions(temp)) {
-        inheritance = ConfigTools.executeInstructions(temp, references, config);
+      if (ConfigInstructionParser.hasInstructions(temp)) {
+        inheritance = ConfigInstructionParser.executeInstructions(
+          temp,
+          references,
+          config
+        );
       } else {
         inheritance = TypeInfo.create(temp, config);
       }
@@ -61,8 +55,12 @@ export class GenericTools {
     if (match[5]) {
       let temp = match[5].trim();
 
-      if (ConfigTools.hasInstructions(temp)) {
-        dflt = ConfigTools.executeInstructions(temp, references, config);
+      if (ConfigInstructionParser.hasInstructions(temp)) {
+        dflt = ConfigInstructionParser.executeInstructions(
+          temp,
+          references,
+          config
+        );
       } else {
         dflt = TypeInfo.create(temp, config);
       }
@@ -96,8 +94,12 @@ export class GenericSchema {
 
       if (typeof data.name === "string") {
         let temp = data.name.trim();
-        if (ConfigTools.hasInstructions(temp)) {
-          name = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          name = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         } else {
           name = temp;
         }
@@ -106,8 +108,12 @@ export class GenericSchema {
       if (typeof data.dflt === "string") {
         let temp = data.dflt.trim();
 
-        if (ConfigTools.hasInstructions(temp)) {
-          dflt = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          dflt = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         } else {
           dflt = temp;
         }
@@ -118,8 +124,8 @@ export class GenericSchema {
       if (typeof data.inheritance === "string") {
         let temp = data.inheritance.trim();
 
-        if (ConfigTools.hasInstructions(temp)) {
-          inheritance = ConfigTools.executeInstructions(
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          inheritance = ConfigInstructionParser.executeInstructions(
             temp,
             references,
             config
@@ -145,7 +151,7 @@ export class GenericSchema {
     public readonly dflt?: string
   ) {}
 
-  toObject(): GenericObject {
+  toObject(): GenericSchemaObject {
     const { name, dflt, inheritance } = this;
     return {
       name,

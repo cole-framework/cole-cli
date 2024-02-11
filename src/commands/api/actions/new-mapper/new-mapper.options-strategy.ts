@@ -1,12 +1,15 @@
 import chalk from "chalk";
-import { Strategy } from "../../../../core/strategy";
 import { MapperJson, NewMapperOptions } from "./types";
-import { CliOptionsTools, Texts } from "../../../../core";
+import { CliOptionsTools, Config } from "../../../../core";
 import { ApiJsonParser } from "../../common/api-json.parser";
-import { ApiConfig, ApiGenerator } from "../../common";
+import { ApiGenerator } from "../../common";
+import { Strategy, Texts } from "@cole-framework/cole-cli-core";
 
 export class NewMapperOptionsStrategy extends Strategy {
-  public async apply(apiConfig: ApiConfig, options: NewMapperOptions) {
+  constructor(private config: Config) {
+    super();
+  }
+  public async apply(options: NewMapperOptions, cliPluginPackageName: string) {
     const { config } = this;
     const texts = await Texts.load();
 
@@ -25,13 +28,16 @@ export class NewMapperOptionsStrategy extends Strategy {
       entity,
     };
 
-    const schema = new ApiJsonParser(apiConfig, config, texts).build({
+    const schema = new ApiJsonParser(config, texts).build({
       entities: [],
       models: [],
       mappers: [mapper],
     });
 
-    const result = await new ApiGenerator(config).generate(schema);
+    const result = await new ApiGenerator(
+      config,
+      cliPluginPackageName
+    ).generate(schema);
 
     if (result.isFailure) {
       console.log(result.failure.error);

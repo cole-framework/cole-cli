@@ -7,14 +7,9 @@ import {
 } from "./types";
 import { Entity } from "../new-entity";
 import { RepositoryFactoryType } from "../../../../core/type.info";
-import {
-  ClassData,
-  ClassSchema,
-  Component,
-  Config,
-  WriteMethod,
-} from "../../../../core";
+import { ClassData, ClassSchema, Component, Config } from "../../../../core";
 import { nanoid } from "nanoid";
+import { WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class RepositoryFactoryFactory {
   static create(

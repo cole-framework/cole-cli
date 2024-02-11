@@ -1,13 +1,6 @@
 import { existsSync } from "fs";
+import { Config, Frame } from "../../../../../core";
 import {
-  Config,
-  Frame,
-  PropJson,
-  Texts,
-  WriteMethod,
-} from "../../../../../core";
-import {
-  ApiConfig,
   ApiJson,
   InputNameAndEndpointInteraction,
   InputTextInteraction,
@@ -15,13 +8,13 @@ import {
   SelectComponentWriteMethodInteraction,
 } from "../../../common";
 import { CreateModelsFrame } from "../../new-model";
+import { PropJson, Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class CreateSourcesFrame extends Frame<ApiJson> {
   public static NAME = "create_sources_frame";
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
     protected texts: Texts
   ) {
     super(CreateSourcesFrame.NAME);
@@ -33,8 +26,8 @@ export class CreateSourcesFrame extends Frame<ApiJson> {
     endpoint?: string;
     props?: PropJson[];
   }) {
-    const { texts, config, apiConfig } = this;
-    const createModelsFrame = new CreateModelsFrame(config, apiConfig, texts);
+    const { texts, config } = this;
+    const createModelsFrame = new CreateModelsFrame(config, texts);
     const result: ApiJson = { models: [], entities: [], sources: [] };
     const storages = context.storages ? [...context.storages] : [];
     const { name, endpoint } = await new InputNameAndEndpointInteraction({
@@ -54,7 +47,7 @@ export class CreateSourcesFrame extends Frame<ApiJson> {
         endpoint,
       }).path;
 
-      if (apiConfig.force === false) {
+      if (config.project.force === false) {
         if (existsSync(componentPath)) {
           writeMethod = await new SelectComponentWriteMethodInteraction(
             texts
@@ -73,7 +66,7 @@ export class CreateSourcesFrame extends Frame<ApiJson> {
         hint: texts.get("hint___please_enter_storage_model_name"),
       });
 
-      if (apiConfig.dependencies_write_method !== WriteMethod.Skip) {
+      if (config.project.dependencies_write_method !== WriteMethod.Skip) {
         if (
           await InteractionPrompts.confirm(
             texts

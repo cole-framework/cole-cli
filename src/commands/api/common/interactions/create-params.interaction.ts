@@ -1,10 +1,10 @@
-import { Texts, TypeInfo, WriteMethod } from "../../../../core";
-import { ParamJson } from "../../../../core/components";
+import { TypeInfo } from "../../../../core";
 import { Config } from "../../../../core/config";
 import { EntityJson, ModelJson } from "../../actions";
 import { CreateParamInteraction } from "./create-param.interaction";
-import { Interaction } from "./interaction";
-import { InteractionPrompts } from "./interaction-prompts";
+import { Interaction } from "../../../../core";
+import { InteractionPrompts } from "../../../../core";
+import { ParamJson, Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 type InteractionResult = {
   params: ParamJson[];

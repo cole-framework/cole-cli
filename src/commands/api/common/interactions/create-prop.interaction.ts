@@ -1,7 +1,6 @@
-import { Texts } from "../../../../core";
-import { PropJson } from "../../../../core/components";
-import { Interaction } from "./interaction";
-import { InteractionPrompts } from "./interaction-prompts";
+import { PropJson, Texts } from "@cole-framework/cole-cli-core";
+import { Interaction } from "../../../../core";
+import { InteractionPrompts } from "../../../../core";
 
 export class CreatePropInteraction extends Interaction<PropJson> {
   constructor(private texts: Texts) {

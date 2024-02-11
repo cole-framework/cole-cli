@@ -1,4 +1,5 @@
-import { Config, Frame, Texts } from "../../../../../core";
+import { Texts } from "@cole-framework/cole-cli-core";
+import { Config, Frame } from "../../../../../core";
 import { InteractionPrompts } from "../../../common";
 
 export type RepositoryDescription = {
@@ -101,8 +102,6 @@ export class DescribeRepositoryFrame extends Frame<RepositoryDescription> {
     willHaveAdditionalContent = await InteractionPrompts.confirm(
       texts.get("will_your_repository_contain_additional_properties_or_methods")
     );
-
-    
 
     return {
       createInterface,

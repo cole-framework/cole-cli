@@ -1,4 +1,5 @@
-import { Config, Frame, Texts } from "../../../../../core";
+import { Texts } from "@cole-framework/cole-cli-core";
+import { Config, Frame } from "../../../../../core";
 import { InteractionPrompts } from "../../../common";
 
 export class SelectSourceStoragesFrame extends Frame<string[]> {

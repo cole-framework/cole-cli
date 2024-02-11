@@ -3,12 +3,11 @@ import {
   StoryResolver,
   Storyboard,
   StoryboardSession,
-  Texts,
   TimelineFrame,
 } from "../../../../core";
-import { ApiConfig } from "../../common/api.config";
 import { ApiJson } from "../../common/api.types";
 import { CreateSourcesFrame, SelectSourceStoragesFrame } from "./frames";
+import { Texts } from "@cole-framework/cole-cli-core";
 
 export class NewSourceStoryResolver extends StoryResolver<ApiJson> {
   resolve(timeline: TimelineFrame[]): ApiJson {
@@ -30,7 +29,7 @@ export class NewSourceStoryboard extends Storyboard<ApiJson> {
   constructor(
     texts: Texts,
     config: Config,
-    apiConfig: ApiConfig,
+
     session?: StoryboardSession
   ) {
     super(
@@ -40,7 +39,7 @@ export class NewSourceStoryboard extends Storyboard<ApiJson> {
     );
 
     this.addFrame(new SelectSourceStoragesFrame(config, texts)).addFrame(
-      new CreateSourcesFrame(config, apiConfig, texts),
+      new CreateSourcesFrame(config, texts),
       (t) => ({ storages: t.prevFrame.output })
     );
   }

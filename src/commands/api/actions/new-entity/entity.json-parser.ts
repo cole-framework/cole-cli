@@ -1,16 +1,15 @@
-import { WriteMethod } from "../../../../core/enums";
+import chalk from "chalk";
 import { Model, ModelFactory } from "../new-model";
 import { Entity, EntityJson } from "./types";
-import chalk from "chalk";
-import { Config, Texts, TestCaseSchema } from "../../../../core";
+import { Config, TestCaseSchema } from "../../../../core";
 import { EntityFactory } from "./entity.factory";
 import { TestSuite, TestSuiteFactory } from "../new-test-suite";
-import { ApiConfig } from "../../common";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class EntityJsonParser {
   constructor(
     private config: Config,
-    private apiConfig: ApiConfig,
+
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {}
@@ -19,7 +18,7 @@ export class EntityJsonParser {
     list: EntityJson[],
     modelsRef: Model[]
   ): { models: Model[]; entities: Entity[]; test_suites: TestSuite[] } {
-    const { config, texts, writeMethod, apiConfig } = this;
+    const { config, texts, writeMethod } = this;
     const models: Model[] = [];
     const entities: Entity[] = [];
     const test_suites: TestSuite[] = [];
@@ -64,7 +63,7 @@ export class EntityJsonParser {
         []
       );
 
-      if (!apiConfig.skip_tests && entity.element.methods.length > 0) {
+      if (!config.project.skip_tests && entity.element.methods.length > 0) {
         //
         const suite = TestSuiteFactory.create(
           { name, endpoint, type: "unit_tests" },

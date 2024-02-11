@@ -1,29 +1,27 @@
 import {
-  Config,
-  FileTemplateModel,
+  LanguageStrategyProvider,
+  PluginMap,
   Result,
-  Strategy,
-  WorkerPool,
-} from "../../../core";
+} from "@cole-framework/cole-cli-core";
 import { ApiSchema } from "./api.schema";
-import { COMPILER_WORKER_PATH } from "../../../core/worker";
-import { TypeScriptTemplateModelStrategy } from "../../../defaults/typescript.strategy";
-import Logger from "../../../core/tools/logger";
+import { COMPILER_WORKER_PATH } from "../../../core/workers/worker";
+import { Config, WorkerPool } from "../../../core";
 
-const logger = Logger.getLogger();
 export class ApiGenerator {
-  private modelsStrategy: Strategy<FileTemplateModel[]>;
-  private templatesStrategy: Strategy;
-
-  constructor(protected config: Config) {}
+  constructor(
+    protected config: Config,
+    protected cliPluginPackageName: string
+  ) {}
 
   public async generate(api: ApiSchema): Promise<Result> {
-    const { config, modelsStrategy, templatesStrategy } = this;
+    const { config, cliPluginPackageName } = this;
     const obj = api.toObject();
-    // const codeModule = require(config.code.module);
-    const { content: models, failure } = new TypeScriptTemplateModelStrategy(
-      config
-    ).apply(obj);
+    const languageModule: LanguageStrategyProvider = require(
+      cliPluginPackageName
+    );
+    const { content: models, failure } = languageModule
+      .createTemplateModelStrategy()
+      .apply(obj);
 
     if (failure) {
       return Result.withFailure(failure);
@@ -43,7 +41,7 @@ export class ApiGenerator {
     workerPool.setTaskCompleteCallback((data) => {
       if (Array.isArray(data?.state)) {
         data.state.forEach((s) => {
-          logger.info(
+          console.info(
             `${s.status} ${s.path}`,
             s.status === "skipped"
               ? `🔵`
@@ -67,7 +65,7 @@ export class ApiGenerator {
       const batch = models.slice(i, i + batchSize);
       promises.push(
         workerPool.executeTask({
-          code_module: config.code.module,
+          code_module: cliPluginPackageName,
           transport: config.compilation.transport,
           models: batch,
         })

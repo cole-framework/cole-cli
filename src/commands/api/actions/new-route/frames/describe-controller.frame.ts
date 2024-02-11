@@ -1,21 +1,15 @@
 import { existsSync } from "fs";
-import {
-  Config,
-  EntityType,
-  Frame,
-  Texts,
-  WriteMethod,
-} from "../../../../../core";
-import { ApiConfig, ApiJson, InteractionPrompts } from "../../../common";
+import { Config, EntityType, Frame } from "../../../../../core";
+import { ApiJson, InteractionPrompts } from "../../../common";
 import { ControllerJson, HandlerJson } from "../../new-controller";
 import { EntityJson } from "../../new-entity";
 import { PathParamsTools, QueryParamsTools } from "../parsers";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class DescribeControllerFrame extends Frame<ApiJson> {
   public static NAME = "describe_controller_frame";
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
     protected texts: Texts
   ) {
     super(DescribeControllerFrame.NAME);
@@ -29,7 +23,7 @@ export class DescribeControllerFrame extends Frame<ApiJson> {
     response_body: any;
     path: string;
   }) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config } = this;
     const { endpoint, controller, handler, request_body, response_body, path } =
       context;
     const controllers: ControllerJson[] = [];
@@ -42,7 +36,7 @@ export class DescribeControllerFrame extends Frame<ApiJson> {
     let input: EntityJson = { name: `${handler}Input`, props: [] };
     let output: EntityJson = { name: `${handler}Output`, props: [] };
     let h: HandlerJson = { name: handler };
-    let writeMethod = apiConfig.dependencies_write_method;
+    let writeMethod = config.project.dependencies_write_method;
 
     if (writeMethod !== WriteMethod.Skip) {
       const message = existsSync(cPath)

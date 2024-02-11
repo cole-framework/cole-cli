@@ -1,15 +1,6 @@
 import { existsSync } from "fs";
+import { Config, Frame, ParamSchema, TypeInfo } from "../../../../../core";
 import {
-  Config,
-  Frame,
-  MethodJson,
-  ParamSchema,
-  Texts,
-  TypeInfo,
-  WriteMethod,
-} from "../../../../../core";
-import {
-  ApiConfig,
   ApiJson,
   DefineMethodInteraction,
   InputNameAndEndpointInteraction,
@@ -19,13 +10,13 @@ import {
 import { ComponentTools } from "../../../../../core/components/component.tools";
 import { CreateModelsFrame } from "../../new-model";
 import { CreateEntityFrame } from "../../new-entity";
+import { MethodJson, Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class CreateToolsetFrame extends Frame<ApiJson> {
   public static NAME = "create_toolset_frame";
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
     protected texts: Texts
   ) {
     super(CreateToolsetFrame.NAME);
@@ -36,7 +27,7 @@ export class CreateToolsetFrame extends Frame<ApiJson> {
     endpoint?: string;
     layer?: string;
   }) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config } = this;
     const result: ApiJson = { toolsets: [], entities: [], models: [] };
     const layer = context.layer || "domain";
     const methods = new Set<MethodJson>();
@@ -58,7 +49,7 @@ export class CreateToolsetFrame extends Frame<ApiJson> {
 
     let writeMethod = WriteMethod.Write;
 
-    if (apiConfig.force === false) {
+    if (config.project.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts
@@ -78,7 +69,7 @@ export class CreateToolsetFrame extends Frame<ApiJson> {
         do {
           method = await new DefineMethodInteraction(texts).run();
           methods.add(method);
-          if (apiConfig.dependencies_write_method !== WriteMethod.Skip) {
+          if (config.project.dependencies_write_method !== WriteMethod.Skip) {
             const componentTypes: TypeInfo[] = [];
             if (Array.isArray(method.params)) {
               method.params.forEach((param) => {
@@ -110,21 +101,13 @@ export class CreateToolsetFrame extends Frame<ApiJson> {
               for (const componentType of componentTypes) {
                 let res: ApiJson;
                 if (componentType.isModel) {
-                  res = await new CreateModelsFrame(
-                    config,
-                    apiConfig,
-                    texts
-                  ).run({
+                  res = await new CreateModelsFrame(config, texts).run({
                     endpoint,
                     name: componentType.ref,
                     types: [componentType.type],
                   });
                 } else if (componentType.isEntity) {
-                  res = await new CreateEntityFrame(
-                    config,
-                    apiConfig,
-                    texts
-                  ).run({
+                  res = await new CreateEntityFrame(config, texts).run({
                     endpoint,
                     name: componentType.ref,
                   });

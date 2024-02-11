@@ -1,12 +1,16 @@
 import chalk from "chalk";
-import { Strategy } from "../../../../core/strategy";
 import { ToolsetJson, NewToolsetOptions } from "./types";
 import { ApiJsonParser } from "../../common/api-json.parser";
-import { CliOptionsTools, MethodJson, Texts } from "../../../../core";
-import { ApiConfig, ApiGenerator } from "../../common";
+import { CliOptionsTools, Config } from "../../../../core";
+import { ApiGenerator } from "../../common";
+import { Strategy, Texts } from "@cole-framework/cole-cli-core";
 
 export class NewToolsetOptionsStrategy extends Strategy {
-  public async apply(apiConfig: ApiConfig, options: NewToolsetOptions) {
+  constructor(private config: Config) {
+    super();
+  }
+
+  public async apply(options: NewToolsetOptions, cliPluginPackageName: string) {
     const { config } = this;
     const texts = await Texts.load();
 
@@ -28,13 +32,16 @@ export class NewToolsetOptionsStrategy extends Strategy {
       endpoint,
       methods,
     };
-    const schema = new ApiJsonParser(apiConfig, config, texts).build({
+    const schema = new ApiJsonParser(config, texts).build({
       models: [],
       entities: [],
       toolsets: [toolset],
     });
 
-    const result = await new ApiGenerator(config).generate(schema);
+    const result = await new ApiGenerator(
+      config,
+      cliPluginPackageName
+    ).generate(schema);
 
     if (result.isFailure) {
       console.log(result.failure.error);

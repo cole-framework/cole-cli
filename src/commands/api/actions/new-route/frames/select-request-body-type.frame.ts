@@ -1,4 +1,5 @@
-import { Frame, Texts } from "../../../../../core";
+import { Texts } from "@cole-framework/cole-cli-core";
+import { Frame } from "../../../../../core";
 import { InteractionPrompts } from "../../../common";
 import { CreateObjectPropInteraction } from "./interactions/create-object-prop.interaction";
 

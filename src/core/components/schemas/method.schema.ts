@@ -1,37 +1,16 @@
-import { Config, ConfigAddons, ConfigTools, ReservedType } from "../../config";
-import { AccessType } from "../../enums";
+import {
+  AccessType,
+  MethodJson,
+  MethodSchemaObject,
+} from "@cole-framework/cole-cli-core";
+import { Config, ConfigInstructionParser } from "../../config";
 import { TypeInfo, UnknownType } from "../../type.info";
 import { SchemaTools } from "../schema.tools";
-import {
-  GenericData,
-  GenericJson,
-  GenericTools,
-  GenericSchema,
-  GenericObject,
-} from "./generic.schema";
-import {
-  ParamData,
-  ParamJson,
-  ParamTools,
-  ParamSchema,
-  ParamObject,
-} from "./param.schema";
+import { GenericData, GenericTools, GenericSchema } from "./generic.schema";
+import { ParamData, ParamTools, ParamSchema } from "./param.schema";
 
 export const METHOD_REGEX =
   /^(static|async|private|protected|public)?\s*(static|async|private|protected|public)?\s*(async|static|private|protected|public)?\s*([a-zA-Z0-9_]+)(\s*\<(.+)\>\s*)?(\((.*)\))?(\s*:\s*([a-zA-Z0-9\[\]\<\>\{\\}]+))?(\s*=>\s*(.*))?$/;
-
-export type MethodObject = {
-  access: string;
-  name: string;
-  return_type: TypeInfo;
-  is_async: boolean;
-  is_static: boolean;
-  params: ParamObject[];
-  body: string;
-  template: string;
-  supr: MethodObject;
-  generics: GenericObject[];
-};
 
 export type MethodData = {
   access?: string;
@@ -45,21 +24,6 @@ export type MethodData = {
   supr?: MethodData;
   generics?: GenericData[];
 };
-
-export type MethodJson = {
-  access?: string;
-  name?: string;
-  return_type?: string;
-  is_async?: boolean;
-  is_static?: boolean;
-  params?: string | (ParamJson | string)[];
-  body?: string;
-  supr?: MethodJson;
-  generics?: (GenericJson | string)[];
-  prompt?: string;
-};
-
-export type MethodConfig = MethodJson & ConfigAddons;
 
 export class MethodTools {
   static stringToData(
@@ -99,8 +63,12 @@ export class MethodTools {
 
       if (match[4]) {
         let temp = match[4].trim();
-        if (ConfigTools.hasInstructions(temp)) {
-          name = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          name = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         } else {
           name = temp;
         }
@@ -108,8 +76,12 @@ export class MethodTools {
 
       if (match[10]) {
         let temp = match[10].trim();
-        if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          temp = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         }
         returnType = TypeInfo.isType(temp)
           ? temp
@@ -158,8 +130,12 @@ export class MethodTools {
 
         if (typeof item.return_type === "string") {
           let temp = item.return_type.trim();
-          if (ConfigTools.hasInstructions(temp)) {
-            temp = ConfigTools.executeInstructions(temp, references, config);
+          if (ConfigInstructionParser.hasInstructions(temp)) {
+            temp = ConfigInstructionParser.executeInstructions(
+              temp,
+              references,
+              config
+            );
           }
           return_type = TypeInfo.isType(temp)
             ? temp
@@ -167,8 +143,12 @@ export class MethodTools {
         }
 
         const tempName = item.name.trim();
-        if (ConfigTools.hasInstructions(tempName)) {
-          name = ConfigTools.executeInstructions(tempName, references, config);
+        if (ConfigInstructionParser.hasInstructions(tempName)) {
+          name = ConfigInstructionParser.executeInstructions(
+            tempName,
+            references,
+            config
+          );
         } else {
           name = tempName;
         }
@@ -229,8 +209,12 @@ export class MethodSchema {
       body = data.body;
 
       const tempName = data.name.trim();
-      if (ConfigTools.hasInstructions(tempName)) {
-        name = ConfigTools.executeInstructions(tempName, references, config);
+      if (ConfigInstructionParser.hasInstructions(tempName)) {
+        name = ConfigInstructionParser.executeInstructions(
+          tempName,
+          references,
+          config
+        );
       } else {
         name = tempName;
       }
@@ -239,8 +223,12 @@ export class MethodSchema {
         returnType = data.return_type;
       } else if (typeof data.return_type === "string") {
         let temp = data.return_type.trim();
-        if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          temp = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         }
         returnType = TypeInfo.isType(temp)
           ? temp
@@ -250,8 +238,8 @@ export class MethodSchema {
       if (Array.isArray(data.params)) {
         data.params.forEach((param) => {
           if (typeof param === "string") {
-            if (ConfigTools.hasInstructions(param)) {
-              const p = ConfigTools.executeInstructions(
+            if (ConfigInstructionParser.hasInstructions(param)) {
+              const p = ConfigInstructionParser.executeInstructions(
                 param,
                 references,
                 config
@@ -269,8 +257,8 @@ export class MethodSchema {
           }
         });
       } else if (typeof data.params === "string") {
-        if (ConfigTools.hasInstructions(data.params)) {
-          params = ConfigTools.executeInstructions(
+        if (ConfigInstructionParser.hasInstructions(data.params)) {
+          params = ConfigInstructionParser.executeInstructions(
             data.params,
             references,
             config
@@ -371,7 +359,7 @@ export class MethodSchema {
     return [...this.__generics];
   }
 
-  toObject(): MethodObject {
+  toObject(): MethodSchemaObject {
     const {
       access,
       __params,
@@ -385,7 +373,7 @@ export class MethodSchema {
       template,
     } = this;
 
-    const mth: MethodObject = {
+    const mth: MethodSchemaObject = {
       access,
       params: __params.map((p) => p.toObject()),
       generics: __generics.map((g) => g.toObject()),

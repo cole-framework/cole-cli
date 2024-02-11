@@ -1,11 +1,5 @@
 import { existsSync } from "fs";
-import {
-  Config,
-  Frame,
-  PropJson,
-  Texts,
-  WriteMethod,
-} from "../../../../../core";
+import { Config, Frame } from "../../../../../core";
 import {
   ApiJson,
   CreatePropsInteraction,
@@ -13,15 +7,13 @@ import {
   InteractionPrompts,
   SelectComponentWriteMethodInteraction,
 } from "../../../common";
-import { ApiConfig } from "../../../common/api.config";
-import chalk from "chalk";
+import { PropJson, Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class CreateEntityFrame extends Frame<ApiJson> {
   public static NAME = "create_entity_frame";
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
     protected texts: Texts
   ) {
     super(CreateEntityFrame.NAME);
@@ -32,7 +24,7 @@ export class CreateEntityFrame extends Frame<ApiJson> {
     endpoint?: string;
     props?: PropJson[];
   }) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config } = this;
     const result: ApiJson = { entities: [], models: [] };
     const passedProps = context.props || [];
     let name: string;
@@ -57,7 +49,7 @@ export class CreateEntityFrame extends Frame<ApiJson> {
 
     let writeMethod = WriteMethod.Write;
 
-    if (apiConfig.force === false) {
+    if (config.project.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts
@@ -69,7 +61,7 @@ export class CreateEntityFrame extends Frame<ApiJson> {
       const { props, ...deps } = await new CreatePropsInteraction(
         texts,
         config,
-        apiConfig.dependencies_write_method
+        config.project.dependencies_write_method
       ).run({
         endpoint,
         target: "entity",
@@ -80,7 +72,7 @@ export class CreateEntityFrame extends Frame<ApiJson> {
       result.models.push(...deps.models);
       let has_model = false;
 
-      if (apiConfig.dependencies_write_method !== WriteMethod.Skip) {
+      if (config.project.dependencies_write_method !== WriteMethod.Skip) {
         has_model = await InteractionPrompts.confirm(
           texts.get("do_you_want_to_create_entity_json_model")
         );

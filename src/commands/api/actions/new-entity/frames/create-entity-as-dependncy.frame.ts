@@ -1,15 +1,14 @@
-import { Config, Frame, PropJson, Texts } from "../../../../../core";
+import { Config, Frame } from "../../../../../core";
 import { ApiJson, InputNameAndEndpointInteraction } from "../../../common";
-import { ApiConfig } from "../../../common/api.config";
 import chalk from "chalk";
 import { CreateEntityFrame } from "./create-entity.frame";
+import { PropJson, Texts } from "@cole-framework/cole-cli-core";
 
 export class CreateEntityAsDependencyFrame extends Frame<ApiJson> {
   public static NAME = "create_entity_as_dependency_frame";
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
     protected texts: Texts
   ) {
     super(CreateEntityAsDependencyFrame.NAME);
@@ -21,7 +20,7 @@ export class CreateEntityAsDependencyFrame extends Frame<ApiJson> {
     endpoint?: string;
     props?: PropJson[];
   }) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config } = this;
     const { dependencyOf, ...rest } = context;
 
     console.log(
@@ -32,8 +31,8 @@ export class CreateEntityAsDependencyFrame extends Frame<ApiJson> {
       )
     );
 
-    if (apiConfig.with_dependencies) {
-      return new CreateEntityFrame(config, apiConfig, texts).run(rest);
+    if (config.project.with_dependencies) {
+      return new CreateEntityFrame(config, texts).run(rest);
     }
 
     const { name, endpoint } = await new InputNameAndEndpointInteraction({

@@ -1,16 +1,11 @@
 import { nanoid } from "nanoid";
-import {
-  ClassData,
-  ClassSchema,
-  Component,
-  Config,
-  WriteMethod,
-} from "../../../../core";
+import { ClassData, ClassSchema, Component, Config } from "../../../../core";
 
-import { RouteIOType, TypeInfo } from "../../../../core/type.info";
+import { RouteIOType } from "../../../../core/type.info";
 import { Entity } from "../new-entity";
 import { Model } from "../new-model";
 import { RouteData, RouteModel, RouteElement } from "./types";
+import { WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class RouteIOFactory {
   public static create(

@@ -1,12 +1,6 @@
 import chalk from "chalk";
 import { pascalCase } from "change-case";
-import {
-  Config,
-  Texts,
-  TypeInfo,
-  TestCaseSchema,
-  WriteMethod,
-} from "../../../../../core";
+import { Config, TypeInfo, TestCaseSchema } from "../../../../../core";
 import {
   Controller,
   ControllerInputJsonParser,
@@ -22,8 +16,8 @@ import { PathParamsJsonParser } from "./path-params.json-parser";
 import { QueryParamsJsonParser } from "./query-params.json-parser";
 import { RequestBodyJsonParser } from "./request-body.json-parser";
 import { ResponseBodyJsonParser } from "./response-body.json-parser";
-import { ApiConfig } from "../../../common";
 import { TestSuite, TestSuiteFactory } from "../../new-test-suite";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class RouteJsonParser {
   private inputParser: ControllerInputJsonParser;
@@ -39,7 +33,7 @@ export class RouteJsonParser {
 
   constructor(
     private config: Config,
-    private apiConfig: ApiConfig,
+
     private texts: Texts,
     private writeMethod: { component: WriteMethod; dependency: WriteMethod }
   ) {
@@ -235,16 +229,8 @@ export class RouteJsonParser {
     route_ios: RouteIO[];
     test_suites: TestSuite[];
   } {
-    const {
-      config,
-      texts,
-      writeMethod,
-      models,
-      entities,
-      routes,
-      route_ios,
-      apiConfig,
-    } = this;
+    const { config, texts, writeMethod, models, entities, routes, route_ios } =
+      this;
     const test_suites: TestSuite[] = [];
 
     models.length = 0;
@@ -344,7 +330,7 @@ export class RouteJsonParser {
         );
         route_ios.push(io);
 
-        if (!apiConfig.skip_tests && io.element.methods.length > 0) {
+        if (!config.project.skip_tests && io.element.methods.length > 0) {
           //
           const suite = TestSuiteFactory.create(
             { name, endpoint, type: "unit_tests" },

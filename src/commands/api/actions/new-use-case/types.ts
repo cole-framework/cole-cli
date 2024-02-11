@@ -1,6 +1,5 @@
+import { ClassJson, ParamJson } from "@cole-framework/cole-cli-core";
 import {
-  ClassJson,
-  ParamJson,
   ElementWithProps,
   ElementWithMethods,
   ElementWithGenerics,

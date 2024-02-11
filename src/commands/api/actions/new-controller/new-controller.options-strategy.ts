@@ -1,12 +1,18 @@
 import chalk from "chalk";
-import { Strategy } from "../../../../core/strategy";
 import { NewControllerOptions, ControllerJson, HandlerJson } from "./types";
 import { ApiJsonParser } from "../../common/api-json.parser";
-import { CliOptionsTools, Texts } from "../../../../core";
-import { ApiConfig, ApiGenerator } from "../../common";
+import { CliOptionsTools, Config } from "../../../../core";
+import { ApiGenerator } from "../../common";
+import { Strategy, Texts } from "@cole-framework/cole-cli-core";
 
 export class NewControllerOptionsStrategy extends Strategy {
-  public async apply(apiConfig: ApiConfig, options: NewControllerOptions) {
+  constructor(private config: Config) {
+    super();
+  }
+  public async apply(
+    options: NewControllerOptions,
+    cliPluginPackageName: string
+  ) {
     const { config } = this;
     const texts = await Texts.load();
 
@@ -35,10 +41,13 @@ export class NewControllerOptionsStrategy extends Strategy {
       handlers,
     };
 
-    const schema = new ApiJsonParser(apiConfig, config, texts).build({
+    const schema = new ApiJsonParser(config, texts).build({
       controllers: [controller],
     });
-    const result = await new ApiGenerator(config).generate(schema);
+    const result = await new ApiGenerator(
+      config,
+      cliPluginPackageName
+    ).generate(schema);
 
     if (result.isFailure) {
       console.log(result.failure.error);

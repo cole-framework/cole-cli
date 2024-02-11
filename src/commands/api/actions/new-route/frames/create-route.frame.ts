@@ -1,7 +1,6 @@
 import { existsSync } from "fs";
-import { Config, Frame, Texts, WriteMethod } from "../../../../../core";
+import { Config, Frame } from "../../../../../core";
 import {
-  ApiConfig,
   ApiJson,
   SelectComponentWriteMethodInteraction,
 } from "../../../common";
@@ -9,13 +8,13 @@ import { RouteNameAndEndpoint } from "./define-route-name-and-endpoint.frame";
 import { RequestBodyType } from "./select-request-body-type.frame";
 import { ResponseBodyType } from "./select-response-body-type.frame";
 import { RouteDescription } from "./interactions/describe-route.interaction";
+import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class CreateRouteFrame extends Frame<ApiJson> {
   public static NAME = "create_route_frame";
 
   constructor(
     protected config: Config,
-    protected apiConfig: ApiConfig,
     protected texts: Texts
   ) {
     super(CreateRouteFrame.NAME);
@@ -27,7 +26,7 @@ export class CreateRouteFrame extends Frame<ApiJson> {
       RequestBodyType &
       ResponseBodyType
   ) {
-    const { texts, config, apiConfig } = this;
+    const { texts, config } = this;
     const {
       name,
       endpoint,
@@ -50,7 +49,7 @@ export class CreateRouteFrame extends Frame<ApiJson> {
     }).path;
     let writeMethod = WriteMethod.Write;
 
-    if (apiConfig.force === false) {
+    if (config.project.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts

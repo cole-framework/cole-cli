@@ -1,26 +1,21 @@
-import { Config, ConfigAddons, ConfigTools, ReservedType } from "../../config";
+import {
+  ConfigJsonAddons,
+  ExportJson,
+  ExportSchemaObject,
+  GenericJson,
+  GenericSchemaObject,
+  ImportJson,
+  ImportSchemaObject,
+  PropJson,
+  PropSchemaObject,
+} from "@cole-framework/cole-cli-core";
+import { Config, ConfigInstructionParser } from "../../config";
 import { TypeInfo, ObjectType, UnknownType } from "../../type.info";
 import { SchemaTools } from "../schema.tools";
-import {
-  ExportData,
-  ExportJson,
-  ExportObject,
-  ExportSchema,
-} from "./export.schema";
-import {
-  GenericData,
-  GenericJson,
-  GenericTools,
-  GenericSchema,
-  GenericObject,
-} from "./generic.schema";
-import {
-  ImportData,
-  ImportJson,
-  ImportObject,
-  ImportSchema,
-} from "./import.schema";
-import { PropData, PropJson, PropObject, PropSchema } from "./prop.schema";
+import { ExportData, ExportSchema } from "./export.schema";
+import { GenericData, GenericTools, GenericSchema } from "./generic.schema";
+import { ImportData, ImportSchema } from "./import.schema";
+import { PropData, PropSchema } from "./prop.schema";
 
 export const TYPE_REGEX =
   /([a-zA-Z0-9_]+)\s*(<([a-zA-Z0-9_, \<\>\[\]\(\)]+)>)?(\s*=\s*(.+))?/;
@@ -37,12 +32,12 @@ export type TypeData = {
 };
 
 export type TypeObject = {
-  exp?: ExportObject;
+  exp?: ExportSchemaObject;
   name: string;
-  props?: PropObject[];
-  generics?: GenericObject[];
+  props?: PropSchemaObject[];
+  generics?: GenericSchemaObject[];
   alias?: any;
-  imports?: ImportObject[];
+  imports?: ImportSchemaObject[];
 };
 
 export type TypeJson = {
@@ -56,7 +51,7 @@ export type TypeJson = {
   alias?: any;
 };
 
-export type TypeConfig = TypeJson & ConfigAddons;
+export type TypeConfig = TypeJson & ConfigJsonAddons;
 
 export class TypeTools {
   static stringToData(
@@ -86,8 +81,12 @@ export class TypeTools {
         type = ObjectType.create();
       } catch (e) {
         let temp = match[5].trim();
-        if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          temp = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         }
         type = TypeInfo.create(temp, config);
       }
@@ -134,8 +133,12 @@ export class TypeSchema {
       if (typeof data.type === "string") {
         let temp = data.type.trim();
 
-        if (ConfigTools.hasInstructions(temp)) {
-          temp = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          temp = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         }
         type = TypeInfo.create(temp, config);
       } else if (TypeInfo.isType(data.type)) {
@@ -157,8 +160,12 @@ export class TypeSchema {
       if (typeof data.alias === "string") {
         let temp = data.alias.trim();
 
-        if (ConfigTools.hasInstructions(temp)) {
-          alias = ConfigTools.executeInstructions(temp, references, config);
+        if (ConfigInstructionParser.hasInstructions(temp)) {
+          alias = ConfigInstructionParser.executeInstructions(
+            temp,
+            references,
+            config
+          );
         } else {
           alias = TypeInfo.create(temp, config);
         }

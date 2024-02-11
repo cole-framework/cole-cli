@@ -1,14 +1,8 @@
 import { nanoid } from "nanoid";
-import {
-  Config,
-  WriteMethod,
-  Component,
-  ClassSchema,
-  ClassJson,
-  EntityType,
-} from "../../../../core";
+import { Config, Component, ClassSchema, EntityType } from "../../../../core";
 import { EntityData, Entity, EntityElement, EntityAddons } from "./types";
 import { Model } from "../new-model";
+import { ClassJson, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class EntityFactory {
   static create(

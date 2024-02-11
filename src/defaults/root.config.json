@@ -1,0 +1,8 @@
+{
+  "plugin_map_url": "https://raw.githubusercontent.com/cole-framework/cole-cli-config/main/plugin-map.json",
+  "local_plugin_map_path": "./.cole/plugin-map.json",
+  "local_plugin_config_path": "./.cole/plugin.config.json",
+  "local_cli_config_path": "./.cole/cli.config.json",
+  "local_texts_path": "./.cole/texts.json",
+  "local_cli_session_path": "./.cole/sessions"
+}
