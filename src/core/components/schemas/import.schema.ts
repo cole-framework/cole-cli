@@ -59,7 +59,8 @@ export class ImportSchema {
   public static create(
     data: string | ImportData | ImportJson,
     config: Config,
-    references?: { [key: string]: unknown; dependencies: any[] }
+    references?: { [key: string]: unknown; dependencies: any[] },
+    meta?: any
   ) {
     let dflt;
     let path;
@@ -160,24 +161,26 @@ export class ImportSchema {
       }
     }
 
-    return new ImportSchema(dflt, path, list, alias);
+    return new ImportSchema(dflt, path, list, alias, meta);
   }
 
   constructor(
     public readonly dflt: string,
     public readonly path: string,
     public readonly list: string[],
-    public readonly alias: string
+    public readonly alias: string,
+    public readonly meta?: any
   ) {}
 
   toObject(): ImportSchemaObject {
-    const { dflt, path, list, alias } = this;
+    const { dflt, path, list, alias, meta } = this;
 
     return {
       dflt,
       path,
       alias,
       list,
+      meta,
     };
   }
 }

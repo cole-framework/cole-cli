@@ -18,16 +18,17 @@ import { ToolsetJson, ToolsetJsonParser } from "../actions/new-toolset";
 import { Texts, WriteMethod } from "@cole-framework/cole-cli-core";
 
 export class ApiJsonParser {
-  private apiSchema = new ApiSchema();
+  private apiSchema: ApiSchema;
   private writeMethod: { component: WriteMethod; dependency: WriteMethod };
 
   constructor(
     private config: Config,
     private texts: Texts
   ) {
+    this.apiSchema = new ApiSchema(config);
     this.writeMethod = {
-      component: config.project.write_method,
-      dependency: config.project.dependencies_write_method,
+      component: config.command.write_method,
+      dependency: config.command.dependencies_write_method,
     };
   }
 
@@ -259,6 +260,7 @@ export class ApiJsonParser {
 
   build(json: ApiJson): ApiSchema {
     // console.log("JSON", JSON.stringify(json, null, 2));
+    const { config } = this;
 
     this.parseModels(json.models || []);
     this.parseEntities(json.entities || []);
@@ -269,6 +271,41 @@ export class ApiJsonParser {
     this.parseControllers(json.controllers || []);
     this.parseRoutes(json.routes || []);
     this.parseTools(json.toolsets || []);
+
+    this.apiSchema.controllers.forEach((controller) => {
+      this.apiSchema.container.addDependency(controller, config);
+    });
+
+    this.apiSchema.routes.forEach((route) => {
+      this.apiSchema.router.addDependency(route, config);
+      this.apiSchema.router.addons.routes.push({
+        name: route.type.name,
+        ...route.addons,
+      });
+
+      route.dependencies.forEach((dep) => {
+        if (dep.type.isController) {
+          const ctrl = this.apiSchema.controllers.find(
+            (c) => c.type.name === dep.type.name
+          );
+          if (ctrl) {
+            this.apiSchema.router.addDependency(ctrl, config);
+          }
+        }
+      });
+    });
+
+    this.apiSchema.use_cases.forEach((use_case) => {
+      this.apiSchema.container.addDependency(use_case, config);
+    });
+
+    this.apiSchema.repositories.forEach((repository) => {
+      this.apiSchema.container.addDependency(repository, config);
+    });
+
+    this.apiSchema.toolsets.forEach((toolset) => {
+      this.apiSchema.container.addDependency(toolset, config);
+    });
 
     return this.apiSchema;
   }

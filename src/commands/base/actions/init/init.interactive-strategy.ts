@@ -8,6 +8,7 @@ import {
 } from "@cole-framework/cole-cli-core";
 
 import RootConfig from "../../../../defaults/root.config.json";
+import { ProjectConfigService } from "../../../../core";
 
 export class InitInteractiveStrategy extends Strategy {
   constructor(private pluginMap: PluginMap) {
@@ -42,6 +43,10 @@ export class InitInteractiveStrategy extends Strategy {
 
     await new PluginConfigService(RootConfig.local_plugin_config_path).sync(
       languagePlugin.cli_plugin_config_url
+    );
+
+    await new ProjectConfigService(RootConfig.local_project_config_path).set(
+      content
     );
 
     const result = await languageStrategies

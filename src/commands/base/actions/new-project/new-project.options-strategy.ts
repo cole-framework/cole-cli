@@ -1,3 +1,4 @@
+import { ProjectConfigService } from "./../../../../core/config/tools/project.config.service";
 import chalk from "chalk";
 import {
   LanguageStrategyProvider,
@@ -48,7 +49,7 @@ export class NewProjectOptionsStrategy extends Strategy {
     } else {
       description.source = options.source;
     }
-    
+
     if (options.di) {
       description.dependency_injection = options.di;
     }
@@ -79,6 +80,10 @@ export class NewProjectOptionsStrategy extends Strategy {
 
     await new PluginConfigService(RootConfig.local_plugin_config_path).sync(
       languagePlugin.cli_plugin_config_url
+    );
+
+    await new ProjectConfigService(RootConfig.local_project_config_path).set(
+      description
     );
 
     const result = await languageStrategies

@@ -63,7 +63,7 @@ export class EntityJsonParser {
         []
       );
 
-      if (!config.project.skip_tests && entity.element.methods.length > 0) {
+      if (!config.command.skip_tests && entity.element.methods.length > 0) {
         //
         const suite = TestSuiteFactory.create(
           { name, endpoint, type: "unit_tests" },

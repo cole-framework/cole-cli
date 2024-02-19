@@ -2,6 +2,7 @@ import {
   Config,
   PluginConfigService,
   PluginMapService,
+  ProjectConfigService,
   TextsService,
 } from "../../../core";
 import { newController } from "./new-controller";
@@ -27,6 +28,9 @@ export * from "./new-route";
 export * from "./new-source";
 export * from "./new-toolset";
 export * from "./new-use-case";
+export * from "./new-router";
+export * from "./new-launcher";
+export * from "./new-container";
 
 import RootConfig from "../../../defaults/root.config.json";
 import { Texts } from "@cole-framework/cole-cli-core";
@@ -35,12 +39,9 @@ export const newComponent = async (options: any, type?: string) => {
   const texts = Texts.load();
   const cliConfig = await new CliConfigService().sync();
 
-  const pluginConfigService = new PluginConfigService(
-    RootConfig.local_plugin_config_path
-  );
-
-  const { content: pluginConfig, failure } =
-    await pluginConfigService.getLocal();
+  const { content: projectConfig, failure } = await new ProjectConfigService(
+    RootConfig.local_project_config_path
+  ).get();
 
   if (failure) {
     console.log(
@@ -49,6 +50,12 @@ export const newComponent = async (options: any, type?: string) => {
     process.exit(0);
   }
 
+  const pluginConfigService = new PluginConfigService(
+    RootConfig.local_plugin_config_path
+  );
+
+  const { content: pluginConfig } = await pluginConfigService.getLocal();
+
   const pluginMapService = new PluginMapService(
     RootConfig.plugin_map_url,
     RootConfig.local_plugin_map_path
@@ -56,7 +63,7 @@ export const newComponent = async (options: any, type?: string) => {
 
   const pluginMap = await pluginMapService.sync();
 
-  const config = Config.create(cliConfig, pluginConfig, options);
+  const config = Config.create(cliConfig, pluginConfig, projectConfig, options);
   const cliPluginPackageName = pluginMap.getLanguage(
     config.code.alias
   ).cli_plugin;

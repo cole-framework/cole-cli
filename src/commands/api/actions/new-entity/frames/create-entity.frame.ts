@@ -49,7 +49,7 @@ export class CreateEntityFrame extends Frame<ApiJson> {
 
     let writeMethod = WriteMethod.Write;
 
-    if (config.project.force === false) {
+    if (config.command.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts
@@ -61,7 +61,7 @@ export class CreateEntityFrame extends Frame<ApiJson> {
       const { props, ...deps } = await new CreatePropsInteraction(
         texts,
         config,
-        config.project.dependencies_write_method
+        config.command.dependencies_write_method
       ).run({
         endpoint,
         target: "entity",
@@ -72,7 +72,7 @@ export class CreateEntityFrame extends Frame<ApiJson> {
       result.models.push(...deps.models);
       let has_model = false;
 
-      if (config.project.dependencies_write_method !== WriteMethod.Skip) {
+      if (config.command.dependencies_write_method !== WriteMethod.Skip) {
         has_model = await InteractionPrompts.confirm(
           texts.get("do_you_want_to_create_entity_json_model")
         );

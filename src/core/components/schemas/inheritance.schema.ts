@@ -15,7 +15,8 @@ export class InheritanceSchema {
   public static create(
     data: string | InheritanceData | InheritanceJson,
     config: Config,
-    references?: { [key: string]: unknown; dependencies: any[] }
+    references?: { [key: string]: unknown; dependencies: any[] },
+    meta?: any
   ) {
     if (!data) {
       return null;
@@ -55,11 +56,12 @@ export class InheritanceSchema {
       }
     }
 
-    inth = new InheritanceSchema(name);
+    inth = new InheritanceSchema(name, meta);
 
     generics.forEach((g) => {
-      if (SchemaTools.executeMeta(g, references, config)) {
-        inth.addGeneric(GenericSchema.create(g, config, references));
+      const meta = SchemaTools.executeMeta(g, references, config);
+      if (meta) {
+        inth.addGeneric(GenericSchema.create(g, config, references, meta));
       }
     });
 
@@ -68,7 +70,10 @@ export class InheritanceSchema {
 
   private __generics: GenericSchema[] = [];
 
-  private constructor(public readonly name: string) {}
+  private constructor(
+    public readonly name: string,
+    public readonly meta?: any
+  ) {}
 
   addGeneric(generic: GenericSchema) {
     if (this.hasGeneric(generic) === false) {
@@ -96,10 +101,11 @@ export class InheritanceSchema {
   }
 
   toObject(): InheritanceSchemaObject {
-    const { name, __generics } = this;
+    const { name, __generics, meta } = this;
     const intf: InheritanceSchemaObject = {
       name,
       generics: __generics.map((g) => g.toObject()),
+      meta,
     };
 
     return intf;

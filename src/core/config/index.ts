@@ -1,4 +1,5 @@
 export * from "./cli.config";
+export * from "./command.config";
 export * from "./compilation.config";
 export * from "./components.config";
 export * from "./config";

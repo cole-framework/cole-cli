@@ -33,10 +33,10 @@ export class DescribeControllerFrame extends Frame<ApiJson> {
       endpoint,
     }).path;
 
-    let input: EntityJson = { name: `${handler}Input`, props: [] };
-    let output: EntityJson = { name: `${handler}Output`, props: [] };
+    let input: EntityJson = { name: `${handler}Input`, endpoint, props: [] };
+    let output: EntityJson = { name: `${handler}Output`, endpoint, props: [] };
     let h: HandlerJson = { name: handler };
-    let writeMethod = config.project.dependencies_write_method;
+    let writeMethod = config.command.dependencies_write_method;
 
     if (writeMethod !== WriteMethod.Skip) {
       const message = existsSync(cPath)
@@ -57,7 +57,7 @@ export class DescribeControllerFrame extends Frame<ApiJson> {
           input.props.push({ name: k, type: "string" });
         });
 
-        if (typeof request_body === "object") {
+        if (request_body && typeof request_body === "object") {
           Object.keys(request_body).forEach((k) => {
             input.props.push({ name: k, type: request_body[k] });
           });
@@ -79,7 +79,7 @@ export class DescribeControllerFrame extends Frame<ApiJson> {
         /*
          */
 
-        if (typeof response_body === "object") {
+        if (response_body && typeof response_body === "object") {
           Object.keys(response_body).forEach((k) => {
             output.props.push({ name: k, type: response_body[k] });
           });

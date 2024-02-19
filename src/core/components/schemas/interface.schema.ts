@@ -27,7 +27,8 @@ export class InterfaceSchema {
   public static create(
     data: InterfaceData | InterfaceJson,
     config: Config,
-    references?: { [key: string]: unknown; dependencies: any[] }
+    references?: { [key: string]: unknown; dependencies: any[] },
+    meta?: any
   ) {
     if (!data) {
       return null;
@@ -47,8 +48,11 @@ export class InterfaceSchema {
             InheritanceSchema.create({ name: i }, config, references)
           );
         } else {
-          if (SchemaTools.executeMeta(i, references, config)) {
-            inheritance.push(InheritanceSchema.create(i, config, references));
+          const meta = SchemaTools.executeMeta(i, references, config);
+          if (meta) {
+            inheritance.push(
+              InheritanceSchema.create(i, config, references, meta)
+            );
           }
         }
       });
@@ -69,37 +73,42 @@ export class InterfaceSchema {
       data.id || nanoid(),
       name,
       exp,
-      inheritance
+      inheritance,
+      meta
     );
 
     if (Array.isArray(data.props)) {
       data.props.forEach((p) => {
-        if (SchemaTools.executeMeta(p, references, config)) {
-          intf.addProp(PropSchema.create(p, config, references));
+        const meta = SchemaTools.executeMeta(p, references, config);
+        if (meta) {
+          intf.addProp(PropSchema.create(p, config, references, meta));
         }
       });
     }
 
     if (Array.isArray(data.methods)) {
       data.methods.forEach((m) => {
-        if (SchemaTools.executeMeta(m, references, config)) {
-          intf.addMethod(MethodSchema.create(m, config, references));
+        const meta = SchemaTools.executeMeta(m, references, config);
+        if (meta) {
+          intf.addMethod(MethodSchema.create(m, config, references, meta));
         }
       });
     }
 
     if (Array.isArray(data.generics)) {
       data.generics.forEach((g) => {
-        if (SchemaTools.executeMeta(g, references, config)) {
-          intf.addGeneric(GenericSchema.create(g, config, references));
+        const meta = SchemaTools.executeMeta(g, references, config);
+        if (meta) {
+          intf.addGeneric(GenericSchema.create(g, config, references, meta));
         }
       });
     }
 
     if (Array.isArray(data.imports)) {
       data.imports.forEach((i) => {
-        if (SchemaTools.executeMeta(i, references, config)) {
-          intf.addImport(ImportSchema.create(i, config, references));
+        const meta = SchemaTools.executeMeta(i, references, config);
+        if (meta) {
+          intf.addImport(ImportSchema.create(i, config, references, meta));
         }
       });
     }
@@ -117,7 +126,8 @@ export class InterfaceSchema {
     public readonly id: string,
     public readonly name: string,
     public readonly exp: ExportSchema,
-    inheritance: InheritanceSchema[] = []
+    inheritance: InheritanceSchema[] = [],
+    public readonly meta?: any
   ) {
     inheritance.forEach((i) => {
       this.__inheritance.push(i);
@@ -228,6 +238,7 @@ export class InterfaceSchema {
       __imports,
       __inheritance,
       exp,
+      meta,
     } = this;
     const intf: InterfaceSchemaObject = {
       name,
@@ -237,6 +248,7 @@ export class InterfaceSchema {
       props: __props.map((p) => p.toObject()),
       generics: __generics.map((g) => g.toObject()),
       imports: __imports.map((i) => i.toObject()),
+      meta,
     };
 
     return intf;

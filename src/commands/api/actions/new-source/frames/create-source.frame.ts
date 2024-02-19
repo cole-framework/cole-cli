@@ -47,7 +47,7 @@ export class CreateSourcesFrame extends Frame<ApiJson> {
         endpoint,
       }).path;
 
-      if (config.project.force === false) {
+      if (config.command.force === false) {
         if (existsSync(componentPath)) {
           writeMethod = await new SelectComponentWriteMethodInteraction(
             texts
@@ -66,7 +66,7 @@ export class CreateSourcesFrame extends Frame<ApiJson> {
         hint: texts.get("hint___please_enter_storage_model_name"),
       });
 
-      if (config.project.dependencies_write_method !== WriteMethod.Skip) {
+      if (config.command.dependencies_write_method !== WriteMethod.Skip) {
         if (
           await InteractionPrompts.confirm(
             texts

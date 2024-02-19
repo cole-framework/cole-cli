@@ -10,7 +10,7 @@ import { existsSync } from "fs";
 export const newProject = async (options: NewProjectOptions) => {
   const texts = Texts.load();
 
-  if (existsSync(Config.local_plugin_config_path)) {
+  if (existsSync(Config.local_project_config_path)) {
     console.log(
       chalk.yellow(
         texts.get("configuration_file_detected__can_not_create_new_project")

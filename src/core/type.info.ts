@@ -14,6 +14,9 @@ export type ComponentLabel =
   | "source"
   | "route"
   | "route_model"
+  | "router"
+  | "launcher"
+  | "container"
   | "route_io";
 
 export abstract class TypeInfo {
@@ -307,6 +310,9 @@ export abstract class TypeInfo {
     public readonly isRouteModel?: boolean,
     public readonly isConfigInstructionType?: boolean,
     public readonly isTestSuite?: boolean,
+    public readonly isRouter?: boolean,
+    public readonly isContainer?: boolean,
+    public readonly isLauncher?: boolean,
     public readonly type?: string,
     public readonly component?: string,
     public readonly chain?: (TypeInfo | "|" | "&")[]
@@ -709,6 +715,54 @@ export class ControllerType {
 
   static create(name: string, ref: string) {
     return new ControllerType(name, ref, `Controller<${name}>`);
+  }
+}
+
+export class RouterType {
+  public readonly isRouter = true;
+  public readonly isComponentType = true;
+  public readonly component = "router";
+
+  private constructor(
+    public readonly name: string,
+    public readonly ref: string,
+    public readonly tag: string
+  ) {}
+
+  static create(name: string, ref: string) {
+    return new RouterType(name, ref, `Router<${name}>`);
+  }
+}
+
+export class LauncherType {
+  public readonly isLauncher = true;
+  public readonly isComponentType = true;
+  public readonly component = "launcher";
+
+  private constructor(
+    public readonly name: string,
+    public readonly ref: string,
+    public readonly tag: string
+  ) {}
+
+  static create(name: string, ref: string) {
+    return new LauncherType(name, ref, `Launcher<${name}>`);
+  }
+}
+
+export class ContainerType {
+  public readonly isContainer = true;
+  public readonly isComponentType = true;
+  public readonly component = "container";
+
+  private constructor(
+    public readonly name: string,
+    public readonly ref: string,
+    public readonly tag: string
+  ) {}
+
+  static create(name: string, ref: string) {
+    return new ContainerType(name, ref, `Container<${name}>`);
   }
 }
 

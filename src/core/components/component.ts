@@ -10,6 +10,7 @@ import {
   ImportTools,
   ImportData,
   TestCaseSchema,
+  FunctionSchema,
 } from "./schemas";
 import { ComponentTools } from "./component.tools";
 import { Config } from "../config";
@@ -41,6 +42,13 @@ export interface ElementWithMethods {
   hasMethod(name: string): boolean;
 }
 
+export interface ElementWithFunctions {
+  functions: FunctionSchema[];
+  addFunction(fn: FunctionSchema);
+  findFunction(name: string): FunctionSchema;
+  hasFunction(name: string): boolean;
+}
+
 export interface ElementWithUnitTests {
   tests: TestCaseSchema[];
   addTest(test: TestCaseSchema);
@@ -70,7 +78,7 @@ export type ComponentElement = ElementSchemaObject &
 
 export class Component<
   Element extends ComponentElement = ComponentElement,
-  ElementAddons = unknown,
+  ElementAddons = any,
 > {
   public static create<
     Element extends ComponentElement,
@@ -80,7 +88,7 @@ export class Component<
     data: {
       id: string;
       type: TypeInfo;
-      endpoint: string;
+      endpoint?: string;
       path: string;
       writeMethod: WriteMethod;
       addons?: ElementAddons;
@@ -129,44 +137,50 @@ export class Component<
     public readonly element: Element
   ) {}
 
-  addDependency(dependency: Component, config: Config) {
-    const { id, path, type, element } = dependency;
+  addDependency(dependency: Component | Dependency, config: Config) {
+    const { id, path, type } = dependency;
 
     if (dependency && this.hasDependency(dependency) === false) {
-      this.__dependencies.push({ id, path, type, name: element.name });
+      if (dependency["element"]) {
+        const { element } = dependency as Component;
+        this.__dependencies.push({ id, path, type, name: element.name });
 
-      if (Array.isArray(this.element.imports) && this.path !== path) {
-        const relativePath = ImportTools.createRelativeImportPath(
-          this.path,
-          path
-        );
-        const impt = this.element.findImport({ path: relativePath });
+        if (Array.isArray(this.element.imports) && this.path !== path) {
+          const relativePath = ImportTools.createRelativeImportPath(
+            this.path,
+            path
+          );
+          const impt = this.element.findImport({ path: relativePath });
 
-        if (impt) {
-          if (element.exp?.is_default && !impt.dflt) {
-            impt.dflt["dflt"] = element.name;
+          if (impt) {
+            if (element.exp?.is_default && !impt.dflt) {
+              impt.dflt["dflt"] = element.name;
+            } else {
+              impt.list.push(element.name);
+            }
           } else {
-            impt.list.push(element.name);
-          }
-        } else {
-          let impt = { path, ref_path: this.path };
-          if (element.exp?.is_default) {
-            impt["dflt"] = element.name;
-          } else {
-            impt["list"] = [element.name];
-          }
+            let impt = { path, ref_path: this.path };
+            if (element.exp?.is_default) {
+              impt["dflt"] = element.name;
+            } else {
+              impt["list"] = [element.name];
+            }
 
-          this.element.addImport(ImportSchema.create(impt, config));
+            this.element.addImport(ImportSchema.create(impt, config));
+          }
         }
+      } else {
+        this.__dependencies.push(dependency as Dependency);
       }
     }
   }
 
-  hasDependency(dependency: Component) {
+  hasDependency(dependency: Component | Dependency) {
     return (
       this.__dependencies.findIndex((d) => {
+        const name = dependency["element"]?.name || dependency["name"];
         return (
-          d.name === dependency.element.name &&
+          d.name === name &&
           d.type.ref === dependency.type.ref &&
           d.type.type === dependency.type.type &&
           d.path === dependency.path

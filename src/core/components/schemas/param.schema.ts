@@ -180,7 +180,8 @@ export class ParamSchema {
   public static create(
     data: string | ParamJson | ParamData,
     config: Config,
-    references?: { [key: string]: unknown; dependencies: any[] }
+    references?: { [key: string]: unknown; dependencies: any[] },
+    meta?: any
   ): ParamSchema {
     if (!data) {
       return null;
@@ -273,7 +274,8 @@ export class ParamSchema {
       isOptional,
       isReadonly,
       value,
-      template
+      template,
+      meta
     );
   }
 
@@ -284,7 +286,8 @@ export class ParamSchema {
     public readonly isOptional: boolean,
     public readonly isReadonly: boolean,
     public readonly value: any,
-    public readonly template: string
+    public readonly template: string,
+    public readonly meta?: any
   ) {}
 
   toObject(): ParamSchemaObject {
@@ -296,6 +299,7 @@ export class ParamSchema {
       isReadonly: is_readonly,
       value,
       template,
+      meta,
     } = this;
 
     return {
@@ -306,6 +310,7 @@ export class ParamSchema {
       is_readonly,
       value,
       template,
+      meta,
     };
   }
 

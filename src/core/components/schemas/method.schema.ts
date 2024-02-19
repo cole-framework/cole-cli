@@ -173,7 +173,8 @@ export class MethodSchema {
   public static create(
     data: MethodData | MethodJson | string,
     config: Config,
-    references?: { [key: string]: unknown; dependencies: any[] }
+    references?: { [key: string]: unknown; dependencies: any[] },
+    meta?: any
   ): MethodSchema {
     if (!data) {
       return null;
@@ -251,8 +252,9 @@ export class MethodSchema {
               params.push(ParamSchema.create(param, config, references));
             }
           } else {
-            if (SchemaTools.executeMeta(param, references, config)) {
-              params.push(ParamSchema.create(param, config, references));
+            const meta = SchemaTools.executeMeta(param, references, config);
+            if (meta) {
+              params.push(ParamSchema.create(param, config, references, meta));
             }
           }
         });
@@ -264,23 +266,26 @@ export class MethodSchema {
             config
           );
         } else {
-          if (SchemaTools.executeMeta(data.params, references, config)) {
-            params.push(ParamSchema.create(data.params, config, references));
+          const meta = SchemaTools.executeMeta(data.params, references, config);
+          if (meta) {
+            params.push(ParamSchema.create(data.params, config, references, meta));
           }
         }
       }
 
       if (Array.isArray(data.generics)) {
         data.generics.forEach((g) => {
-          if (SchemaTools.executeMeta(g, references, config)) {
-            generics.push(GenericSchema.create(g, config, references));
+          const meta = SchemaTools.executeMeta(g, references, config);
+          if (meta) {
+            generics.push(GenericSchema.create(g, config, references, meta));
           }
         });
       }
 
       if (data.supr) {
-        if (SchemaTools.executeMeta(data.supr, references, config)) {
-          supr = MethodSchema.create(data.supr, config, references);
+        const meta = SchemaTools.executeMeta(data.supr, references, config);
+        if (meta) {
+          supr = MethodSchema.create(data.supr, config, references, meta);
         }
       }
 
@@ -295,7 +300,8 @@ export class MethodSchema {
       isAsync,
       body,
       supr,
-      template
+      template,
+      meta
     );
 
     params.forEach((param) => {
@@ -320,7 +326,8 @@ export class MethodSchema {
     public readonly isAsync: boolean,
     public readonly body: string,
     public readonly supr: MethodSchema,
-    public readonly template: string
+    public readonly template: string,
+    public readonly meta?: any
   ) {}
 
   addParam(param: ParamSchema) {
@@ -371,6 +378,7 @@ export class MethodSchema {
       name,
       returnType,
       template,
+      meta,
     } = this;
 
     const mth: MethodSchemaObject = {
@@ -384,6 +392,7 @@ export class MethodSchema {
       name,
       return_type: returnType,
       template,
+      meta,
     };
 
     return mth;

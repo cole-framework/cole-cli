@@ -55,7 +55,7 @@ export class CreateMappersFrame extends Frame<ApiJson> {
         endpoint,
       }).path;
 
-      if (config.project.force === false) {
+      if (config.command.force === false) {
         if (existsSync(componentPath)) {
           writeMethod = await new SelectComponentWriteMethodInteraction(
             texts
@@ -64,7 +64,7 @@ export class CreateMappersFrame extends Frame<ApiJson> {
       }
 
       if (writeMethod !== WriteMethod.Skip) {
-        if (config.project.dependencies_write_method !== WriteMethod.Skip) {
+        if (config.command.dependencies_write_method !== WriteMethod.Skip) {
           if (!entityName) {
             const createEntityResult = await new CreateEntityAsDependencyFrame(
               config,

@@ -7,6 +7,7 @@ import { ComponentsConfigTools } from "./tools/components-config.tools";
 import { DatabaseConfig } from "./database.config";
 import { GeneralConfig } from "./general.config";
 import { WebFrameworkConfig } from "./web-framework.config";
+import { CommandConfig } from "./command.config";
 import { ProjectConfig } from "./project.config";
 
 export type GeneratedPath = {
@@ -24,6 +25,7 @@ export class Config {
   public static create(
     cliConfig: CliConfig,
     pluginConfig: LanguagePluginConfig,
+    projectConfig: ProjectConfig,
     options: any
   ): Config {
     const general = GeneralConfig.create(cliConfig);
@@ -38,29 +40,31 @@ export class Config {
       pluginConfig.language.source_path,
       pluginConfig.architecture.components
     );
-    const project = ProjectConfig.create(options, cliConfig);
+    const command = CommandConfig.create(options, cliConfig);
 
     return new Config(
+      projectConfig,
       general,
       compilation,
       databases,
       language,
       web,
       components,
-      project
+      command
     );
   }
 
   private __allReservedTypes: ReservedType[] = [];
 
   constructor(
+    public readonly project: ProjectConfig,
     public readonly general: GeneralConfig,
     public readonly compilation: CompilationConfig,
     public readonly databases: DatabaseConfig[],
     public readonly code: LanguageConfig,
     public readonly web: WebFrameworkConfig[],
     public readonly components: ComponentsConfig,
-    public readonly project: ProjectConfig
+    public readonly command: CommandConfig
   ) {
     if (Array.isArray(databases)) {
       databases.forEach((db) => {

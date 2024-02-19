@@ -31,7 +31,7 @@ export class CreateEntityAsDependencyFrame extends Frame<ApiJson> {
       )
     );
 
-    if (config.project.with_dependencies) {
+    if (config.command.with_dependencies) {
       return new CreateEntityFrame(config, texts).run(rest);
     }
 

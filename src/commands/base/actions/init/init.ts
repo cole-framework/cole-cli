@@ -12,9 +12,10 @@ import chalk from "chalk";
 
 export const init = async (options: InitOptions) => {
   const texts = Texts.load();
+  const projectConfigExists = existsSync(Config.local_project_config_path);
   const pluginConfigExists = existsSync(Config.local_plugin_config_path);
 
-  if (!options.force && pluginConfigExists) {
+  if (!options.force && projectConfigExists) {
     const shouldContinue = await InteractionPrompts.continue(
       texts.get("configuration_file_detected_do_you_want_to_overwrite_it")
     );
@@ -48,7 +49,7 @@ export const init = async (options: InitOptions) => {
   if (Object.keys(options).length === 0) {
     new InitInteractiveStrategy(pluginMap).apply().catch((error) => {
       if (error) {
-        console.log(chalk.yellow(error.message));
+        console.log(chalk.yellow(error));
       }
     });
   } else {

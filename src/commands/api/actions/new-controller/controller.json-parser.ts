@@ -167,7 +167,7 @@ export class ControllerJsonParser {
         []
       );
 
-      if (!config.project.skip_tests && controller.element.methods.length > 0) {
+      if (!config.command.skip_tests && controller.element.methods.length > 0) {
         //
         const suite = TestSuiteFactory.create(
           { name, endpoint, type: "unit_tests" },

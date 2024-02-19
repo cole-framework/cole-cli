@@ -147,7 +147,10 @@ export class ComponentsConfig {
         rootPath,
         "toolset_unit_tests",
         data.toolset_unit_tests
-      )
+      ),
+      ComponentConfig.create(rootPath, "router", data.router),
+      ComponentConfig.create(rootPath, "container", data.container),
+      ComponentConfig.create(rootPath, "launcher", data.launcher)
     );
   }
 
@@ -174,6 +177,10 @@ export class ComponentsConfig {
     public readonly repository_factory_unit_tests: ComponentConfig,
     public readonly use_case_unit_tests: ComponentConfig,
     public readonly route_io_unit_tests: ComponentConfig,
-    public readonly toolset_unit_tests: ComponentConfig
+    public readonly toolset_unit_tests: ComponentConfig,
+    //
+    public readonly router: ComponentConfig,
+    public readonly container: ComponentConfig,
+    public readonly launcher: ComponentConfig
   ) {}
 }

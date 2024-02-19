@@ -32,7 +32,7 @@ export class CreateModelsAsDependenciesFrame extends Frame<ApiJson> {
       )
     );
 
-    if (config.project.with_dependencies) {
+    if (config.command.with_dependencies) {
       return new CreateModelsFrame(config, texts).run(rest);
     }
 

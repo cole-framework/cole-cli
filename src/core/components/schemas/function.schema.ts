@@ -102,7 +102,8 @@ export class FunctionSchema {
   public static create(
     data: FunctionData | FunctionJson | string,
     config: Config,
-    references?: { [key: string]: unknown; dependencies: any[] }
+    references?: { [key: string]: unknown; dependencies: any[] },
+    meta?: any
   ): FunctionSchema {
     if (!data) {
       return null;
@@ -181,8 +182,9 @@ export class FunctionSchema {
               params.push(ParamSchema.create(param, config, references));
             }
           } else {
-            if (SchemaTools.executeMeta(param, references, config)) {
-              params.push(ParamSchema.create(param, config, references));
+            const meta = SchemaTools.executeMeta(param, references, config);
+            if (meta) {
+              params.push(ParamSchema.create(param, config, references, meta));
             }
           }
         });
@@ -194,16 +196,20 @@ export class FunctionSchema {
             config
           );
         } else {
-          if (SchemaTools.executeMeta(data.params, references, config)) {
-            params.push(ParamSchema.create(data.params, config, references));
+          const meta = SchemaTools.executeMeta(data.params, references, config);
+          if (meta) {
+            params.push(
+              ParamSchema.create(data.params, config, references, meta)
+            );
           }
         }
       }
 
       if (Array.isArray(data.generics)) {
         data.generics.forEach((g) => {
-          if (SchemaTools.executeMeta(g, references, config)) {
-            generics.push(GenericSchema.create(g, config, references));
+          const meta = SchemaTools.executeMeta(g, references, config);
+          if (meta) {
+            generics.push(GenericSchema.create(g, config, references, meta));
           }
         });
       }
@@ -215,7 +221,8 @@ export class FunctionSchema {
       returnType,
       isAsync,
       body,
-      template
+      template,
+      meta
     );
 
     params.forEach((param) => {
@@ -238,7 +245,8 @@ export class FunctionSchema {
     public readonly returnType: TypeInfo,
     public readonly isAsync: boolean,
     public readonly body: string,
-    public readonly template: string
+    public readonly template: string,
+    public readonly meta?: any
   ) {}
 
   addParam(param: ParamSchema) {
@@ -287,6 +295,7 @@ export class FunctionSchema {
       returnType,
       exp,
       template,
+      meta,
     } = this;
     const fn: FunctionSchemaObject = {
       exp: exp?.toObject(),
@@ -297,6 +306,7 @@ export class FunctionSchema {
       is_async: isAsync,
       return_type: returnType,
       template,
+      meta,
     };
 
     return fn;

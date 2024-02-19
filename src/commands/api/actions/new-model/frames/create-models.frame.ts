@@ -47,7 +47,7 @@ export class CreateModelsFrame extends Frame<ApiJson> {
     const newPropsResult = await new CreatePropsInteraction(
       texts,
       config,
-      config.project.dependencies_write_method
+      config.command.dependencies_write_method
     ).run({
       endpoint,
       target: "model",
@@ -65,7 +65,7 @@ export class CreateModelsFrame extends Frame<ApiJson> {
         endpoint,
       }).path;
 
-      if (config.project.force === false) {
+      if (config.command.force === false) {
         if (existsSync(componentPath)) {
           writeMethod = await new SelectComponentWriteMethodInteraction(
             texts

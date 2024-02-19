@@ -78,7 +78,8 @@ export class GenericSchema {
   public static create(
     data: string | GenericJson | GenericData,
     config: Config,
-    references?: { [key: string]: unknown; dependencies: any[] }
+    references?: { [key: string]: unknown; dependencies: any[] },
+    meta?: any
   ) {
     let inheritance;
     let name;
@@ -142,21 +143,23 @@ export class GenericSchema {
       }
     }
 
-    return new GenericSchema(name, inheritance, dflt);
+    return new GenericSchema(name, inheritance, dflt, meta);
   }
 
   constructor(
     public readonly name: string,
     public readonly inheritance?: InheritanceSchema,
-    public readonly dflt?: string
+    public readonly dflt?: string,
+    public readonly meta?: any,
   ) {}
 
   toObject(): GenericSchemaObject {
-    const { name, dflt, inheritance } = this;
+    const { name, dflt, inheritance, meta } = this;
     return {
       name,
       dflt,
       inheritance: inheritance?.toObject(),
+      meta,
     };
   }
 

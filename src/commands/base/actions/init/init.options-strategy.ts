@@ -7,7 +7,11 @@ import {
   Strategy,
   Texts,
 } from "@cole-framework/cole-cli-core";
-import { CliOptionsTools, PluginConfigService } from "../../../../core";
+import {
+  CliOptionsTools,
+  PluginConfigService,
+  ProjectConfigService,
+} from "../../../../core";
 
 import RootConfig from "../../../../defaults/root.config.json";
 
@@ -72,6 +76,10 @@ export class InitOptionsStrategy extends Strategy {
 
     await new PluginConfigService(RootConfig.local_plugin_config_path).sync(
       languagePlugin.cli_plugin_config_url
+    );
+
+    await new ProjectConfigService(RootConfig.local_project_config_path).set(
+      description
     );
 
     const result = await languageStrategies

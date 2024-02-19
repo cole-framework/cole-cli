@@ -373,7 +373,7 @@ export class RepositoryJsonParser {
           impl_result.entities.forEach((e) => entities.push(e));
           repository_impls.push(impl);
 
-          if (!config.project.skip_tests && impl.element.methods.length > 0) {
+          if (!config.command.skip_tests && impl.element.methods.length > 0) {
             //
             const suite = TestSuiteFactory.create(
               { name: data.name, endpoint, type: "unit_tests" },

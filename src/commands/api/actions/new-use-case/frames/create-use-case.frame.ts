@@ -50,7 +50,7 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
       endpoint,
     }).path;
 
-    if (config.project.force === false) {
+    if (config.command.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts
@@ -68,7 +68,7 @@ export class CreateUseCaseFrame extends Frame<ApiJson> {
         const { params, ...deps } = await new CreateParamsInteraction(
           texts,
           config,
-          config.project.dependencies_write_method
+          config.command.dependencies_write_method
         ).run(
           {
             endpoint,

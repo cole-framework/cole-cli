@@ -1,6 +1,5 @@
 import {
   LanguageStrategyProvider,
-  PluginMap,
   Result,
 } from "@cole-framework/cole-cli-core";
 import { ApiSchema } from "./api.schema";
@@ -21,7 +20,7 @@ export class ApiGenerator {
     );
     const { content: models, failure } = languageModule
       .createTemplateModelStrategy()
-      .apply(obj);
+      .apply(obj, config.project);
 
     if (failure) {
       return Result.withFailure(failure);

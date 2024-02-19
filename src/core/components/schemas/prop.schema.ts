@@ -184,7 +184,8 @@ export class PropSchema {
   public static create(
     data: string | PropJson | PropData,
     config: Config,
-    references: { [key: string]: unknown; dependencies: any[] }
+    references: { [key: string]: unknown; dependencies: any[] },
+    meta?: any
   ): PropSchema {
     if (!data) {
       return null;
@@ -279,7 +280,8 @@ export class PropSchema {
       isReadonly,
       isStatic,
       value,
-      template
+      template,
+      meta
     );
   }
 
@@ -291,7 +293,8 @@ export class PropSchema {
     public readonly isReadonly: boolean,
     public readonly isStatic: boolean,
     public readonly value: any,
-    public readonly template: string
+    public readonly template: string,
+    public readonly meta?: any
   ) {}
 
   toObject(): PropSchemaObject {
@@ -304,6 +307,7 @@ export class PropSchema {
       isStatic: is_static,
       value,
       template,
+      meta,
     } = this;
 
     return {
@@ -315,6 +319,7 @@ export class PropSchema {
       is_static,
       value,
       template,
+      meta,
     };
   }
 

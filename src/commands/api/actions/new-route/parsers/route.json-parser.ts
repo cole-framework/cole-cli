@@ -3,6 +3,7 @@ import { pascalCase } from "change-case";
 import { Config, TypeInfo, TestCaseSchema } from "../../../../../core";
 import {
   Controller,
+  ControllerFactory,
   ControllerInputJsonParser,
   ControllerOutputJsonParser,
 } from "../../new-controller";
@@ -294,11 +295,25 @@ export class RouteJsonParser {
       }
 
       controller = controllersRef.find((c) => c.type.ref === data.controller);
-      const handler = controller?.element.findMethod(data.handler);
+
+      if (!controller) {
+        controller = ControllerFactory.create(
+          {
+            name: data.controller,
+            handlers: [{ name: data.handler }],
+            endpoint,
+          },
+          WriteMethod.Skip,
+          config,
+          []
+        );
+      }
+
+      const handler = controller.element.findMethod(data.handler);
 
       input = this.buildInput(
-        handler?.name || data.handler,
-        handler?.params[0]?.type,
+        handler.name,
+        handler.params[0]?.type,
         endpoint,
         pathParams,
         queryParams,
@@ -308,8 +323,8 @@ export class RouteJsonParser {
       );
 
       output = this.buildOutput(
-        handler?.name || data.handler,
-        handler?.returnType,
+        handler.name,
+        handler.returnType,
         endpoint,
         responseBody,
         [...models, ...modelsRef],
@@ -330,7 +345,7 @@ export class RouteJsonParser {
         );
         route_ios.push(io);
 
-        if (!config.project.skip_tests && io.element.methods.length > 0) {
+        if (!config.command.skip_tests && io.element.methods.length > 0) {
           //
           const suite = TestSuiteFactory.create(
             { name, endpoint, type: "unit_tests" },
@@ -355,6 +370,7 @@ export class RouteJsonParser {
 
       const route = RouteFactory.create(
         data,
+        controller,
         io,
         writeMethod.component,
         config

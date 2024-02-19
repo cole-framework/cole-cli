@@ -51,7 +51,7 @@ export class ConstructorSchema {
     data: ConstructorJson | ConstructorData | string,
     config: Config,
     references?: { [key: string]: unknown; dependencies: any[] },
-    isSuper = false
+    meta?: any
   ) {
     let access: string = AccessType.Public;
     let body: string;
@@ -89,8 +89,9 @@ export class ConstructorSchema {
               params.push(ParamSchema.create(param, config, references));
             }
           } else {
-            if (SchemaTools.executeMeta(param, references, config)) {
-              params.push(ParamSchema.create(param, config, references));
+            const meta = SchemaTools.executeMeta(param, references, config)
+            if (meta) {
+              params.push(ParamSchema.create(param, config, references, meta));
             }
           }
         });
@@ -102,8 +103,9 @@ export class ConstructorSchema {
             config
           );
         } else {
-          if (SchemaTools.executeMeta(data.params, references, config)) {
-            params.push(ParamSchema.create(data.params, config, references));
+          const meta = SchemaTools.executeMeta(data.params, references, config)
+          if (meta) {
+            params.push(ParamSchema.create(data.params, config, references, meta));
           }
         }
       }
@@ -111,7 +113,7 @@ export class ConstructorSchema {
       template = (<ConstructorData>data).template;
     }
 
-    const ctor = new ConstructorSchema(access, body, supr, template);
+    const ctor = new ConstructorSchema(access, body, supr, template, meta);
 
     params.forEach((param) => {
       ctor.addParam(param);
@@ -126,7 +128,8 @@ export class ConstructorSchema {
     public readonly access: string,
     public readonly body: string,
     public readonly supr: ConstructorSchema,
-    public readonly template: string
+    public readonly template: string,
+    public readonly meta?: any
   ) {}
 
   addParam(param: ParamSchema) {
@@ -148,13 +151,14 @@ export class ConstructorSchema {
   }
 
   toObject(): ConstructorSchemaObject {
-    const { access, __params, body, supr, template } = this;
+    const { access, __params, body, supr, template, meta } = this;
     const ctr: ConstructorSchemaObject = {
       access,
       params: __params.map((p) => p.toObject()),
       body,
       supr: supr?.toObject(),
       template,
+      meta
     };
 
     if (supr) {

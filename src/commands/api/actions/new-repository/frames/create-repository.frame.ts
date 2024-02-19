@@ -44,7 +44,7 @@ export class CreateRepositoryFrame extends Frame<ApiJson> {
     }).path;
     let writeMethod = WriteMethod.Write;
 
-    if (config.project.force === false) {
+    if (config.command.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts
@@ -64,7 +64,7 @@ export class CreateRepositoryFrame extends Frame<ApiJson> {
         defineMethodsResult = await new DefineMethodsInteraction(
           texts,
           config,
-          config.project.dependencies_write_method,
+          config.command.dependencies_write_method,
           references
         ).run({ endpoint: endpoint, component: "repository" });
 

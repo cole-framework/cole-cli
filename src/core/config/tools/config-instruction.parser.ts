@@ -24,6 +24,8 @@ export type InstructionData = { [key: string]: any; dependencies: any[] };
 const instruction_regex =
   /{{\s*(USE|IF)\s+(DEPENDENCY|ADDONS)\(([A-Z]+)?\s*([a-zA-Z.0-9_]+)?(\s+[A-Z=\>\<\! ]+\s+)?([a-zA-Z0-9\"\'\_\- ]+)?\).?([a-z.A-Z0-9\[\]-_\(\)]+)?(\s+[A-Z_ ]+\s+)?([^}]+)?\s*}}/;
 
+const flag_regex = /{{\s*FLAG\s+([a-zA-Z.0-9_,]+)\s*}}/;
+
 export class ConfigInstructionParser {
   static hasInstructions(value: string) {
     return new RegExp(instruction_regex, "g").test(value);
@@ -35,6 +37,7 @@ export class ConfigInstructionParser {
     config: Config
   ): any {
     const instruction_match = value.match(new RegExp(instruction_regex, "g"));
+    const flag_match = value.match(new RegExp(flag_regex));
 
     if (Array.isArray(instruction_match)) {
       if (instruction_match.length === 1) {
@@ -59,6 +62,8 @@ export class ConfigInstructionParser {
       });
 
       return result;
+    } else if (Array.isArray(flag_match)) {
+      return flag_match[1].split(",");
     }
   }
 
@@ -84,10 +89,6 @@ export class ConfigInstructionParser {
       source_type.toLowerCase() === "dependency"
         ? data.dependencies
         : data.addons;
-
-    if (source_type && source?.length === 0) {
-      return "PARSE_ERROR_ # _MISSING_SOURCE";
-    }
 
     o = this.getSource(source, source_path, source_operator, source_value);
 
@@ -140,6 +141,14 @@ export class ConfigInstructionParser {
 
   private static metCondition(operator, value, expected) {
     const op = operator.trim().toLowerCase();
+    if (
+      op === "is not" &&
+      typeof expected === "string" &&
+      (expected.toLowerCase() === "null" ||
+        expected.toLowerCase() === "undefined")
+    ) {
+      return !!value;
+    }
 
     if (
       ((op === "=" || op === "==" || op === "===" || op === "is") &&

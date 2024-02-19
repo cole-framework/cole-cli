@@ -8,10 +8,12 @@ import {
 } from "../../../../core";
 import { RouteData, RouteIO, RouteElement } from "./types";
 import { WriteMethod } from "@cole-framework/cole-cli-core";
+import { Controller } from "../new-controller";
 
 export class RouteFactory {
   public static create(
     data: RouteData,
+    controller: Controller,
     io: RouteIO,
     writeMethod: WriteMethod,
     config: Config
@@ -26,8 +28,10 @@ export class RouteFactory {
 
     const methodLC = method.toLowerCase();
     const { defaults } = config.components.route;
-    const addons: { path: string } = {
+    const addons: { path: string; controller: string; handler: string } = {
       path: data.request.path,
+      controller: controller.type.name,
+      handler: data.handler,
     };
     const interfaces = [];
     const methods = [];
@@ -56,6 +60,10 @@ export class RouteFactory {
 
     if (io) {
       dependencies.push(io);
+    }
+
+    if (controller) {
+      dependencies.push(controller);
     }
 
     if (defaults?.common?.ctor) {

@@ -45,7 +45,8 @@ export class ClassSchema {
     }
 
     if (data.ctor) {
-      if (SchemaTools.executeMeta(data.ctor, references, config)) {
+      const meta = SchemaTools.executeMeta(data.ctor, references, config);
+      if (meta) {
         ctor = ConstructorSchema.create(data.ctor, config, references);
       }
     }
@@ -57,8 +58,11 @@ export class ClassSchema {
             InheritanceSchema.create({ name: i }, config, references)
           );
         } else {
-          if (SchemaTools.executeMeta(i, references, config)) {
-            inheritance.push(InheritanceSchema.create(i, config, references));
+          const meta = SchemaTools.executeMeta(i, references, config);
+          if (meta) {
+            inheritance.push(
+              InheritanceSchema.create(i, config, references, meta)
+            );
           }
         }
       });
@@ -75,40 +79,45 @@ export class ClassSchema {
 
     if (Array.isArray(data.interfaces)) {
       data.interfaces.forEach((i) => {
-        if (SchemaTools.executeMeta(i, references, config)) {
-          cls.addInterface(InterfaceSchema.create(i, config, references));
+        const meta = SchemaTools.executeMeta(i, references, config);
+        if (meta) {
+          cls.addInterface(InterfaceSchema.create(i, config, references, meta));
         }
       });
     }
 
     if (Array.isArray(data.props)) {
       data.props.forEach((p) => {
-        if (SchemaTools.executeMeta(p, references, config)) {
-          cls.addProp(PropSchema.create(p, config, references));
+        const meta = SchemaTools.executeMeta(p, references, config);
+        if (meta) {
+          cls.addProp(PropSchema.create(p, config, references, meta));
         }
       });
     }
 
     if (Array.isArray(data.methods)) {
       data.methods.forEach((m) => {
-        if (SchemaTools.executeMeta(m, references, config)) {
-          cls.addMethod(MethodSchema.create(m, config, references));
+        const meta = SchemaTools.executeMeta(m, references, config);
+        if (meta) {
+          cls.addMethod(MethodSchema.create(m, config, references, meta));
         }
       });
     }
 
     if (Array.isArray(data.generics)) {
       data.generics.forEach((g) => {
-        if (SchemaTools.executeMeta(g, references, config)) {
-          cls.addGeneric(GenericSchema.create(g, config, references));
+        const meta = SchemaTools.executeMeta(g, references, config);
+        if (meta) {
+          cls.addGeneric(GenericSchema.create(g, config, references, meta));
         }
       });
     }
 
     if (Array.isArray(data.imports)) {
       data.imports.forEach((i) => {
-        if (SchemaTools.executeMeta(i, references, config)) {
-          cls.addImport(ImportSchema.create(i, config, references));
+        const meta = SchemaTools.executeMeta(i, references, config);
+        if (meta) {
+          cls.addImport(ImportSchema.create(i, config, references, meta));
         }
       });
     }

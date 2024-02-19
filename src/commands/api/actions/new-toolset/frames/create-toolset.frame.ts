@@ -49,7 +49,7 @@ export class CreateToolsetFrame extends Frame<ApiJson> {
 
     let writeMethod = WriteMethod.Write;
 
-    if (config.project.force === false) {
+    if (config.command.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts
@@ -69,7 +69,7 @@ export class CreateToolsetFrame extends Frame<ApiJson> {
         do {
           method = await new DefineMethodInteraction(texts).run();
           methods.add(method);
-          if (config.project.dependencies_write_method !== WriteMethod.Skip) {
+          if (config.command.dependencies_write_method !== WriteMethod.Skip) {
             const componentTypes: TypeInfo[] = [];
             if (Array.isArray(method.params)) {
               method.params.forEach((param) => {

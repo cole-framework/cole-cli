@@ -1,40 +1,43 @@
-import { CliConfig } from "./cli.config";
-import { DefaultCliOptions } from "../../commands/api/common/api.types";
-import { WriteMethod } from "@cole-framework/cole-cli-core";
+import { ProjectDescription } from "@cole-framework/cole-cli-core";
 
 export class ProjectConfig {
-  static create(options: DefaultCliOptions, cliConfig: CliConfig) {
-    const with_dependencies =
-      options.withDeps === undefined
-        ? cliConfig.with_dependencies
-        : options.withDeps;
-    const write_method = options.force
-      ? WriteMethod.Overwrite
-      : WriteMethod.Write;
-    const skip_tests =
-      options.skipTests === undefined
-        ? cliConfig.skip_tests
-        : options.skipTests;
-    const dependencies_write_method = with_dependencies
-      ? write_method
-      : WriteMethod.Skip;
-
+  static create(project: ProjectDescription) {
+    const {
+      language,
+      database,
+      web_framework,
+      service,
+      source,
+      dependency_injection,
+      name,
+      author,
+      description,
+      license,
+    } = project;
     return new ProjectConfig(
-      skip_tests,
-      with_dependencies,
-      false,
-      options.force,
-      write_method,
-      dependencies_write_method
+      language,
+      database,
+      web_framework,
+      service,
+      source,
+      dependency_injection,
+      name,
+      author,
+      description,
+      license
     );
   }
 
   constructor(
-    public readonly skip_tests: boolean,
-    public readonly with_dependencies: boolean,
-    public readonly use_cwd: boolean,
-    public readonly force: boolean,
-    public readonly write_method: WriteMethod,
-    public readonly dependencies_write_method: WriteMethod
+    public readonly language: string,
+    public readonly database: string[],
+    public readonly web_framework: string,
+    public readonly service: string,
+    public readonly source: string,
+    public readonly dependency_injection: string,
+    public readonly name: string,
+    public readonly author: string,
+    public readonly description: string,
+    public readonly license: string
   ) {}
 }

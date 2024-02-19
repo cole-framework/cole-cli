@@ -107,11 +107,15 @@ export class StoryboardSession {
         mkdirSync(localSessionPath, { recursive: true });
       }
       if (existsSync(sessionPath)) {
+        this.model = JSON.parse(readFileSync(sessionPath, "utf-8"));
         if (
           !!parentSession ||
-          (await InteractionPrompts.confirm(texts.get("CONTINUE_PREV_SESSION")))
+          (await InteractionPrompts.confirm(
+            texts
+              .get("continue_prev_session_#")
+              .replace("#", this.model.storyboard)
+          ))
         ) {
-          this.model = JSON.parse(readFileSync(sessionPath, "utf-8"));
           this.sessionTimeline = new SessionTimeline(this.model.timeline);
           return;
         }

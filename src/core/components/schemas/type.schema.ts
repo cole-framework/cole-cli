@@ -31,7 +31,7 @@ export type TypeData = {
   alias?: any;
 };
 
-export type TypeObject = {
+export type TypeObject = ConfigJsonAddons & {
   exp?: ExportSchemaObject;
   name: string;
   props?: PropSchemaObject[];
@@ -184,8 +184,9 @@ export class TypeSchema {
     props.forEach((p) => t.addProp(p));
 
     imports.forEach((i) => {
-      if (SchemaTools.executeMeta(i, references, config)) {
-        t.addImport(ImportSchema.create(i, config, references));
+      const meta = SchemaTools.executeMeta(i, references, config);
+      if (meta) {
+        t.addImport(ImportSchema.create(i, config, references, meta));
       }
     });
 
@@ -199,7 +200,8 @@ export class TypeSchema {
   private constructor(
     public readonly name: string,
     public readonly alias: TypeInfo,
-    public readonly exp: ExportSchema
+    public readonly exp: ExportSchema,
+    public readonly meta?: any
   ) {}
 
   addImport(impt: ImportSchema) {
@@ -275,7 +277,7 @@ export class TypeSchema {
   }
 
   toObject(): TypeObject {
-    const { __props, __generics, name, exp, alias, __imports } = this;
+    const { __props, __generics, name, exp, alias, __imports, meta } = this;
 
     return {
       name,
@@ -284,6 +286,7 @@ export class TypeSchema {
       props: __props.map((p) => p.toObject()),
       generics: __generics.map((g) => g.toObject()),
       imports: __imports.map((i) => i.toObject()),
+      meta,
     };
   }
 

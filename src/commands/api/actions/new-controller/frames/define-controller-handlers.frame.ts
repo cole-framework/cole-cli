@@ -38,7 +38,7 @@ export class DefineControllerHandlersFrame extends Frame<ControllerHandlers> {
         handler = await new DefineHandlerInteraction(texts).run();
         result.handlers.push(handler);
 
-        if (config.project.dependencies_write_method !== WriteMethod.Skip) {
+        if (config.command.dependencies_write_method !== WriteMethod.Skip) {
           let hasComponentType = false;
 
           const types = [];

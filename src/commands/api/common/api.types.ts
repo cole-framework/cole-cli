@@ -1,3 +1,11 @@
+import {
+  Component,
+  ComponentElement,
+  ElementWithFunctions,
+  ElementWithImports,
+  ElementWithMethods,
+  ElementWithProps,
+} from "../../../core";
 import { ControllerJson } from "../actions/new-controller/types";
 import { EntityJson } from "../actions/new-entity/types";
 import { MapperJson } from "../actions/new-mapper";

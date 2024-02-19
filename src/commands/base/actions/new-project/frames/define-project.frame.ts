@@ -191,7 +191,7 @@ export class DefineProjectFrame extends Frame<ProjectDescription> {
     };
 
     if (framework !== "none") {
-      result["framework"] = framework;
+      result["web_framework"] = framework;
     }
 
     if (dependency_injection !== "none") {

@@ -1,4 +1,4 @@
-import { Component, TypeInfo } from "../../../core";
+import { Component, Config, TypeInfo } from "../../../core";
 import { Controller } from "../actions/new-controller";
 import { Entity } from "../actions/new-entity";
 import { Mapper } from "../actions/new-mapper";
@@ -14,6 +14,14 @@ import { Toolset } from "../actions/new-toolset";
 import { UseCase } from "../actions/new-use-case";
 import { TestSuite } from "../actions/new-test-suite";
 import { ApiObject } from "@cole-framework/cole-cli-core";
+import {
+  Container,
+  ContainerFactory,
+  Launcher,
+  LauncherFactory,
+  Router,
+  RouterFactory,
+} from "../actions";
 
 export class ApiSchema {
   public readonly toolsets = new ApiComponentCollection<Toolset>();
@@ -32,6 +40,28 @@ export class ApiSchema {
     new ApiComponentCollection<RepositoryFactory>();
   public readonly test_suites = new ApiComponentCollection<TestSuite>();
 
+  private _router: Router;
+  private _container: Container;
+  private _launcher: Launcher;
+
+  constructor(config: Config) {
+    this._router = RouterFactory.create(config);
+    this._launcher = LauncherFactory.create(config);
+    this._container = ContainerFactory.create(config);
+  }
+
+  get launcher() {
+    return this._launcher;
+  }
+
+  get router() {
+    return this._router;
+  }
+
+  get container() {
+    return this._container;
+  }
+
   toObject(): ApiObject {
     const {
       models,
@@ -47,6 +77,9 @@ export class ApiSchema {
       repository_impls,
       repository_factories,
       test_suites,
+      router,
+      launcher,
+      container,
     } = this;
 
     return {
@@ -65,6 +98,9 @@ export class ApiSchema {
         .toArray()
         .map((i) => i.toObject()),
       test_suites: test_suites.toArray().map((i) => i.toObject()),
+      launcher: launcher.toObject(),
+      router: router.toObject(),
+      container: container.toObject(),
     };
   }
 }

@@ -16,7 +16,8 @@ export const newRoute = async (
       .apply(cliPluginPackageName)
       .catch((error) => {
         if (error) {
-          console.log(chalk.yellow(error.message));
+          console.log(chalk.yellow(error));
+          console.log(error);
         }
       });
   }

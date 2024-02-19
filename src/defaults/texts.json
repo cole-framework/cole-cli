@@ -138,7 +138,8 @@
   "description_new_components": "Generates new project or components within the existing project structure",
   "configuration_file_detected_do_you_want_to_overwrite_it": "A configuration file has been detected. Do you want to overwrite it?",
   "configuration_file_detected__can_not_create_new_project": "A configuration file has been detected. You cannot create a new project here.",
-  "hint___please_select_dependency_injection": "Please select a dependency injection library",
+  "please_select_dependency_injection": "Please select a dependency injection library",
+  "hint___please_select_dependency_injection": " ",
   "name": "Name",
   "return_type": "Return type",
   "params": "Parameters",
@@ -198,5 +199,11 @@
   "description_new_repository": "Generates a repository file with optional entity, model, and storage specifications",
   "description_new_route": "Creates a route file with detailed HTTP method, path, and handler specifications",
   "description_new_controller": "Generates a controller file with specified handlers for endpoint actions",
-  "description_new_component": "Generates a new component with specified options."
+  "description_new_component": "Generates a new component with specified options.",
+  "create_source_#": "Creating source",
+  "install_dependencies_#": "Installing project dependencies",
+  "create_tsconfig_#": "Creating tsconfig file",
+  "init_node_project_#": "Initializing Node project",
+  "no_config_found_for_#": "No configuration found for",
+  "continue_prev_session_#": "Unfinished session \"#\" found, do you want to continue it?"
 }

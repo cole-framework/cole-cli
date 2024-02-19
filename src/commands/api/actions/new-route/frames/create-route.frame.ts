@@ -49,7 +49,7 @@ export class CreateRouteFrame extends Frame<ApiJson> {
     }).path;
     let writeMethod = WriteMethod.Write;
 
-    if (config.project.force === false) {
+    if (config.command.force === false) {
       if (existsSync(componentPath)) {
         writeMethod = await new SelectComponentWriteMethodInteraction(
           texts
